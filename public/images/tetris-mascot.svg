@@ -1,0 +1,41 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 320 320" width="100%" height="100%">
+  <defs>
+    <filter id="tetrisGlow" x="-10%" y="-10%" width="120%" height="120%">
+      <feDropShadow dx="0" dy="8" stdDeviation="6" flood-color="#7c3aed" flood-opacity="0.3" />
+    </filter>
+  </defs>
+  <g filter="url(#tetrisGlow)">
+    <!-- T piece (Purple) -->
+    <g transform="translate(110, 60)">
+      <rect x="35" y="0" width="35" height="35" rx="6" fill="#a855f7" stroke="#7e22ce" stroke-width="2" />
+      <rect x="0" y="35" width="35" height="35" rx="6" fill="#9333ea" stroke="#6b21a8" stroke-width="2" />
+      <rect x="35" y="35" width="35" height="35" rx="6" fill="#a855f7" stroke="#7e22ce" stroke-width="2" />
+      <rect x="70" y="35" width="35" height="35" rx="6" fill="#9333ea" stroke="#6b21a8" stroke-width="2" />
+    </g>
+
+    <!-- L piece (Cyan/Blue Dichoptic) -->
+    <g transform="translate(60, 150)">
+      <rect x="0" y="0" width="35" height="35" rx="6" fill="#06b6d4" stroke="#0891b2" stroke-width="2" />
+      <rect x="0" y="35" width="35" height="35" rx="6" fill="#06b6d4" stroke="#0891b2" stroke-width="2" />
+      <rect x="0" y="70" width="35" height="35" rx="6" fill="#0891b2" stroke="#0e7490" stroke-width="2" />
+      <rect x="35" y="70" width="35" height="35" rx="6" fill="#06b6d4" stroke="#0891b2" stroke-width="2" />
+    </g>
+
+    <!-- Square piece (Amber/Gold) -->
+    <g transform="translate(150, 160)">
+      <rect x="0" y="0" width="35" height="35" rx="6" fill="#f59e0b" stroke="#d97706" stroke-width="2" />
+      <rect x="35" y="0" width="35" height="35" rx="6" fill="#fbbf24" stroke="#d97706" stroke-width="2" />
+      <rect x="0" y="35" width="35" height="35" rx="6" fill="#f59e0b" stroke="#d97706" stroke-width="2" />
+      <rect x="35" y="35" width="35" height="35" rx="6" fill="#fbbf24" stroke="#d97706" stroke-width="2" />
+    </g>
+
+    <!-- Z piece (Red Amblyopia High Stimulus) -->
+    <g transform="translate(170, 100)">
+      <rect x="0" y="0" width="35" height="35" rx="6" fill="#ef4444" stroke="#dc2626" stroke-width="2" />
+      <rect x="35" y="0" width="35" height="35" rx="6" fill="#ef4444" stroke="#dc2626" stroke-width="2" />
+      <rect x="35" y="35" width="35" height="35" rx="6" fill="#dc2626" stroke="#b91c1c" stroke-width="2" />
+      <rect x="70" y="35" width="35" height="35" rx="6" fill="#dc2626" stroke="#b91c1c" stroke-width="2" />
+    </g>
+  </g>
+</svg>
+

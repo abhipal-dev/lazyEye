@@ -1,0 +1,38 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100" fill="none">
+  <defs>
+    <linearGradient id="redLensGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#ff4d4d"/>
+      <stop offset="100%" stop-color="#dc2626"/>
+    </linearGradient>
+    <linearGradient id="cyanLensGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#38bdf8"/>
+      <stop offset="100%" stop-color="#0284c7"/>
+    </linearGradient>
+    <linearGradient id="fusionGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#a855f7"/>
+      <stop offset="100%" stop-color="#6366f1"/>
+    </linearGradient>
+    <filter id="glow" x="-20%" y="-20%" width="140%" height="140%">
+      <feGaussianBlur stdDeviation="3" result="blur" />
+      <feComposite in="SourceGraphic" in2="blur" operator="over" />
+    </filter>
+  </defs>
+
+  <!-- Outer Eye Contour (Top Lid) -->
+  <path d="M10 50 Q 50 12 90 50" stroke="url(#cyanLensGrad)" stroke-width="6" stroke-linecap="round" fill="none"/>
+  
+  <!-- Outer Eye Contour (Bottom Lid) -->
+  <path d="M10 50 Q 50 88 90 50" stroke="url(#redLensGrad)" stroke-width="6" stroke-linecap="round" fill="none"/>
+
+  <!-- Left Anaglyph Filter (Red Lens Half) -->
+  <path d="M50 24 A 26 26 0 0 0 50 76 Z" fill="url(#redLensGrad)" opacity="0.88" />
+
+  <!-- Right Anaglyph Filter (Cyan/Blue Lens Half) -->
+  <path d="M50 24 A 26 26 0 0 1 50 76 Z" fill="url(#cyanLensGrad)" opacity="0.88" />
+
+  <!-- Central Binocular Fusion Pupil -->
+  <circle cx="50" cy="50" r="14" fill="#0f172a" stroke="url(#fusionGrad)" stroke-width="3.5" filter="url(#glow)" />
+  <circle cx="50" cy="50" r="7" fill="#ffffff" />
+  <circle cx="53" cy="46" r="3" fill="#ffffff" opacity="0.8" />
+</svg>
+

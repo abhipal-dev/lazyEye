@@ -1,0 +1,87 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 540 440" fill="none">
+  <defs>
+    <linearGradient id="bgGlow" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#3b82f6" stop-opacity="0.12"/>
+      <stop offset="50%" stop-color="#06b6d4" stop-opacity="0.08"/>
+      <stop offset="100%" stop-color="#ef4444" stop-opacity="0.12"/>
+    </linearGradient>
+    <linearGradient id="redFilter" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#ff4d4d"/>
+      <stop offset="100%" stop-color="#dc2626"/>
+    </linearGradient>
+    <linearGradient id="cyanFilter" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#38bdf8"/>
+      <stop offset="100%" stop-color="#0284c7"/>
+    </linearGradient>
+    <linearGradient id="glassFrame" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#1e293b"/>
+      <stop offset="100%" stop-color="#0f172a"/>
+    </linearGradient>
+    <filter id="softShadow" x="-10%" y="-10%" width="120%" height="120%">
+      <feDropShadow dx="0" dy="12" stdDeviation="16" flood-color="#0f172a" flood-opacity="0.25"/>
+    </filter>
+  </defs>
+
+  <!-- Ambient Backdrop Glow -->
+  <rect x="20" y="20" width="500" height="400" rx="28" fill="url(#bgGlow)" />
+  <circle cx="160" cy="180" r="120" fill="#ef4444" opacity="0.1" filter="blur(40px)" />
+  <circle cx="380" cy="180" r="120" fill="#38bdf8" opacity="0.1" filter="blur(40px)" />
+
+  <!-- Connecting Waveforms / Fusion Rays -->
+  <path d="M 120 220 Q 270 140 420 220" stroke="#38bdf8" stroke-width="2" stroke-dasharray="6 6" opacity="0.5" />
+  <path d="M 120 220 Q 270 300 420 220" stroke="#ef4444" stroke-width="2" stroke-dasharray="6 6" opacity="0.5" />
+
+  <!-- Central Target / Binocular Fusion Point -->
+  <circle cx="270" cy="220" r="32" fill="#ffffff" fill-opacity="0.1" stroke="#3b82f6" stroke-width="2" />
+  <circle cx="270" cy="220" r="18" fill="#ffffff" fill-opacity="0.18" stroke="#06b6d4" stroke-width="1.5" />
+  <circle cx="270" cy="220" r="6" fill="#3b82f6" />
+
+  <!-- Dichoptic Glasses (Main Centerpiece) -->
+  <g transform="translate(90, 110)" filter="url(#softShadow)">
+    <!-- Bridge -->
+    <path d="M 160 92 Q 180 82 200 92" stroke="#334155" stroke-width="10" stroke-linecap="round" fill="none" />
+    <path d="M 160 92 Q 180 82 200 92" stroke="#64748b" stroke-width="4" stroke-linecap="round" fill="none" />
+
+    <!-- Left Frame & Red Filter -->
+    <rect x="35" y="45" width="130" height="95" rx="28" fill="url(#glassFrame)" stroke="#475569" stroke-width="5" />
+    <rect x="47" y="57" width="106" height="71" rx="18" fill="url(#redFilter)" opacity="0.88" />
+    <!-- Glass Reflection -->
+    <path d="M 55 65 L 115 65 L 75 120 L 55 120 Z" fill="#ffffff" opacity="0.18" />
+
+    <!-- Right Frame & Cyan Filter -->
+    <rect x="195" y="45" width="130" height="95" rx="28" fill="url(#glassFrame)" stroke="#475569" stroke-width="5" />
+    <rect x="207" y="57" width="106" height="71" rx="18" fill="url(#cyanFilter)" opacity="0.88" />
+    <!-- Glass Reflection -->
+    <path d="M 215 65 L 275 65 L 235 120 L 215 120 Z" fill="#ffffff" opacity="0.18" />
+
+    <!-- Temples / Arms -->
+    <path d="M 38 60 Q 15 48 5 40" stroke="#334155" stroke-width="7" stroke-linecap="round" fill="none"/>
+    <path d="M 322 60 Q 345 48 355 40" stroke="#334155" stroke-width="7" stroke-linecap="round" fill="none"/>
+  </g>
+
+  <!-- Left Eye Calibration Badge (Floating Top Left) -->
+  <g transform="translate(32, 55)" filter="url(#softShadow)">
+    <rect width="186" height="50" rx="16" fill="#ffffff" fill-opacity="0.96" stroke="#fecaca" stroke-width="1.5"/>
+    <circle cx="24" cy="25" r="10" fill="#ef4444" />
+    <text x="44" y="22" font-family="'Plus Jakarta Sans', system-ui, -apple-system, sans-serif" font-size="11.5" font-weight="700" fill="#0f172a">Left Eye (Amblyopic)</text>
+    <text x="44" y="37" font-family="'Plus Jakarta Sans', system-ui, -apple-system, sans-serif" font-size="9.5" font-weight="600" fill="#dc2626">High Contrast Filter</text>
+  </g>
+
+  <!-- Right Eye Calibration Badge (Floating Top Right) -->
+  <g transform="translate(322, 55)" filter="url(#softShadow)">
+    <rect width="186" height="50" rx="16" fill="#ffffff" fill-opacity="0.96" stroke="#bae6fd" stroke-width="1.5"/>
+    <circle cx="24" cy="25" r="10" fill="#0284c7" />
+    <text x="44" y="22" font-family="'Plus Jakarta Sans', system-ui, -apple-system, sans-serif" font-size="11.5" font-weight="700" fill="#0f172a">Right Eye (Dominant)</text>
+    <text x="44" y="37" font-family="'Plus Jakarta Sans', system-ui, -apple-system, sans-serif" font-size="9.5" font-weight="600" fill="#0284c7">Subdued Contrast Filter</text>
+  </g>
+
+  <!-- Bottom Therapy Highlights Pill -->
+  <g transform="translate(90, 340)">
+    <rect width="360" height="52" rx="26" fill="#0f172a" fill-opacity="0.9" stroke="#334155" stroke-width="1.5"/>
+    <circle cx="36" cy="26" r="14" fill="#3b82f6"/>
+    <path d="M30 26 L34 30 L42 21" stroke="#ffffff" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/>
+    <text x="60" y="24" font-family="'Plus Jakarta Sans', sans-serif" font-size="13" font-weight="700" fill="#ffffff">Binocular Fusion Active</text>
+    <text x="60" y="38" font-family="'Plus Jakarta Sans', sans-serif" font-size="10" font-weight="500" fill="#94a3b8">Both eyes working concurrently in 12 games</text>
+  </g>
+</svg>
+

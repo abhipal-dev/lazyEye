@@ -1,0 +1,115 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 600 500" width="100%" height="100%">
+  <defs>
+    <linearGradient id="screenBg" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#0f172a" />
+      <stop offset="100%" stop-color="#1e293b" />
+    </linearGradient>
+    <linearGradient id="primaryGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#2563eb" />
+      <stop offset="100%" stop-color="#06b6d4" />
+    </linearGradient>
+    <linearGradient id="redLens" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#ef4444" stop-opacity="0.85" />
+      <stop offset="100%" stop-color="#b91c1c" stop-opacity="0.9" />
+    </linearGradient>
+    <linearGradient id="cyanLens" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#06b6d4" stop-opacity="0.85" />
+      <stop offset="100%" stop-color="#0284c7" stop-opacity="0.9" />
+    </linearGradient>
+    <filter id="softGlow" x="-20%" y="-20%" width="140%" height="140%">
+      <feDropShadow dx="0" dy="12" stdDeviation="16" flood-color="#2563eb" flood-opacity="0.25" />
+    </filter>
+  </defs>
+
+  <!-- Ambient Background Glow Circles -->
+  <circle cx="300" cy="220" r="180" fill="url(#primaryGrad)" opacity="0.08" />
+  <circle cx="460" cy="140" r="90" fill="#06b6d4" opacity="0.12" filter="blur(20px)" />
+  <circle cx="140" cy="300" r="110" fill="#2563eb" opacity="0.12" filter="blur(20px)" />
+
+  <!-- Digital Game Therapy Display Tablet -->
+  <g filter="url(#softGlow)">
+    <rect x="70" y="60" width="460" height="280" rx="24" fill="url(#screenBg)" stroke="#334155" stroke-width="4" />
+    <!-- Screen Header Bar -->
+    <rect x="70" y="60" width="460" height="40" rx="24" fill="#1e293b" />
+    <circle cx="100" cy="80" r="5" fill="#ef4444" />
+    <circle cx="116" cy="80" r="5" fill="#f59e0b" />
+    <circle cx="132" cy="80" r="5" fill="#10b981" />
+    <text x="300" y="85" text-anchor="middle" fill="#94a3b8" font-family="sans-serif" font-size="12" font-weight="600">Dichoptic Amblyopia Training • Active Session</text>
+
+    <!-- Split Screen Channels (Red Channel Left / Cyan Channel Right) -->
+    <!-- Red View (Left eye) -->
+    <g transform="translate(100, 120)">
+      <rect x="0" y="0" width="180" height="180" rx="14" fill="#18181b" stroke="#ef4444" stroke-width="2" />
+      <text x="90" y="24" text-anchor="middle" fill="#ef4444" font-family="sans-serif" font-size="11" font-weight="700">LEFT EYE (RED)</text>
+      <!-- Red Targets (e.g. Snake Apples / Tetris blocks) -->
+      <circle cx="50" cy="80" r="16" fill="#ef4444" />
+      <circle cx="130" cy="120" r="16" fill="#ef4444" />
+      <rect x="80" y="60" width="28" height="28" rx="6" fill="#ef4444" opacity="0.8" />
+      <path d="M 30 140 Q 70 120 110 145" stroke="#ef4444" stroke-width="6" stroke-linecap="round" fill="none" />
+    </g>
+
+    <!-- Cyan View (Right eye) -->
+    <g transform="translate(320, 120)">
+      <rect x="0" y="0" width="180" height="180" rx="14" fill="#18181b" stroke="#06b6d4" stroke-width="2" />
+      <text x="90" y="24" text-anchor="middle" fill="#06b6d4" font-family="sans-serif" font-size="11" font-weight="700">RIGHT EYE (CYAN)</text>
+      <!-- Cyan Obstacles / Borders -->
+      <rect x="25" y="45" width="28" height="28" rx="6" fill="#06b6d4" opacity="0.8" />
+      <rect x="120" y="75" width="28" height="28" rx="6" fill="#06b6d4" opacity="0.8" />
+      <path d="M 50 110 Q 100 80 140 120" stroke="#06b6d4" stroke-width="6" stroke-linecap="round" fill="none" />
+    </g>
+
+    <!-- Binocular Fusion Center Beam -->
+    <path d="M 280 180 L 320 180" stroke="#a855f7" stroke-width="4" stroke-dasharray="4 4" />
+    <circle cx="300" cy="210" r="16" fill="#a855f7" opacity="0.3" />
+    <text x="300" y="214" text-anchor="middle" fill="#c084fc" font-family="sans-serif" font-size="11" font-weight="800">FUSION</text>
+  </g>
+
+  <!-- Stylish Patient / Child Wearing Anaglyph 3D Glasses -->
+  <g transform="translate(200, 310)" filter="url(#softGlow)">
+    <!-- Shoulders / Torso -->
+    <path d="M 20 170 C 20 110, 180 110, 180 170 Z" fill="#2563eb" />
+    <path d="M 65 170 L 135 170 L 115 140 L 85 140 Z" fill="#ffffff" opacity="0.8" />
+
+    <!-- Neck -->
+    <rect x="85" y="85" width="30" height="40" rx="6" fill="#fed7aa" />
+
+    <!-- Head / Face -->
+    <ellipse cx="100" cy="65" rx="52" ry="58" fill="#fde68a" />
+    <!-- Hair -->
+    <path d="M 46 60 C 44 15, 156 15, 154 60 C 145 35, 130 30, 100 30 C 70 30, 55 35, 46 60 Z" fill="#451a03" />
+
+    <!-- Cute Ears -->
+    <ellipse cx="48" cy="68" rx="8" ry="12" fill="#fde68a" />
+    <ellipse cx="152" cy="68" rx="8" ry="12" fill="#fde68a" />
+
+    <!-- Modern Red-Cyan Vision Glasses -->
+    <!-- Frame Bridge & Outer Rims -->
+    <rect x="42" y="48" width="116" height="34" rx="8" fill="#0f172a" />
+    <rect x="46" y="52" width="48" height="26" rx="5" fill="url(#redLens)" />
+    <rect x="106" y="52" width="48" height="26" rx="5" fill="url(#cyanLens)" />
+    <!-- Lens Reflection Highlights -->
+    <line x1="50" y1="55" x2="65" y2="72" stroke="#ffffff" stroke-width="2.5" opacity="0.6" stroke-linecap="round" />
+    <line x1="110" y1="55" x2="125" y2="72" stroke="#ffffff" stroke-width="2.5" opacity="0.6" stroke-linecap="round" />
+
+    <!-- Happy Smile -->
+    <path d="M 88 92 Q 100 102 112 92" stroke="#b45309" stroke-width="2.5" stroke-linecap="round" fill="none" />
+  </g>
+
+  <!-- Floating Floating Badge Pills (Clinically Proven) -->
+  <g transform="translate(60, 390)">
+    <rect x="0" y="0" width="195" height="46" rx="23" fill="#ffffff" filter="url(#softGlow)" />
+    <circle cx="24" cy="23" r="13" fill="#10b981" />
+    <path d="M 18 23 L 22 27 L 30 19" stroke="#ffffff" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" fill="none" />
+    <text x="45" y="22" fill="#0f172a" font-family="sans-serif" font-size="12" font-weight="800">Clinically Proven</text>
+    <text x="45" y="35" fill="#64748b" font-family="sans-serif" font-size="10" font-weight="600">Dual-Channel Fusion</text>
+  </g>
+
+  <g transform="translate(370, 390)">
+    <rect x="0" y="0" width="185" height="46" rx="23" fill="#ffffff" filter="url(#softGlow)" />
+    <circle cx="24" cy="23" r="13" fill="#3b82f6" />
+    <path d="M 17 23 L 31 23 M 24 16 L 24 30" stroke="#ffffff" stroke-width="2.5" stroke-linecap="round" fill="none" />
+    <text x="45" y="22" fill="#0f172a" font-family="sans-serif" font-size="12" font-weight="800">12+ Smart Games</text>
+    <text x="45" y="35" fill="#64748b" font-family="sans-serif" font-size="10" font-weight="600">Amblyopia Recovery</text>
+  </g>
+</svg>
+

@@ -1,0 +1,36 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 280 64" fill="none">
+  <defs>
+    <linearGradient id="logoRedGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#ef4444"/>
+      <stop offset="100%" stop-color="#b91c1c"/>
+    </linearGradient>
+    <linearGradient id="logoCyanGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#38bdf8"/>
+      <stop offset="100%" stop-color="#0284c7"/>
+    </linearGradient>
+    <linearGradient id="logoFusionGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#a855f7"/>
+      <stop offset="100%" stop-color="#2563eb"/>
+    </linearGradient>
+  </defs>
+
+  <!-- Eye Graphic on Left -->
+  <g transform="translate(4, 6) scale(0.52)">
+    <path d="M10 50 Q 50 12 90 50" stroke="url(#logoCyanGrad)" stroke-width="6.5" stroke-linecap="round" fill="none"/>
+    <path d="M10 50 Q 50 88 90 50" stroke="url(#logoRedGrad)" stroke-width="6.5" stroke-linecap="round" fill="none"/>
+    <path d="M50 24 A 26 26 0 0 0 50 76 Z" fill="url(#logoRedGrad)" opacity="0.9" />
+    <path d="M50 24 A 26 26 0 0 1 50 76 Z" fill="url(#logoCyanGrad)" opacity="0.9" />
+    <circle cx="50" cy="50" r="14" fill="#0f172a" stroke="url(#logoFusionGrad)" stroke-width="3.5" />
+    <circle cx="50" cy="50" r="7" fill="#ffffff" />
+    <circle cx="53" cy="46" r="3" fill="#ffffff" opacity="0.85" />
+  </g>
+
+  <!-- Brand Typography -->
+  <text x="68" y="38" font-family="'Plus Jakarta Sans', -apple-system, sans-serif" font-size="28" font-weight="800" fill="currentColor">
+    Lazy<tspan fill="url(#logoCyanGrad)">Eye</tspan>
+  </text>
+  <text x="70" y="52" font-family="'Plus Jakarta Sans', -apple-system, sans-serif" font-size="9" font-weight="700" letter-spacing="2.8" fill="#64748b" text-transform="uppercase">
+    VISION THERAPY
+  </text>
+</svg>
+

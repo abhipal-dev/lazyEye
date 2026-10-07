@@ -1,0 +1,403 @@
+#h1{
+    scroll-behavior: smooth;
+}
+
+.logo-name{
+    margin-top: 2rem;
+}
+
+
+.nav-content{
+padding-left: 45rem;
+}
+.nav-item{
+    padding: 2rem;
+    font-size: 2rem;
+}
+
+.btn1 {
+    
+    margin: 2rem 2rem ;
+    outline: none;
+    cursor: pointer;
+    border: none;
+    padding: 0.9rem 2rem;
+    /* margin: 0; */
+    font-family: inherit;
+    font-size: inherit;
+    position: relative;
+    display: inline-block;
+    letter-spacing: 0.05rem;
+    font-weight: 700;
+    font-size: 17px;
+    border-radius: 500px;
+    overflow: hidden;
+    background: #66f5ff;
+    color: ghostwhite;
+   }
+   
+   .btn1 span {
+    position: relative;
+    z-index: 10;
+    transition: color 0.5s;
+   }
+   
+   .btn1:hover span {
+    color: black;
+   }
+   
+   .btn1::before,
+   .btn1::after {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    z-index: 0;
+   }
+   
+   .btn1::before {
+    content: "";
+    background: rgb(60,204,204);
+    width: 120%;
+    left: -10%;
+    transform: skew(30deg);
+    transition: transform 0.4s cubic-bezier(0.3, 1, 0.8, 1);
+   }
+   
+   .btn1:hover::before {
+    transform: translate3d(100%, 0, 0);
+   }
+   
+   .main-text{
+    font-size: 8rem;
+    color: #0e1dec;
+    margin-top: 8rem;
+    font-weight: bold;
+    
+   }
+
+   .Page-content{
+    padding-top: 15rem;
+   }
+   .vl {
+    border-left: 1.5rem solid #0e1dec;
+    border-radius: 1rem;
+    height: 90rem;
+    position: absolute;
+    margin:100rem 10rem;
+    /* left: 50%; */
+    /* margin-left: -3px; */
+    top: 0;
+  }
+
+   .kn-head{
+    font-size: 3rem;
+    margin-top: 5rem;
+   }
+   .kn-cont{
+    font-size: 2rem; 
+    text-align: justify; 
+    width: 80%
+   }
+   .kn-ab h3{
+    font-size: 2.5rem;
+    margin: 2rem;
+   }
+
+
+/* ---------------------------- footer-------------------------- */
+
+   .site-footer
+{
+margin-top: 10rem;
+  background-color:#26272b;
+  padding:4.5rem 0 2rem;
+  font-size:1.5rem;
+  line-height:2.4rem;
+  color:#737373;
+}
+.site-footer hr
+{
+  border-top-color:#bbb;
+  opacity:0.5
+}
+.site-footer hr.small
+{
+  margin:2rem 0
+}
+.site-footer h6
+{
+  color:#fff;
+  font-size:1.6rem;
+  text-transform:uppercase;
+  margin-top:5rem;
+  letter-spacing:0.3rem
+}
+.site-footer a
+{
+  color:#737373;
+}
+.footer-links
+{
+  padding-left:0;
+  list-style:none
+}
+.footer-links li
+{
+  display:block
+}
+.footer-links a
+{
+  color:#737373
+}
+.footer-links a:active,.footer-links a:focus,.footer-links a:hover
+{
+  color:#3366cc;
+  text-decoration:none;
+}
+.footer-links.inline li
+{
+  display:inline-block
+}
+.site-footer .social-icons
+{
+  text-align:right
+}
+.site-footer .social-icons a
+{
+  width:4rem;
+  height:4rem;
+  line-height:4rem;
+  margin-left:0.6rem;
+  margin-right:0;
+  border-radius:100%;
+  background-color:#33353d
+}
+.copyright-text
+{
+  margin:0
+}
+
+
+
+.input-group {
+    display: flex;
+    align-items: center;
+    padding-top: 2rem;
+  }
+  
+  .input {
+    min-height: 5rem;
+    max-width: 20rem;
+    padding: 0 1rem;
+    color: #fff;
+    font-size: 1.5rem;
+    border: 0.2rem solid #5e4dcd;
+    border-radius: 0.6rem 0 0 0.6rem;
+    background-color: transparent;
+  }
+  
+  .button--submit {
+    min-height: 5rem;
+    padding: 0.5rem 1rem;
+    border: none;
+    border-radius: 0 0.6rem 0.6rem 0;
+    background-color: #5e4dcd;
+    color: #fff;
+    font-size: 1.5rem;
+    cursor: pointer;
+    transition: background-color .3s ease-in-out;
+  }
+  
+  .button--submit:hover {
+    background-color: #5e5dcd;
+  }
+  
+  .input:focus, .input:focus-visible {
+    border-color: #3898EC;
+    outline: none;
+  }
+
+  .footer-links{
+    font-size: 2rem;
+    padding-top : 2rem;
+  }
+  .footer-links a{
+    text-decoration: none;
+  }
+  
+@media (max-width:991px)
+{
+  .site-footer [class^=col-]
+  {
+    margin-bottom:3rem
+  }
+}
+@media (max-width:76.7rem)
+{
+  .site-footer
+  {
+    padding-bottom:0
+  }
+  .site-footer .copyright-text,.site-footer .social-icons
+  {
+    text-align:center
+  }
+}
+.social-icons
+{
+  padding-left:0;
+  margin-bottom:0;
+  list-style:none
+}
+.social-icons li
+{
+  display:inline-block;
+  margin-bottom:4px
+}
+.social-icons li.title
+{
+  margin-right:1.5;
+  text-transform:uppercase;
+  color:#96a2b2;
+  font-weight:700;
+  font-size:1.3rem;
+}
+.social-icons a{
+  background-color:#eceeef;
+  color:#818a91;
+  font-size:1.6rem;
+  display:inline-block;
+  line-height:44rem;
+  width:4.4rem;
+  height:4.4rem;
+  text-align:center;
+  margin-right:0.8rem;
+  border-radius:100%;
+  -webkit-transition:all .2s linear;
+  -o-transition:all .2s linear;
+  transition:all .2s linear
+}
+.social-icons a:active,.social-icons a:focus,.social-icons a:hover
+{
+  color:#fff;
+  background-color:#29aafe
+}
+.social-icons.size-sm a
+{
+  line-height:3.4rem;
+  height:3.4rem;
+  width:3.4rem;
+  font-size:1.4rem;
+}
+.social-icons a.facebook:hover
+{
+  background-color:#3b5998
+}
+.social-icons a.twitter:hover
+{
+  background-color:#00aced
+}
+.social-icons a.linkedin:hover
+{
+  background-color:#007bb6
+}
+@media (max-width:76.7rem)
+{
+  .social-icons li.title
+  {
+    display:block;
+    margin-right:0;
+    font-weight:600
+  }
+}
+
+
+
+.gotopbtn
+{
+  position: fixed;
+  width: 5rem;
+  height: 5rem;
+  background: #27ae60;
+  bottom: 8rem;
+  right: 5rem;
+  text-decoration: none;
+  text-align: center;
+  line-height: 5rem;
+  color: white;
+  font-size: 3.2rem;
+}
+
+
+/* --------------------Login------------------------- */
+.divider:after,
+.divider:before {
+content: "";
+flex: 1;
+height: 1rem;
+background: #eee;
+}
+.h-custom {
+height: calc(100% - 7.3rem);
+}
+@media (max-width: 45.0rem) {
+.h-custom {
+height: 100%;
+}
+}
+
+
+.offset-xl-1 h2{
+    font-size: 4rem;
+    border-bottom: 0.5rem solid #333;
+    border-radius: 0.8rem;
+    width: 11rem;
+   
+}
+.frm-cont{
+    margin-top: 8rem;
+    width: 70%;
+    height: 70rem;
+}
+.frm-cont input{
+    height: 2rem;
+}
+.form-outline{
+    font-size: 1.5rem;
+}
+.form-outline input{
+    padding: 1.5rem;
+    font-size: 1.5rem;
+}
+.btn-block{
+    font-size: 2rem;
+    padding: 1rem;
+}   
+
+.mb-4 input{
+    padding: 2.5rem;
+}
+.mb-4 input:focus,input:focus-visible{
+    border-color: #107906;
+    outline: none;
+
+
+}
+
+.ms-5{
+    padding-top: 1.5rem;
+    margin-left:28rem!important;
+    font-size: 2.5rem;
+    position: absolute;
+}
+.mb-5{
+    font-size: 1.5rem;
+    padding-top: 2rem;
+}
+form#register_form span{
+  color: red !important;
+  font-weight: 400;
+  font-size: 1.3rem;
+}

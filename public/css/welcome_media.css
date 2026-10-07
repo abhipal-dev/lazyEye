@@ -1,0 +1,613 @@
+
+
+
+@media(max-width:480px ) {
+    .navbar-expand-lg{
+        width: 100%;
+    }
+    .nav-img{
+        padding-left: 1rem;
+    }
+
+    .navbar-collapse{
+        padding: 2rem;
+    }
+    .nav-item {
+        padding-left: 1rem;
+        font-size: 2rem;
+    }
+    
+    /* .navbar-toggler{
+        top: 18px; 
+        position: relative !important;
+        left: 15px;
+    } */
+    
+    .text1{
+        padding: 1rem;
+    }
+    
+    .main-text {
+        font-size: 3rem;
+        margin-top: 0rem;
+    }
+    .main-text2 {
+        font-size: 2.2rem;
+    }
+
+    .home-img{
+        width: 78%;
+        height: auto;
+        margin-left: 6rem;
+    }
+
+    .circle {
+        margin-right: 5rem;
+    }
+    
+    .circle1 {
+        top: 2rem;
+        bottom: 0;
+        left: 10rem;
+        right: 0;
+    }
+    
+    .circle2 {
+        width: 80px;
+        height: 80px;
+        top: 35rem;
+        bottom: 0;
+        left: 35rem;
+    }
+
+    .vl {
+        display: none;
+    }
+
+    .Page-content {
+        margin-top: 15rem;
+        /* padding: 5rem; */
+    }
+
+    .first_heading h2 {
+        text-align: center;
+        text-transform: uppercase;
+        padding-bottom: 2.2rem;
+      }
+      .first_heading h2:before {
+        width: 6rem;
+        height: 0.8rem;
+        display: block;
+        content: "";
+        position: absolute;
+        bottom: 2rem;
+        left: 45%;
+        margin-left: -1.4rem;
+        background-color: #000000;
+      }
+      .first_heading h2:after {
+        width: 18rem;
+        height: 0.3rem;
+        display: block;
+        content: "";
+        position: relative;
+        margin-top: 1rem;
+        left: 40%;
+        margin-left: -5rem;
+        background-color: #000000;
+      }
+      
+    .kn-ab {
+        margin: 0rem;
+        width: 100%;
+    }
+    .kn-text{
+        font-size: 3rem;
+        text-align: center;
+    }
+    .kn-head {
+        font-size: 3.5rem;
+        margin-left: 5rem;
+    }
+    .kn-cont {
+        font-size: 1.2rem;
+        padding: 2rem;
+        /* margin-left: 5rem; */
+        line-height: 2.6rem;
+
+    }
+
+
+    #main-Card {
+        width: 100%;
+    }
+    #main-Card .container .card {
+        min-width: 35rem;
+        height: 30rem;
+    }
+    #main-Card .container .card .box .content h2 {
+        position: absolute;
+        top: 18rem;
+        right: 11rem;
+        font-size: 4rem;
+        color: white;
+    }
+
+    #main-Card .container .card .box .content h3 {
+        font-size: 1.8rem;
+        color: #fff;
+        z-index: 1;
+        transition: 0.5s;
+        margin-bottom: 1.5rem;
+    }
+
+    .ins-con h1 {
+        font-size: 3rem ;
+    }
+    .ins-text{
+        text-align: justify;
+        color:#fff;
+        font-size: 18px;
+        padding: 1rem;
+      }
+    /* .ins-con p {
+        margin: 1rem !important;
+        font-size: 4rem !important;
+    } */
+    /* #main-Card .container {
+        margin-left: 15rem;
+    } */
+
+    .cont-cont {
+        margin-top: 0rem;
+        /* margin:0 15rem 2rem 1rem; */
+    }
+    .cont-cont h3 {
+        font-size: 3rem;
+        text-align: center;
+        padding: 0;
+    }
+    .cont-cont p {
+        font-size: 2rem;
+    }
+
+    .con-img{
+        /* width: 40rem;
+        height: 35rem;*/
+        margin-left: 1rem; 
+    
+    }
+    .mainhead{
+        font-size: 2.5rem;
+        text-align: center;
+        color: #373d51;
+        padding: 1.3rem;
+        margin: 0;
+      }
+      .ccard {
+        text-align: center;
+        width: 30rem;
+        margin-left: auto;
+        margin-right: auto;
+        margin-bottom: 1.5rem;
+      }
+      .ccard h2{
+        font-size: 27px;
+      }
+    .maincard{
+        text-align: center;
+        /* margin: 2.5rem; */
+        margin-left: 2.5rem;
+        width: 90%;
+        padding: 1rem;
+      }
+
+    }
+    /* .FAQ-Container {
+      margin: 0rem;
+      padding: 2rem;
+      width: 90% !important;
+    } */
+    
+      
+    .logo-holder {
+        display: none;
+    }
+
+    .fot-row{
+        padding-left: 0rem;
+    }
+    .courses-item_link {
+        display: block;
+        padding: 36px 25px;
+        background-color: #242020;
+      
+        overflow: hidden;
+      
+        position: relative;
+      }
+      .courses-item_title {
+       
+        line-height: 1.2;
+       
+      }
+
+      .courses-item_date-box {
+        font-size: 21px;
+        color: #FFF;
+      line-height: 1.2;
+        z-index: 2;
+        position: relative;
+      }
+
+        /* / ---------------------login--------------------- / */
+
+        .ms-1 {
+            padding-top: 1.5rem;
+            margin-left: 24rem !important;
+            font-size: 2.5rem;
+            position: absolute;
+        }
+        .chead1{
+
+            /* text-align: center !important; */
+            margin-left: 18rem;
+        }
+          /* / ---------------------Registration--------------------- / */
+          .frm-cont {
+            margin-left: 10rem;
+        }
+        .svg_im {
+            margin-top: 20rem;
+        }
+        .ms-5 {
+            padding-top: 1.5rem;
+            margin-left: 24rem !important;
+            font-size: 2.5rem;
+            position: absolute;
+        }
+        
+
+
+
+
+
+@media(max-width:360px) {
+    /* .home_image1 {
+       display: none;
+    } */
+
+    .nav-img{
+        padding-left: 1rem;
+    }
+
+    .navbar-collapse{
+        padding-left: 2rem;
+    }
+    .nav-item {
+        padding-left: 1rem;
+        font-size: 2rem;
+    }
+    .text1{
+        padding: 1rem;
+    }
+    
+    .main-text {
+        font-size: 2.5rem;
+        margin-top: 0rem;
+    }
+    .main-text2 {
+        font-size: 2rem;
+    }
+
+    /* .home-img{
+        width: 100%;
+        height: auto;
+    } */
+
+    .circle {
+        width: 50px;
+        height: 50px;
+        background: cyan;
+        border-radius: 50%;
+        position: absolute;
+        opacity: 0.4;
+        background-image: linear-gradient(to right, #dece68, #fdaf67, #ff9180, #fd7ea6, #d37ccb);
+        top: 0;
+        bottom: 0;
+        margin-right: 5rem;
+        /* left: 20; */
+        /* right: 25; */
+        overflow: hidden;
+        margin: auto;
+        animation: circle 6s linear infinite;
+    }
+    
+    
+    .circle1 {
+        width: 60px;
+        height: 60px;
+        background: cyan;
+        border-radius: 50%;
+        background-image: linear-gradient(to right, #dece68, #fdaf67, #ff9180, #fd7ea6, #d37ccb);
+        opacity: 0.4;
+        position: relative;
+        top: 2rem;
+        bottom: 0;
+        left: 10rem;
+        right: 0;
+        overflow: hidden;
+        margin: auto;
+        animation: circle1 6s linear infinite;
+    }
+    
+    .circle2 {
+        width: 80px;
+        height: 80px;
+        /* background:cyan; */
+        opacity: 0.4;
+        border-radius: 50%;
+        background-image: linear-gradient(to right, #dece68, #fdaf67, #ff9180, #fd7ea6, #d37ccb);
+        position: absolute;
+        top: 35rem;
+        bottom: 0;
+        left: 25rem;
+        /* right:0; */
+        overflow: hidden;
+        margin: auto;
+        animation: circle2 6s linear infinite;
+    }
+    
+    .Page-content {
+        margin-top: 15rem;
+        padding: 0rem;
+    }
+    .vl {
+        display: none;
+    }
+
+    .first_heading h2 {
+        text-align: center;
+        text-transform: uppercase;
+        padding-bottom: 2.2rem;
+      }
+      .first_heading h2:before {
+        width: 6rem;
+        height: 0.8rem;
+        display: block;
+        content: "";
+        position: absolute;
+        bottom: 2rem;
+        left: 45%;
+        margin-left: -1.4rem;
+        background-color: #000000;
+      }
+      .first_heading h2:after {
+        width: 18rem;
+        height: 0.3rem;
+        display: block;
+        content: "";
+        position: relative;
+        margin-top: 1rem;
+        left: 38%;
+        margin-left: -5rem;
+        background-color: #000000;
+      }
+      
+    .kn-ab {
+        margin: 0rem;
+        width: 100%;
+        /* padding-left: 6rem; */
+        /* margin-left: 5rem; */
+    }
+    .kn-text{
+        font-size: 3rem;
+        text-align: center;
+        /* align-content: center; */
+    }
+    .kn-head {
+        font-size: 2rem;
+        margin-left: 5rem;
+    }
+    .kn-cont {
+        padding: 2rem;
+        font-size: 2rem;
+        /* margin-left: 1rem; */
+        line-height: 2.6rem;
+
+    }
+
+    #main-Card .container .card {
+        min-width: 30rem;
+        height: 30rem;
+    }
+    #main-Card .container .card .box .content h2 {
+        position: absolute;
+        top: 18rem;
+        right: 9rem;
+        font-size: 4rem;
+        color: white;
+    }
+    
+    .courses-item_title {
+        min-height: 87px;
+        margin: 0 0 25px;
+        /* font-family: Georgia, 'Times New Roman', Times, serif; */
+        overflow: hidden;
+        line-height: 1.2;
+        font-weight: bold;
+        font-size: 20px;
+        color: #FFF;
+      
+        z-index: 2;
+        position: relative;
+      }
+
+      .courses-item_link {
+        display: block;
+        padding: 28px 40px;
+        background-color: #242020;
+      
+        overflow: hidden;
+      
+        position: relative;
+      }
+      .courses-item_date-box {
+        font-size: 15px;
+        color: #FFF;
+      
+        z-index: 2;
+        position: relative;
+      }
+
+    /* .content img {
+        width: 100%;
+        height: auto;
+      } */
+    .ins-con h1 {
+        font-size: 3rem ;
+    }
+    .ins-con p {
+        margin: 1rem !important;
+        /* font-size: 4rem !important; */
+    }
+    
+    /* #main-Card .container {
+        margin-left: 15rem;
+    } */
+
+    .mainhead{
+        font-size: 2.5rem;
+        text-align: center;
+        color: #373d51;
+        padding: 1.3rem;
+        margin: 0;
+      }
+      .ccard {
+        text-align: center;
+        width: 30rem;
+        margin-left: auto;
+        margin-right: auto;
+        margin-bottom: 1.5rem;
+      }
+      .ccard h2{
+        font-size: 27px;
+      }
+    .maincard{
+        text-align: center;
+        /* margin: 4rem; */
+        margin-left: 1rem;
+        width: 95%;
+        padding: 1rem;
+      }
+
+    
+    /* .cont-cont h3 {
+        font-size: 3rem;
+        text-align: center;
+        padding: 0;
+    }
+    .cont-cont p {
+        font-size: 2rem;
+    } */
+    .con-img{
+        /* width: 35rem;
+        height: 25rem;*/
+        margin-left: 0; 
+    }
+    #contact {
+        /* width: 20rem !important; */
+    }
+    .webdevanim1{
+        margin-top: 0;
+        /* margin-bottom: 10rem; */
+    }
+    .logo-holder {
+        display: none;
+    }
+ 
+    .cont-cont {
+        margin-top: 0rem;
+        /*margin:0 15rem 6rem 5rem; */
+    }
+
+
+    /* ------------------------FAQ----------------------- */
+
+    .FAQ-section{
+        background-color: #faf6f6;
+        width: 100%;
+      
+      }
+      .FAQ-Container {
+        margin: 0rem;
+        padding: 2rem;
+        width: 100% !important;
+
+      }
+      
+    .site-footer h6 {
+        font-size: 2rem;
+    }
+    .fot-row{
+        padding-left: 0rem;
+    }
+
+  
+    .site-footer {
+        margin-top: 0rem;
+    }
+    .svg_im {
+        margin-top: 20rem;
+    }
+    .frm-cont {
+        margin-top: 8rem;
+        margin-bottom: 10rem !important;
+        margin-left: 2rem;
+        width: 90%;
+    }
+    .ms-5 {
+        margin-left: 38rem !important;
+    }
+    .lg-btn {
+        width: 8rem;
+    }
+  
+
+     .gotopbtn {
+        width: 3rem;
+        height: 3rem;
+        bottom: 3rem;
+        right: 2rem;
+        line-height: 2.7rem;
+        font-size: 2.2rem;
+    } 
+
+      /* / ---------------------login--------------------- / */
+      .chead1{
+        /* text-align: center !important; */
+        margin-left: 10rem;
+    }
+    .ms-1 {
+        padding-top: 1.5rem;
+        margin-left: 27rem !important;
+        font-size: 2.5rem;
+        position: absolute;
+    }
+
+      /* / ---------------------Registration--------------------- / */
+    .ms-5 {
+        padding-top: 1.5rem;
+        margin-left: 28rem !important;
+        font-size: 2.5rem;
+        position: absolute;
+    }
+    /* .rg-nm h2 {
+        font-size: 4rem;
+        border-bottom: 0.5rem solid #333 !important;
+        border-radius: 0.8rem;
+        width: 11rem;
+    } */
+    
+  
+}

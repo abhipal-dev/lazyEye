@@ -1,0 +1,70 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 320 320" width="100%" height="100%">
+  <defs>
+    <linearGradient id="cubeTop" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#38bdf8" />
+      <stop offset="100%" stop-color="#0284c7" />
+    </linearGradient>
+    <linearGradient id="cubeLeft" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#0ea5e9" />
+      <stop offset="100%" stop-color="#0369a1" />
+    </linearGradient>
+    <linearGradient id="cubeRight" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#0284c7" />
+      <stop offset="100%" stop-color="#075985" />
+    </linearGradient>
+    <linearGradient id="amberTop" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#fbbf24" />
+      <stop offset="100%" stop-color="#d97706" />
+    </linearGradient>
+    <linearGradient id="amberLeft" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#f59e0b" />
+      <stop offset="100%" stop-color="#b45309" />
+    </linearGradient>
+    <linearGradient id="amberRight" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#d97706" />
+      <stop offset="100%" stop-color="#78350f" />
+    </linearGradient>
+    <filter id="menjaShadow" x="-10%" y="-10%" width="120%" height="120%">
+      <feDropShadow dx="0" dy="8" stdDeviation="6" flood-color="#0f172a" flood-opacity="0.25" />
+    </filter>
+  </defs>
+
+  <g filter="url(#menjaShadow)">
+    <!-- Amber Block in background right -->
+    <g transform="translate(140, 90)">
+      <polygon points="50,0 100,28 50,56 0,28" fill="url(#amberTop)" />
+      <polygon points="0,28 50,56 50,116 0,88" fill="url(#amberLeft)" />
+      <polygon points="50,56 100,28 100,88 50,116" fill="url(#amberRight)" />
+      <!-- Hollow Hole in amber block -->
+      <polygon points="50,20 70,31 50,42 30,31" fill="#78350f" opacity="0.6" />
+      <polygon points="20,45 40,56 40,86 20,75" fill="#451a03" opacity="0.6" />
+      <polygon points="60,56 80,45 80,75 60,86" fill="#292524" opacity="0.6" />
+    </g>
+
+    <!-- Main Cyan Isometric Block -->
+    <g transform="translate(60, 110)">
+      <polygon points="60,0 120,34 60,68 0,34" fill="url(#cubeTop)" />
+      <polygon points="0,34 60,68 60,138 0,104" fill="url(#cubeLeft)" />
+      <polygon points="60,68 120,34 120,104 60,138" fill="url(#cubeRight)" />
+
+      <!-- Isometric Extrusions / Slices -->
+      <polygon points="60,22 86,37 60,52 34,37" fill="#0369a1" opacity="0.7" />
+      <polygon points="25,55 50,69 50,105 25,91" fill="#082f49" opacity="0.7" />
+      <polygon points="70,69 95,55 95,91 70,105" fill="#075985" opacity="0.7" />
+    </g>
+
+    <!-- Floating Mini Cubes -->
+    <g transform="translate(30, 80)">
+      <polygon points="20,0 40,11 20,22 0,11" fill="#38bdf8" />
+      <polygon points="0,11 20,22 20,44 0,33" fill="#0ea5e9" />
+      <polygon points="20,22 40,11 40,33 20,44" fill="#0284c7" />
+    </g>
+
+    <g transform="translate(195, 45)">
+      <polygon points="15,0 30,8 15,16 0,8" fill="#fbbf24" />
+      <polygon points="0,8 15,16 15,32 0,24" fill="#f59e0b" />
+      <polygon points="15,16 30,8 30,24 15,32" fill="#d97706" />
+    </g>
+  </g>
+</svg>
+

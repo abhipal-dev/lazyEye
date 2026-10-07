@@ -1,0 +1,34 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 320 320" width="100%" height="100%">
+  <defs>
+    <filter id="paddleShadow" x="-10%" y="-10%" width="120%" height="120%">
+      <feDropShadow dx="0" dy="6" stdDeviation="6" flood-color="#0f172a" flood-opacity="0.3" />
+    </filter>
+  </defs>
+  <g filter="url(#paddleShadow)">
+    <!-- Motion Speed Trails -->
+    <path d="M 120 180 Q 160 140 180 110" stroke="#f59e0b" stroke-width="4" stroke-dasharray="8 6" stroke-linecap="round" fill="none" opacity="0.8" />
+    <circle cx="170" cy="120" r="14" fill="#fbbf24" opacity="0.6" />
+    <circle cx="160" cy="135" r="18" fill="#f59e0b" />
+    <circle cx="155" cy="130" r="4" fill="#ffffff" />
+
+    <!-- Red Dichoptic Paddle -->
+    <g transform="translate(45, 110) rotate(-25)">
+      <!-- Paddle Rubber Face -->
+      <ellipse cx="65" cy="65" rx="50" ry="46" fill="#ef4444" stroke="#b91c1c" stroke-width="3" />
+      <ellipse cx="65" cy="65" rx="44" ry="40" fill="#dc2626" />
+      <!-- Handle -->
+      <path d="M 60 110 L 55 170 C 55 175, 75 175, 75 170 L 70 110 Z" fill="#d97706" stroke="#b45309" stroke-width="2" />
+      <rect x="58" y="125" width="14" height="25" fill="#f59e0b" rx="2" />
+    </g>
+
+    <!-- Cyan/Blue Dichoptic Paddle in Background -->
+    <g transform="translate(160, 40) rotate(35)">
+      <!-- Paddle Rubber Face -->
+      <ellipse cx="65" cy="65" rx="46" ry="42" fill="#06b6d4" stroke="#0e7490" stroke-width="3" />
+      <ellipse cx="65" cy="65" rx="40" ry="36" fill="#0891b2" />
+      <!-- Handle -->
+      <path d="M 60 105 L 55 160 C 55 165, 75 165, 75 160 L 70 105 Z" fill="#d97706" stroke="#b45309" stroke-width="2" />
+    </g>
+  </g>
+</svg>
+
