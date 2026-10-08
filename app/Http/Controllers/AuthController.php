@@ -47,45 +47,44 @@ class AuthController extends Controller
                     'messages'=>$validator->getMessageBag()
                 ]);
             }
-                try {
-                    // Ensure database schema and demo records exist
-                    \App\Http\Controllers\UserController::ensureDatabaseReady();
-
-                    $user = DB::table('users')->where('username', $request->username)->first();
-                    if($user){
-                        if($request->password === $user->password){
-                            $request->session()->put('loggedInUser', $user->id);
-                            $request->session()->put('loggedInUserName', $user->fullname);
-                            $request->session()->put('loggedInUserType', $user->accounttype);
-                            if(in_array($user->accounttype, ['admin', 'root', 'doctor'])){
-                                $message = 'success admin';
-                            }
-                            else{
-                                $message = 'success user';
-                            }
-                            return response()->json([
-                                'status' => 200,
-                                'messages' => $message
-                            ]);
-                        }else{
-                            return response()->json([
-                                'status' => 401,
-                                'messages' => 'Incorrect password'
-                            ]);
+            try {
+                $user = \App\Http\Controllers\UserController::safelyQuery(function() use ($request) {
+                    return DB::table('users')->where('username', $request->username)->first();
+                });
+                if($user){
+                    if($request->password === $user->password){
+                        $request->session()->put('loggedInUser', $user->id);
+                        $request->session()->put('loggedInUserName', $user->fullname);
+                        $request->session()->put('loggedInUserType', $user->accounttype);
+                        if(in_array($user->accounttype, ['admin', 'root', 'doctor'])){
+                            $message = 'success admin';
                         }
+                        else{
+                            $message = 'success user';
+                        }
+                        return response()->json([
+                            'status' => 200,
+                            'messages' => $message
+                        ]);
                     }else{
                         return response()->json([
                             'status' => 401,
-                            'messages' => 'User Not Found'
+                            'messages' => 'Incorrect password'
                         ]);
                     }
-                } catch (\Throwable $e) {
-                    \Log::error('Login database error: ' . $e->getMessage());
+                }else{
                     return response()->json([
-                        'status' => 500,
-                        'messages' => 'Database Error: ' . $e->getMessage()
+                        'status' => 401,
+                        'messages' => 'User Not Found'
                     ]);
                 }
+            } catch (\Throwable $e) {
+                \Log::error('Login database error: ' . $e->getMessage());
+                return response()->json([
+                    'status' => 500,
+                    'messages' => 'Database Error: ' . $e->getMessage()
+                ]);
+            }
     }
     public function logout(){
         \Session::flush();

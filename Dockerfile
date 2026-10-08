@@ -41,14 +41,13 @@ COPY . /var/www/html
 COPY --from=composer:latest /usr/bin/composer /usr/bin/composer
 RUN composer install --no-dev --optimize-autoloader
 
+# Generate storage symlink
+RUN php artisan storage:link || true
+
 # Set storage, cache, and database permissions
 RUN chown -R www-data:www-data /var/www/html/storage /var/www/html/bootstrap/cache /var/www/html/database \
     && chmod -R 775 /var/www/html/storage /var/www/html/bootstrap/cache \
     && chmod -R 777 /var/www/html/database
-
-# Generate storage symlink and precompile Blade views
-RUN php artisan storage:link || true \
-    && php artisan view:cache || true
 
 EXPOSE 80
 

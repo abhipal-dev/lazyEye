@@ -4,35 +4,33 @@ This guide documents the **Clever Cloud MySQL** database configuration, **Render
 
 ---
 
-## 1. Clever Cloud MySQL Database Credentials
+## 1. Clever Cloud MySQL Database Credentials (Paris, Europe)
 
-Your permanent cloud MySQL database is hosted on **Clever Cloud (Free Dev Tier)**.
+Your ultra-fast European cloud MySQL database is hosted on **Clever Cloud (Free Dev Tier - Paris)**:
 
 | Parameter | Value | Laravel Environment Variable |
 | :--- | :--- | :--- |
 | **Database Engine** | MySQL 8.x | `DB_CONNECTION=mysql` |
-| **Host** | `bl2b9yn0gbfcs07f01ic-mysql.services.clever-cloud.com` | `DB_HOST` |
+| **Host** | `bpzssackelkqaw4zq5x3-mysql.services.clever-cloud.com` | `DB_HOST` |
 | **Port** | `3306` | `DB_PORT` |
-| **Database Name** | `bl2b9yn0gbfcs07f01ic` | `DB_DATABASE` |
-| **User** | `ugltthhrgmilvln7` | `DB_USERNAME` |
-| **Password** | `niXVKgSEr6Tk3Splr8OJ` | `DB_PASSWORD` |
-| **Connection URI** | `mysql://ugltthhrgmilvln7:niXVKgSEr6Tk3Splr8OJ@bl2b9yn0gbfcs07f01ic-mysql.services.clever-cloud.com:3306/bl2b9yn0gbfcs07f01ic` | — |
-| **MySQL CLI Command** | `mysql -h bl2b9yn0gbfcs07f01ic-mysql.services.clever-cloud.com -P 3306 -u ugltthhrgmilvln7 -p bl2b9yn0gbfcs07f01ic` | — |
+| **Database Name** | `bpzssackelkqaw4zq5x3` | `DB_DATABASE` |
+| **User** | `bpzssackelkqaw4zq5x3` | `DB_USERNAME` |
+| **Password** | *(Copy from Clever Cloud Dashboard)* | `DB_PASSWORD` |
 
 > [!TIP]
-> **One-Click Export**: In your [Clever Cloud Console](https://console.clever-cloud.com/), you can also click the blue **"Export Environment Variables"** button in the top-right corner of your MySQL add-on dashboard to copy all credentials formatted as environment variables.
+> **Where to find your Password**: In your [Clever Cloud Console](https://console.clever-cloud.com/), click on your MySQL add-on `bpzssackelkqaw4zq5x3` $\to$ **Environment Variables** (or click the blue **"Export Environment Variables"** button in the top-right corner) and copy the value of `MYSQL_ADDON_PASSWORD`.
 
 ---
 
 ## 2. Render Environment Variables (Copy & Paste)
 
-To connect your live application on Render to your Clever Cloud MySQL database, copy and paste the following block into Render:
+To connect your live application on Render to your new Clever Cloud MySQL Paris database, update your Render Environment:
 
 ### Instructions:
 1. Log into your **[Render Dashboard](https://dashboard.render.com/)**.
 2. Click on your Web Service: **`lazyeye`**.
 3. In the left navigation sidebar, select **Environment**.
-4. Add or update the following key-value pairs:
+4. Set or update the following values:
 
 ```ini
 APP_NAME=LazyEye
@@ -43,18 +41,18 @@ APP_URL=https://lazyeye.onrender.com
 LOG_CHANNEL=stderr
 
 DB_CONNECTION=mysql
-DB_HOST=bl2b9yn0gbfcs07f01ic-mysql.services.clever-cloud.com
+DB_HOST=bpzssackelkqaw4zq5x3-mysql.services.clever-cloud.com
 DB_PORT=3306
-DB_DATABASE=bl2b9yn0gbfcs07f01ic
-DB_USERNAME=ugltthhrgmilvln7
-DB_PASSWORD=niXVKgSEr6Tk3Splr8OJ
+DB_DATABASE=bpzssackelkqaw4zq5x3
+DB_USERNAME=bpzssackelkqaw4zq5x3
+DB_PASSWORD=<PASTE_YOUR_CLEVER_CLOUD_PARIS_PASSWORD_HERE>
 
 SESSION_DRIVER=cookie
 SESSION_LIFETIME=10080
 ```
 
 5. Click the blue **Save Changes** button at the bottom of the page.
-6. Render will automatically trigger a redeployment with your new database connection.
+6. Render will automatically apply the changes and reconnect.
 
 ---
 
