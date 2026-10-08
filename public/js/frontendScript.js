@@ -146,11 +146,15 @@ $(document).on('click', 'button.loginButton', function (e) {
                 window.location.href = "/user";
             }
             else {
-                sweetAlert('Login Failed', 'Username or Password did not match!', 'error');
+                sweetAlert('Login Failed', data['messages'] || 'Username or Password did not match!', 'error');
             }
         },
-        error: function() {
-            sweetAlert('Connection Error', 'Unable to reach the server. Please check your connection.', 'error');
+        error: function (xhr) {
+            let msg = 'Unable to reach the server. Please check your connection or database credentials.';
+            if (xhr.responseJSON && xhr.responseJSON.messages) {
+                msg = xhr.responseJSON.messages;
+            }
+            sweetAlert('Server / Database Error', msg, 'error');
         }
     });
 });

@@ -47,37 +47,43 @@ class AuthController extends Controller
                     'messages'=>$validator->getMessageBag()
                 ]);
             }
-            else{
-                // $user = DB::table('users')->where('email','abhipal@gmail.com')->first();
-                $user = DB::table('users')->where('username',$request->username)->first();
-                // print_r($user);
-                // print_r($request->email);
-                // die;
-                if($user){
-                    if($request->password===$user->password){
-                        $request->session()->put('loggedInUser',$user->id);
-                        $request->session()->put('loggedInUserName',$user->fullname);
-                        $request->session()->put('loggedInUserType',$user->accounttype);
-                        if(in_array($user->accounttype, ['admin', 'root', 'doctor'])){
-                            $message = 'success admin';
+                try {
+                    // Ensure database schema and demo records exist
+                    \App\Http\Controllers\UserController::ensureDatabaseReady();
+
+                    $user = DB::table('users')->where('username', $request->username)->first();
+                    if($user){
+                        if($request->password === $user->password){
+                            $request->session()->put('loggedInUser', $user->id);
+                            $request->session()->put('loggedInUserName', $user->fullname);
+                            $request->session()->put('loggedInUserType', $user->accounttype);
+                            if(in_array($user->accounttype, ['admin', 'root', 'doctor'])){
+                                $message = 'success admin';
+                            }
+                            else{
+                                $message = 'success user';
+                            }
+                            return response()->json([
+                                'status' => 200,
+                                'messages' => $message
+                            ]);
+                        }else{
+                            return response()->json([
+                                'status' => 401,
+                                'messages' => 'Incorrect password'
+                            ]);
                         }
-                        else{
-                            $message = 'success user';
-                        }
-                        return response()->json([
-                            'status'=>200,
-                            'messages'=>$message
-                        ]);
                     }else{
                         return response()->json([
-                            'status'=>401,
-                            'messages'=>'Incoorect'
+                            'status' => 401,
+                            'messages' => 'User Not Found'
                         ]);
                     }
-                }else{
+                } catch (\Throwable $e) {
+                    \Log::error('Login database error: ' . $e->getMessage());
                     return response()->json([
-                        'status'=>401,
-                        'messages'=>'User Not Found'
+                        'status' => 500,
+                        'messages' => 'Database Error: ' . $e->getMessage()
                     ]);
                 }
             }

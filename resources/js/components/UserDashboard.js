@@ -17,22 +17,26 @@ import ThemeToggle from './ThemeToggle';
 var frameRef = React.createRef(null);
 let message = {}
 $(document).ready(function () {
-    // console.log('ready')
+    // Check if calibration elements exist on current page
+    const leftEye = document.getElementById('leftEyeColor');
+    const rightEye = document.getElementById('rightEyeColor');
+    if (!leftEye || !rightEye) {
+        return; // Elements not present on this page (e.g. Login / Welcome page)
+    }
+
     var l, r, leftDiv, rightDiv, leftColor, rightColor;
 
     //  'l' and 'r' references to contrast sliders
-    l = document.querySelector('#leftColorContrastSlider')
-    r = document.querySelector('#rightColorContrastSlider')
+    l = document.querySelector('#leftColorContrastSlider');
+    r = document.querySelector('#rightColorContrastSlider');
 
     // 'leftDiv' & 'rightDiv' are references to left and right color div
-    leftDiv = document.querySelector('#leftColorTestDiv')
-    rightDiv = document.querySelector('#rightColorTestDiv')
+    leftDiv = document.querySelector('#leftColorTestDiv');
+    rightDiv = document.querySelector('#rightColorTestDiv');
 
     // 'leftColor' & 'rightColor' are references to left and right color options
-    leftColor = document.getElementById('leftEyeColor').value
-    rightColor = document.getElementById('rightEyeColor').value
-    // console.log(leftColor)
-    // console.log(rightColor)
+    leftColor = leftEye.value;
+    rightColor = rightEye.value;
 
     function pad(n) {
         return (n.length < 2) ? "0" + n : n;

@@ -149,3 +149,4 @@ Once pushed to `main`:
 
 ### Q: How do I back up my database?
 * In the [Clever Cloud Console](https://console.clever-cloud.com/), open your MySQL add-on $\to$ click **Backups** tab to download automated daily snapshots of your database at any time.
+

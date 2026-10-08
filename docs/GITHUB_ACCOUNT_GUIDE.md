@@ -106,3 +106,4 @@ flowchart LR
 * **Automated Webhooks**: Render is connected directly to `abhipal-dev/lazyEye`.
 * **Zero-Downtime Deploy**: Whenever a commit is pushed to the `main` branch, Render automatically detects it, pulls the code, executes the `Dockerfile`, and serves the new version.
 * **Rollbacks**: If a bug is ever introduced, you can roll back to any previous commit from the Render dashboard or by running `git revert <commit-hash> && git push origin main`.
+
