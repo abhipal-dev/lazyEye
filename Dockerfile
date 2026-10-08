@@ -10,11 +10,22 @@ RUN apt-get update && apt-get install -y \
     unzip \
     git \
     curl \
-    && docker-php-ext-install pdo_mysql pdo_sqlite mbstring exif pcntl bcmath gd \
+    && docker-php-ext-install pdo_mysql pdo_sqlite mbstring exif pcntl bcmath gd opcache \
     && apt-get clean && rm -rf /var/lib/apt/lists/*
 
-# Enable Apache mod_rewrite for Laravel routing
-RUN a2enmod rewrite
+# Configure production OPcache for high speed
+RUN { \
+    echo 'opcache.enable=1'; \
+    echo 'opcache.memory_consumption=128'; \
+    echo 'opcache.interned_strings_buffer=8'; \
+    echo 'opcache.max_accelerated_files=10000'; \
+    echo 'opcache.revalidate_freq=2'; \
+    echo 'opcache.fast_shutdown=1'; \
+    echo 'opcache.enable_cli=0'; \
+} > /usr/local/etc/php/conf.d/opcache-recommended.ini
+
+# Enable Apache mod_rewrite, deflate (gzip), expires, and headers for speed
+RUN a2enmod rewrite deflate expires headers
 
 # Point Apache document root directly to public/
 ENV APACHE_DOCUMENT_ROOT /var/www/html/public
@@ -35,8 +46,9 @@ RUN chown -R www-data:www-data /var/www/html/storage /var/www/html/bootstrap/cac
     && chmod -R 775 /var/www/html/storage /var/www/html/bootstrap/cache \
     && chmod -R 777 /var/www/html/database
 
-# Generate storage symlink
-RUN php artisan storage:link || true
+# Generate storage symlink and precompile Blade views
+RUN php artisan storage:link || true \
+    && php artisan view:cache || true
 
 EXPOSE 80
 
