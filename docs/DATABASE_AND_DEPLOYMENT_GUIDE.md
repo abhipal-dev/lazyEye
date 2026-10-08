@@ -82,7 +82,45 @@ flowchart TD
 
 ---
 
-## 4. Complete Step-by-Step Deployment Workflow
+## 4. Default Clinical Accounts & Credentials Data
+
+Below is the complete dataset of pre-seeded user accounts available immediately upon database initialization:
+
+### 🏥 Medical Staff & Administrators
+
+| Role | Full Name | Username | Password | Email | Daily Goal |
+| :--- | :--- | :--- | :--- | :--- | :--- |
+| **Admin** | Clinical Administrator | `admin` | `admin123` | `admin@lazyeye.org` | 20 min |
+| **Admin** | Pranjal Agarwal | `pranjal` | `4567` | `pranjalagarwal@gmail.com` | 20 min |
+| **Doctor** | Dr. Sarah Mitchell, OD | `dr_sarah` | `doctor123` | `sarah.mitchell@lazyeye-clinic.org` | 20 min |
+| **Doctor** | Dr. James Vance, FAAO | `dr_vance` | `doctor123` | `james.vance@lazyeye-clinic.org` | 20 min |
+
+### 👁️ Enrolled Vision Therapy Patients
+
+| Full Name | Username | Password | Email | Assigned Doctor | Anaglyph Calibration | Prescribed Target |
+| :--- | :--- | :--- | :--- | :--- | :--- | :--- |
+| **Abhishek Pal** | `abhi8535` | `9870` | `abhi8535@gmail.com` | Dr. Sarah Mitchell | Blue (L) / Red (R) | 25 min / day |
+| **Riya Jaiwal** | `riyajaiwal` | `1234` | `riya@gmail.com` | Dr. Sarah Mitchell | Red (L) / Green (R) | 20 min / day |
+| **Shivam Singh** | `singhsaab` | `9999` | `shivam@gmail.com` | Dr. James Vance | Red (L) / Cyan (R) | 15 min / day |
+| **Avishi Agarwal** | `avishi` | `avishi` | `avishi@gmail.com` | Dr. James Vance | Red (L) / Blue (R) | 20 min / day |
+
+### ⏳ Pending Registrations (`registers` Table)
+
+| Applicant Name | Username | Password | Email | Status | Action |
+| :--- | :--- | :--- | :--- | :--- | :--- |
+| **Arun Badhotiya** | `aruna` | `39654` | `arunbadhotiya@gmail.com` | Pending Approval | Click `[Approve]` in Admin Panel |
+| **Neha Bhardwaj** | `neha0211` | `0211` | `nehabhardwaj@gmail.com` | Pending Approval | Click `[Approve]` in Admin Panel |
+| **Kunal Pal** | `kunal_pal` | `1234` | `kunal@kr.up` | Pending Approval | Click `[Approve]` in Admin Panel |
+
+### 🎮 Pre-Seeded Therapy Sessions (`game_records`)
+* **Total Sessions**: 42 clinical therapy sessions.
+* **Game Distribution**: Tetris, Snake, Flappy Bird, Menja 3D, Bubble Shooter, Sticky Holds, Ball Catcher, Ping Pong, Bouncing Ball.
+* **Score Range**: 15 to 120 points.
+* **Session Durations**: 10 to 25 minutes (600s – 1500s) timestamped across the past 7 days.
+
+---
+
+## 5. Complete Step-by-Step Deployment Workflow
 
 ### Step 1: Commit and Push Code from Local Machine
 Whenever you make updates locally, run:
@@ -110,7 +148,8 @@ Once pushed to `main`:
 1. Render receives GitHub's webhook and starts building the Docker container according to [`Dockerfile`](file:///d:/Abhishek_Projects/lazyEye/Dockerfile).
 2. The Apache web server starts and points to `/var/www/html/public`.
 3. Laravel connects directly to Clever Cloud MySQL on port `3306`.
-4. The deployment becomes live at: **[https://lazyeye.onrender.com](https://lazyeye.onrender.com)**.
+4. If MySQL is unreachable, the system automatically falls back to SQLite seamlessly.
+5. The deployment becomes live at: **[https://lazyeye.onrender.com](https://lazyeye.onrender.com)**.
 
 ---
 
@@ -118,14 +157,15 @@ Once pushed to `main`:
 1. Open **[https://lazyeye.onrender.com](https://lazyeye.onrender.com)** in your browser.
 2. Log into the Admin panel using:
    * **Username**: `admin`
-   * **Password**: `9870`
+   * **Password**: `admin123`
+   *(Or log into a patient account with `abhi8535` / `9870`)*
 3. Verify that the Dashboard displays active patients, doctors, and game records.
 4. Play any game or complete a Tumbling 'E' Visual Acuity test from a patient account.
 5. Exit fullscreen or click **`[ Finish Therapy & Save ]`** $\to$ observe the record permanently saved to Clever Cloud MySQL.
 
 ---
 
-## 5. Essential Service Links
+## 6. Essential Service Links
 
 | Service | Purpose | URL |
 | :--- | :--- | :--- |
@@ -137,7 +177,7 @@ Once pushed to `main`:
 
 ---
 
-## 6. Troubleshooting & Diagnostics
+## 7. Troubleshooting & Diagnostics
 
 ### Q: Why does Render take 30-50 seconds to open the website on first click?
 * **A**: Render's Free tier puts inactive containers to sleep after 15 minutes of idle time. The first request wakes the container up (a "cold start"). Subsequent requests are fast. With our `SESSION_DRIVER=cookie` upgrade, your login session will remain active across cold starts.

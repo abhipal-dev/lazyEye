@@ -20,13 +20,21 @@ Welcome to the LazyEye Vision Therapy technical documentation.
    - Troubleshooting common build & permission errors.
 
 3. [**Cloud Database & Deployment Guide**](DATABASE_AND_DEPLOYMENT_GUIDE.md)
-   - Clever Cloud MySQL database credentials (`bl2b9yn0gbfcs07f01ic-mysql.services.clever-cloud.com`).
+   - Clever Cloud MySQL database credentials (`bpzssackelkqaw4zq5x3-mysql.services.clever-cloud.com` - Paris, Europe).
    - Copy-paste ready Render environment variables block.
    - Built-in schema auto-migrator & demo seeder (`ensureDatabaseReady()`).
    - Step-by-step production release workflow.
+   - Default clinical accounts and login credentials.
    - Essential service links (Live App, Render, Clever Cloud, GitHub).
 
-4. [**GitHub Account & Repository Guide**](GITHUB_ACCOUNT_GUIDE.md)
+4. [**Data Dictionary, Seeded Accounts & Clinical Datasets**](DATA_DICTIONARY_AND_SEEDED_USERS.md)
+   - Comprehensive data dictionary for all tables (`users`, `registers`, `game_records`, `doctor_consultations`).
+   - Master login credentials roster for all staff, doctors, and patients.
+   - Pre-populated clinical therapy game sessions (42 sessions across 9 games).
+   - Pre-populated doctor consultations and prescription records.
+   - Manual data re-seeding and reset procedures.
+
+5. [**GitHub Account & Repository Guide**](GITHUB_ACCOUNT_GUIDE.md)
    - Account overview (`abhipal-dev`) and committer email (`abhipal85350@gmail.com`).
    - Personal Access Token (PAT) generation and Windows credentials manager.
    - Git daily push workflow and automated Render webhooks.

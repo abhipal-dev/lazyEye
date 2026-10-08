@@ -310,3 +310,47 @@ sequenceDiagram
     System->>DB: Inserts into 'doctor_consultations' & updates user_playing_time
 ```
 
+---
+
+## 6. Pre-Seeded Clinical Accounts & Credentials Data
+
+The application automatically seeds a comprehensive clinical dataset on first startup (or whenever `https://lazyeye.onrender.com/seedDemoData` is requested). Use these credentials to test all roles and privilege tiers:
+
+### 🏥 Medical Staff & Clinic Administrators
+
+| Privilege Tier | Full Name | Username | Password | Email | Clinical Role |
+| :--- | :--- | :--- | :--- | :--- | :--- |
+| **`admin`** | Clinical Administrator | `admin` | `admin123` | `admin@lazyeye.org` | Lead Clinical Operations Director |
+| **`admin`** | Pranjal Agarwal | `pranjal` | `4567` | `pranjalagarwal@gmail.com` | Systems & Clinic Administrator |
+| **`doctor`** | Dr. Sarah Mitchell, OD | `dr_sarah` | `doctor123` | `sarah.mitchell@lazyeye-clinic.org` | Senior Pediatric Optometrist |
+| **`doctor`** | Dr. James Vance, FAAO | `dr_vance` | `doctor123` | `james.vance@lazyeye-clinic.org` | Vision Therapy & Binocular Specialist |
+
+### 👁️ Enrolled Vision Therapy Patients (`accounttype: 'user'`)
+
+| Full Name | Username | Password | Email | Assigned Doctor | Default Filter Colors | Prescribed Target |
+| :--- | :--- | :--- | :--- | :--- | :--- | :--- |
+| **Abhishek Pal** | `abhi8535` | `9870` | `abhi8535@gmail.com` | Dr. Sarah Mitchell | Blue (Left) / Red (Right) | 25 min / day |
+| **Riya Jaiwal** | `riyajaiwal` | `1234` | `riya@gmail.com` | Dr. Sarah Mitchell | Red (Left) / Green (Right) | 20 min / day |
+| **Shivam Singh** | `singhsaab` | `9999` | `shivam@gmail.com` | Dr. James Vance | Red (Left) / Cyan (Right) | 15 min / day |
+| **Avishi Agarwal** | `avishi` | `avishi` | `avishi@gmail.com` | Dr. James Vance | Red (Left) / Blue (Right) | 20 min / day |
+
+### ⏳ Pending Applicants (`registers` Table)
+
+| Applicant Full Name | Username | Password | Email | Status | Approval Workflow |
+| :--- | :--- | :--- | :--- | :--- | :--- |
+| **Arun Badhotiya** | `aruna` | `39654` | `arunbadhotiya@gmail.com` | Pending | Log in as `admin` $\to$ Approvals $\to$ Click `[Approve]` |
+| **Neha Bhardwaj** | `neha0211` | `0211` | `nehabhardwaj@gmail.com` | Pending | Log in as `admin` $\to$ Approvals $\to$ Click `[Approve]` |
+| **Kunal Pal** | `kunal_pal` | `1234` | `kunal@kr.up` | Pending | Log in as `admin` $\to$ Approvals $\to$ Click `[Approve]` |
+
+### 📊 Seeded Activity & Consultation Dataset
+
+1. **42 Normalized Game Records (`game_records`)**:
+   - Spans 9 clinical games: *Tetris, Snake, Flappy Bird, Menja, Bubble Shooter, Sticky Holds, Ball Catcher, Ping Pong, Bouncing Ball*.
+   - Scores randomly generated in the clinical range between **15 and 120 points**.
+   - Timestamps evenly distributed across the last 7 calendar days to drive realistic weekly volume charts and individual patient compliance heatmaps.
+2. **3 Longitudinal Doctor Consultations (`doctor_consultations`)**:
+   - **Abhishek Pal** (by Dr. Sarah Mitchell): *Status: Prescribed* — "Patient shows 35% suppression reduction. Continue Snake and Tetris fusion therapy." (Compliance: Excellent, 25 min).
+   - **Riya Jaiwal** (by Dr. Sarah Mitchell): *Status: Under Review* — "Stereoscopic depth perception improving. Maintain daily 20 min session." (Compliance: Good, 20 min).
+   - **Shivam Singh** (by Dr. James Vance): *Status: Under Review* — "Contrast sensitivity adjusted. Right eye contrast set to 220." (Compliance: Moderate, 15 min).
+
+
