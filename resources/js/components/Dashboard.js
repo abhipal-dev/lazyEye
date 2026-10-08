@@ -33,6 +33,10 @@ export default class Dashboard extends React.Component {
     }
 
     componentDidMount() {
+        this.fetchStats();
+    }
+
+    fetchStats = () => {
         $.ajax({
             url: "/fetchDashboardStats",
             type: "get",
@@ -48,6 +52,34 @@ export default class Dashboard extends React.Component {
                 this.setState({ loading: false });
             }
         });
+    }
+
+    handleSeedDemoData = () => {
+        if (typeof Swal !== 'undefined') {
+            Swal.fire({
+                title: 'Initialize Clinical Records?',
+                text: 'This will seed verified doctors, patients, pending registrations, and recent therapy logs.',
+                icon: 'question',
+                showCancelButton: true,
+                confirmButtonColor: '#2563eb',
+                cancelButtonColor: '#64748b',
+                confirmButtonText: 'Yes, Populate Data'
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    $.post("/seedDemoData", () => {
+                        Swal.fire('Success!', 'Clinical demo records successfully initialized.', 'success');
+                        this.fetchStats();
+                    });
+                }
+            });
+        } else {
+            if (confirm('Initialize clinical demo records?')) {
+                $.post("/seedDemoData", () => {
+                    alert('Clinical demo records initialized!');
+                    this.fetchStats();
+                });
+            }
+        }
     }
 
     render() {
@@ -87,6 +119,13 @@ export default class Dashboard extends React.Component {
                         <p className="text-sub small mb-0">Real-time vision therapy analytics, patient adherence, and staff controls</p>
                     </div>
                     <div className="d-flex align-items-center gap-2 flex-wrap">
+                        <button 
+                            className="btn btn-sm btn-outline-success rounded-pill px-3 shadow-sm d-flex align-items-center gap-1 fw-bold"
+                            onClick={this.handleSeedDemoData}
+                            title="Generate realistic clinical patients, doctors, and game sessions"
+                        >
+                            <i className="fa-solid fa-wand-magic-sparkles"></i> Seed Demo Data
+                        </button>
                         <button 
                             className="btn btn-sm btn-primary rounded-pill px-3 shadow-sm d-flex align-items-center gap-1 fw-bold"
                             data-bs-toggle="modal" 

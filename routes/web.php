@@ -56,6 +56,7 @@ Route::get('/fetchDoctors', [UserController::class, 'fetchDoctors']);
 Route::get('/fetchUsers', [UserController::class, 'fetchUsers']);
 
 Route::get('/fetchDashboardStats', [UserController::class, 'fetchDashboardStats']);
+Route::match(['get', 'post'], '/seedDemoData', [UserController::class, 'seedDemoData']);
 
 Route::post('/createUser', [UserController::class, 'createUser']);
 Route::post('/assignDoctor', [UserController::class, 'assignDoctor']);
