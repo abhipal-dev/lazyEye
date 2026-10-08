@@ -9,6 +9,8 @@ import ImageUploadModal from './modals/ImageUploadModal';
 import Games from './Games';
 import ActivityLog from './ActivityLog';
 import ProgressReport from './ProgressReport';
+import VisualAcuityTest from './VisualAcuityTest';
+import ClinicalReport from './ClinicalReport';
 import ThemeToggle from './ThemeToggle';
 
 
@@ -348,6 +350,13 @@ export default class UserDashboard extends React.Component {
                                         Therapy Games
                                     </a>
                                     <a 
+                                        className={`nav-link ${this.state.current_component === 'acuitytest' ? 'active' : ''}`}
+                                        onClick={() => this.setState({ current_component: 'acuitytest' })}
+                                    >
+                                        <div className="sb-nav-link-icon"><i className="fa-solid fa-eye text-primary"></i></div>
+                                        Visual Acuity Test
+                                    </a>
+                                    <a 
                                         className="nav-link" 
                                         data-bs-toggle="modal" 
                                         data-bs-target="#colorSettingModal"
@@ -357,6 +366,13 @@ export default class UserDashboard extends React.Component {
                                     </a>
 
                                     <div className="sb-sidenav-menu-heading">Clinical Reports</div>
+                                    <a 
+                                        className={`nav-link ${this.state.current_component === 'clinicalreport' ? 'active' : ''}`}
+                                        onClick={() => this.setState({ current_component: 'clinicalreport' })}
+                                    >
+                                        <div className="sb-nav-link-icon"><i className="fa-solid fa-file-medical text-info"></i></div>
+                                        Clinical Summary & PDF
+                                    </a>
                                     <a 
                                         className={`nav-link ${this.state.current_component === 'activitylog' ? 'active' : ''}`}
                                         onClick={() => this.setState({ current_component: 'activitylog' })}
@@ -415,6 +431,10 @@ export default class UserDashboard extends React.Component {
                             <div className="container-fluid px-2 px-sm-3 px-md-4">
 
                                 {(this.state.current_component == 'user') ? <Games data={this.state.data.user_game_records} date_format={this.state.date_format}/> : ''}
+
+                                {(this.state.current_component == 'acuitytest') ? <VisualAcuityTest patient={this.state.data} /> : ''}
+
+                                {(this.state.current_component == 'clinicalreport') ? <ClinicalReport data={this.state.data.user_game_records} patient={this.state.data} /> : ''}
 
                                 {(this.state.current_component == 'progressreport') ? <ProgressReport data={this.state.data.user_game_records} date_format={this.state.date_format}/> : ''}
 
