@@ -126,6 +126,40 @@ export default class VisualAcuityTest extends React.Component {
             finalAcuity: resultAcuity,
             history: finalHistory
         });
+
+        // Save result to patient record in database
+        try {
+            const token = $('meta[name="csrf-token"]').attr('content');
+            const patientId = this.props.patient?.id || document.querySelector("section#user")?.dataset?.id;
+            if (patientId) {
+                const scoreMap = {
+                    '20/20': 100,
+                    '20/25': 90,
+                    '20/30': 80,
+                    '20/40': 70,
+                    '20/50': 60,
+                    '20/70': 50,
+                    '20/100': 40
+                };
+                const numericScore = scoreMap[resultAcuity] || 30;
+                $.ajax({
+                    url: "/SaveGameRecords",
+                    type: "post",
+                    headers: { 'X-CSRF-TOKEN': token },
+                    data: {
+                        id: patientId,
+                        game_name: 'Visual Acuity (' + resultAcuity + ')',
+                        game_score: numericScore,
+                        duration: 180
+                    },
+                    success: function() {
+                        window.dispatchEvent(new CustomEvent('lazyeye:game-completed'));
+                    }
+                });
+            }
+        } catch (err) {
+            console.warn("Could not save acuity test result:", err);
+        }
     };
 
     getRotationDeg = (dir) => {
@@ -278,3 +312,4 @@ export default class VisualAcuityTest extends React.Component {
         );
     }
 }
+

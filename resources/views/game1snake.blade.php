@@ -179,6 +179,10 @@
       <span>Score:</span>
       <span id="scoreVal">0</span>
     </div>
+
+    <button id="finishSnakeBtn" style="background:#059669; border:none; color:#fff; border-radius:20px; padding:6px 14px; font-size:12px; font-weight:600; cursor:pointer;">
+      <i class="fa-solid fa-floppy-disk me-1"></i> Finish & Save
+    </button>
   </div>
 
   <!-- Main Canvas Playfield -->
@@ -440,16 +444,28 @@
         : (20 * 60 * 1000);
 
       setTimeout(function() {
-        const message = { msg: 'Game Ended', game: 'Snake', score: score };
-        window.parent.postMessage(message, "*");
+        reportSession();
         console.log('Game ended by Game js timer');
       }, sessionDuration);
     });
+
+    function reportSession() {
+      const message = { msg: 'Game Ended', game: 'Snake', score: score };
+      window.parent.postMessage(message, "*");
+    }
+
+    window.reportGameSession = reportSession;
+    window.currentSession = {
+      game: 'Snake',
+      getScore: function() { return score; }
+    };
 
     $(document).ready(function() {
       $(window).focus();
       updateColors(leftColor, rightColor);
       requestAnimationFrame(loop);
+
+      document.getElementById('finishSnakeBtn')?.addEventListener('click', reportSession);
     });
   </script>
 </body>

@@ -20,6 +20,12 @@ justify-content: center;
 </style>
 </head>
 <body>
+<div style="position:fixed; top:12px; left:50%; transform:translateX(-50%); z-index:100; display:flex; align-items:center; gap:16px; background:rgba(15,23,42,0.88); border:1px solid rgba(255,255,255,0.2); border-radius:30px; padding:6px 20px; color:#f8fafc; font-family:sans-serif; font-size:13px; backdrop-filter:blur(8px); box-shadow:0 4px 16px rgba(0,0,0,0.5);">
+  <span style="font-weight:700; letter-spacing:0.5px; color:#38bdf8;">BUBBLE SHOOTER</span>
+  <span style="color:#64748b;">|</span>
+  <span>Score: <b id="hudScore" style="color:#facc15;">0</b></span>
+  <button id="finishBubbleBtn" style="background:#059669; border:none; color:#fff; border-radius:20px; padding:4px 14px; font-size:12px; font-weight:600; cursor:pointer;">Finish & Save</button>
+</div>
 <canvas width="471" height="992" id="game"></canvas>
 <script>
 var h = window.innerHeight;
@@ -32,9 +38,21 @@ var fixed_col =20,fixed_row=h/32,score=0;
 
 $("canvas").attr("height",h);
 
+function reportSession() {
+  var message = { msg: 'Game Ended', game: "Bubble Shooter", score: score };
+  window.parent.postMessage(message, "*");
+  console.log('Bubble shooter session reported with score:', score);
+}
+
+window.reportGameSession = reportSession;
+window.currentSession = {
+  game: 'Bubble Shooter',
+  getScore: function() { return score; }
+};
 
 $(document).ready(function(){
-$(window).focus();
+  $(window).focus();
+  document.getElementById('finishBubbleBtn')?.addEventListener('click', reportSession);
 }) 
 
 var leftColor = '#ef4444', rightColor = '#06b6d4';
@@ -50,9 +68,8 @@ window.addEventListener('message', function(event) {
   window.parent.postMessage("Game Started", "*");
   var sessionDuration = (event.data.time && !isNaN(event.data.time) && event.data.time > 10000) ? event.data.time : (20 * 60 * 1000);
   setTimeout(function() {
-    var message = { msg: 'Game Ended', game: "Bubble Shooter", score: score };
-    window.parent.postMessage(message, "*");
-    console.log('Game ended by Game js');
+    reportSession();
+    console.log('Game ended by Game js timer');
   }, sessionDuration);
 });
 
@@ -257,6 +274,8 @@ matches.forEach(bubble => {
 bubble.active = false;
 score+=1;
 });
+const el = document.getElementById('hudScore');
+if (el) el.innerText = score;
 }
 }
 

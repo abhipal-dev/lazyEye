@@ -72,52 +72,63 @@ $(document).on('fullscreenchange', function (e) {
 
 $(document).ready(function () {
   // console.log("ready!");
+  let gameSessionReported = false;
+
   window.addEventListener('message', function (event) {
-    console.log("Message received from the child: " + event.data.msg); // Message received from child
-    if (event.data.msg == 'Game Ended') {
-      document.getElementById("iframe").src = "";
-      if (document.exitFullscreen) {
-        document.exitFullscreen();
-      } else if (document.webkitExitFullscreen) { /* Safari */
-        document.webkitExitFullscreen();
-      } else if (document.msExitFullscreen) { /* IE11 */
-        document.msExitFullscreen();
-      }
+    if (!event.data) return;
+    if (event.data === 'Game Started' || event.data.msg === 'Game Started') {
+      gameSessionReported = false;
+      return;
     }
+
     if (event.data.msg == 'Game Ended') {
+      if (gameSessionReported) return;
+      gameSessionReported = true;
+
+      // Safely exit fullscreen
+      if (document.fullscreenElement) {
+        if (document.exitFullscreen) document.exitFullscreen();
+        else if (document.webkitExitFullscreen) document.webkitExitFullscreen();
+        else if (document.msExitFullscreen) document.msExitFullscreen();
+      }
+      document.getElementById("iframe").src = "";
+
+      const rawScore = event.data.score;
+      const gameScore = (rawScore !== undefined && rawScore !== null && !isNaN(rawScore)) ? parseInt(rawScore, 10) : 0;
+      const gameName = event.data.game || 'Therapy Game';
+
       Swal.fire({
-        title: `${event.data.game || 'Session'} Finished!`,
-        text: 'Great effort! Your session score is: ' + (event.data.score !== undefined ? event.data.score : 0),
+        title: `${gameName} Finished!`,
+        text: 'Great effort! Your session score is: ' + gameScore,
         icon: 'success',
         confirmButtonColor: '#2563eb',
         confirmButtonText: 'Continue'
       });
 
-      markPlayedGame(event.data.game);
+      markPlayedGame(gameName);
 
-      //function to get date in format (dd-mm-yyyy)
-      let current_date_timestamp = moment().unix()*1000;
-      console.log(current_date_timestamp)     // current's Date
+      let current_date_timestamp = moment().unix() * 1000;
       let str = $('p#score_history').text();
-      let id = document.querySelector("section#user").dataset.id;
+      let idEl = document.querySelector("section#user");
+      let id = idEl ? idEl.dataset.id : '';
       let score = {}, temp_score = {}, string_score = '';
-      if (str.length) {
-        score = JSON.parse(str)
+      if (str && str.length) {
+        try {
+          score = JSON.parse(str);
+        } catch (e) {
+          score = {};
+        }
       }
-      temp_score[current_date_timestamp] = {}
-      temp_score[current_date_timestamp][event.data.game] = event.data.score;
+      temp_score[current_date_timestamp] = {};
+      temp_score[current_date_timestamp][gameName] = gameScore;
 
       if (score.hasOwnProperty(current_date_timestamp)) {
-        console.log("Found Date")
-        score[current_date_timestamp] = Object.assign(score[current_date_timestamp], temp_score[current_date_timestamp])
+        score[current_date_timestamp] = Object.assign(score[current_date_timestamp], temp_score[current_date_timestamp]);
       } else {
-        console.log("Date Not found")
-        score = Object.assign(score, temp_score)
+        score = Object.assign(score, temp_score);
       }
-      console.log("Score var")
-      console.log(score)
       string_score = JSON.stringify(score);
-      let token = $('meta[name="csrf-token" ]').attr('content');
+      let token = $('meta[name="csrf-token"]').attr('content');
       $.ajax({
         url: "/SaveGameRecords",
         type: "post",
@@ -126,12 +137,14 @@ $(document).ready(function () {
           id: id, 
           score: score, 
           string_score: string_score,
-          game_name: event.data.game,
-          game_score: event.data.score,
-          duration: 1200
+          game_name: gameName,
+          game_score: gameScore,
+          duration: event.data.duration || 1200
         },
         success: function (data) {
           console.log("Game recorded in normalized UTC table:", data);
+          $('p#score_history').text(string_score);
+          window.dispatchEvent(new CustomEvent('lazyeye:game-completed', { detail: { score: score } }));
         }
       });
     }
@@ -175,16 +188,36 @@ $('#iframe').on('load', function () {
 //**************************** */ Removing frame src on exiting fullscreen  *********************************
 
 $(document).on('fullscreenchange', function (e) {
-  let message = {}
-  console.log("Fullscreen state change")
+  console.log("Fullscreen state change");
   if (document.fullscreenElement) {
     // Entered fullscreen
   } else {
-    localStorage.setItem("game_state", 0)
-    console.log("State : " + localStorage.getItem("game_state"));
-    document.querySelector("iframe").contentWindow.localStorage.clear();
+    // Exited fullscreen - check if iframe had an active game session to record
+    const iframe = document.getElementById('iframe');
+    if (iframe && iframe.src && iframe.contentWindow && !gameSessionReported) {
+      try {
+        const cw = iframe.contentWindow;
+        if (typeof cw.reportGameSession === 'function') {
+          cw.reportGameSession();
+        } else if (cw.currentSession && typeof cw.currentSession.getScore === 'function') {
+          const s = cw.currentSession.getScore();
+          window.postMessage({
+            msg: 'Game Ended',
+            game: cw.currentSession.game || 'Therapy Game',
+            score: s
+          }, '*');
+        }
+      } catch (err) {
+        console.warn('Could not query iframe session on exit', err);
+      }
+    }
+    localStorage.setItem("game_state", 0);
+    try {
+      if (document.querySelector("iframe") && document.querySelector("iframe").contentWindow) {
+        document.querySelector("iframe").contentWindow.localStorage.clear();
+      }
+    } catch(e) {}
     document.getElementById('iframe').src = "";
-    console.log('Src React: ' + document.getElementById("iframe").src)
   }
 });
 

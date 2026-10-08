@@ -415,11 +415,21 @@
         : (20 * 60 * 1000);
 
       setTimeout(function() {
-        const message = { msg: 'Game Ended', game: 'Flappy Bird', score: score };
-        window.parent.postMessage(message, "*");
+        reportSession();
         console.log('Game ended by Game js timer');
       }, sessionDuration);
     });
+
+    function reportSession() {
+      const message = { msg: 'Game Ended', game: 'Flappy Bird', score: score };
+      window.parent.postMessage(message, "*");
+    }
+
+    window.reportGameSession = reportSession;
+    window.currentSession = {
+      game: 'Flappy Bird',
+      getScore: function() { return score; }
+    };
 
     $(document).ready(function() {
       $(window).focus();

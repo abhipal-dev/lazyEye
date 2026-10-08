@@ -106,33 +106,57 @@ export default class UserDashboard extends React.Component {
             date_format:"DD/MM/YYYY"
         }
     }
-    componentDidMount() {
+    fetchUserData = () => {
         let token = $('meta[name="csrf-token"]').attr('content');
+        const userId = this.props.id || this.state.id;
+        if (!userId) return;
+
         $.ajax({
             url: "/fetchLoginUser",
             type: "post",
             headers: { 'X-CSRF-TOKEN': token },
-            data: { id: this.props.id },
+            data: { id: userId },
             success: (data) => {
-                this.setState({
-                    id: data[0].id,
-                    fullname: data[0].fullname,
-                    username: data[0].username,
-                    data: data[0],
-                    data2: data,
-                    userProfileImage: `storage/images/${data[0].image_address}`
-                })
-                document.querySelector('#leftColorTestDiv').style.backgroundColor = data[0].left_eye_contrast_color
-                document.querySelector('#rightColorTestDiv').style.backgroundColor = data[0].right_eye_contrast_color
-                document.querySelector('#leftColorTestDiv').innerHTML = data[0].left_eye_contrast_color
-                document.querySelector('#rightColorTestDiv').innerHTML = data[0].right_eye_contrast_color
-                document.getElementById('leftEyeColor').value = data[0].left_eye_color
-                document.getElementById('rightEyeColor').value = data[0].right_eye_color
-                document.querySelector('#leftColorContrastSlider').defaultValue = data[0].left_eye_contrastvalue
-                document.querySelector('#rightColorContrastSlider').defaultValue = data[0].right_eye_contrastvalue
-                console.log(this.state.data)
+                if (data && data.length > 0) {
+                    this.setState({
+                        id: data[0].id,
+                        fullname: data[0].fullname,
+                        username: data[0].username,
+                        data: data[0],
+                        data2: data,
+                        userProfileImage: `storage/images/${data[0].image_address}`
+                    });
+                    const leftDiv = document.querySelector('#leftColorTestDiv');
+                    const rightDiv = document.querySelector('#rightColorTestDiv');
+                    const leftEye = document.getElementById('leftEyeColor');
+                    const rightEye = document.getElementById('rightEyeColor');
+                    const leftSlider = document.querySelector('#leftColorContrastSlider');
+                    const rightSlider = document.querySelector('#rightColorContrastSlider');
+
+                    if (leftDiv) {
+                        leftDiv.style.backgroundColor = data[0].left_eye_contrast_color;
+                        leftDiv.innerHTML = data[0].left_eye_contrast_color;
+                    }
+                    if (rightDiv) {
+                        rightDiv.style.backgroundColor = data[0].right_eye_contrast_color;
+                        rightDiv.innerHTML = data[0].right_eye_contrast_color;
+                    }
+                    if (leftEye) leftEye.value = data[0].left_eye_color;
+                    if (rightEye) rightEye.value = data[0].right_eye_color;
+                    if (leftSlider) leftSlider.defaultValue = data[0].left_eye_contrastvalue;
+                    if (rightSlider) rightSlider.defaultValue = data[0].right_eye_contrastvalue;
+                }
             }
         });
+    };
+
+    componentDidMount() {
+        this.fetchUserData();
+        window.addEventListener('lazyeye:game-completed', this.fetchUserData);
+    }
+
+    componentWillUnmount() {
+        window.removeEventListener('lazyeye:game-completed', this.fetchUserData);
     }
     pad = (n) => {
         return (n.length < 2) ? "0" + n : n;

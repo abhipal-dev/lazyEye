@@ -324,7 +324,10 @@
         <div id="gameOverOverlay" class="game-over-overlay">
           <h2>GAME OVER</h2>
           <p>Score: <span id="finalScore">0</span></p>
-          <button id="restartBtn" class="btn-restart"><i class="fa-solid fa-rotate-right"></i> Play Again</button>
+          <div style="display:flex; gap:10px; margin-top:10px;">
+            <button id="restartBtn" class="btn-restart"><i class="fa-solid fa-rotate-right"></i> Play Again</button>
+            <button id="saveExitBtn" class="btn-restart" style="background:#059669; border-color:#10b981;"><i class="fa-solid fa-floppy-disk"></i> Save & Exit</button>
+          </div>
         </div>
       </div>
 
@@ -394,6 +397,10 @@
         <div><span>Soft Drop:</span> <span class="key-badge">↓ / S</span></div>
         <div><span>Hard Drop:</span> <span class="key-badge">Space</span></div>
       </div>
+
+      <button id="finishSessionBtn" class="btn-restart" style="width:100%; margin-top:10px; background:#059669; border-color:#10b981; font-size:12px; padding:8px 12px; font-weight:600; cursor:pointer;">
+        <i class="fa-solid fa-floppy-disk me-1"></i> Finish Therapy & Save
+      </button>
     </div>
   </div>
 
@@ -854,17 +861,30 @@
       sessionRemainingSec = Math.floor(sessionDuration / 1000);
 
       setTimeout(function() {
-        clearInterval(timerInterval);
-        const message = { msg: 'Game Ended', game: "Tetris", score: score };
-        window.parent.postMessage(message, "*");
+        reportSession();
         console.log('Game ended by Game js timer');
       }, sessionDuration);
     });
+
+    function reportSession() {
+      clearInterval(timerInterval);
+      const message = { msg: 'Game Ended', game: "Tetris", score: score };
+      window.parent.postMessage(message, "*");
+    }
+
+    window.reportGameSession = reportSession;
+    window.currentSession = {
+      game: 'Tetris',
+      getScore: function() { return score; }
+    };
 
     // Start immediately on load
     $(document).ready(function() {
       $(window).focus();
       resetGame();
+
+      document.getElementById('finishSessionBtn')?.addEventListener('click', reportSession);
+      document.getElementById('saveExitBtn')?.addEventListener('click', reportSession);
     });
   </script>
 </body>

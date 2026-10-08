@@ -146,6 +146,9 @@
       <span>Score:</span>
       <span id="scoreVal">0</span>
     </div>
+    <button id="finishBouncingBtn" style="background:#059669; border:none; color:#fff; border-radius:20px; padding:5px 14px; font-size:11px; font-weight:600; cursor:pointer;">
+      <i class="fa-solid fa-floppy-disk me-1"></i> Finish & Save
+    </button>
   </div>
 
   <div class="jump-prompt">Tap Screen or Press Space / Up Arrow to Jump</div>
@@ -296,17 +299,29 @@
         : (20 * 60 * 1000);
 
       setTimeout(function() {
-        const message = { msg: 'Game Ended', game: 'Bouncing Ball', score: score };
-        window.parent.postMessage(message, "*");
+        reportSession();
         console.log('Game ended by Game js timer');
       }, sessionDuration);
     });
+
+    function reportSession() {
+      const message = { msg: 'Game Ended', game: 'Bouncing Ball', score: score };
+      window.parent.postMessage(message, "*");
+    }
+
+    window.reportGameSession = reportSession;
+    window.currentSession = {
+      game: 'Bouncing Ball',
+      getScore: function() { return score; }
+    };
 
     $(document).ready(function() {
       $(window).focus();
       updateColors(leftColor, rightColor);
       requestAnimationFrame(gameLoop);
       spawnObstacle();
+
+      document.getElementById('finishBouncingBtn')?.addEventListener('click', reportSession);
     });
   </script>
 </body>

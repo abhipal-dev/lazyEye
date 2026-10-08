@@ -233,3 +233,4 @@ export default class ClinicalReport extends React.Component {
         );
     }
 }
+
