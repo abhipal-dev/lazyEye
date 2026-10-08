@@ -320,69 +320,55 @@ a {
      message={msg:"Game Ended",score:score*10} 
       window.parent.postMessage(message, "*");
   } 
-  var leftContrast=0,rightContrast=0,leftColorName='',rightColorName='';
+  var leftContrast = 255, rightContrast = 255, leftColorName = 'red', rightColorName = 'cyan';
+  
+  // globalConfig.js
+  let gameSpeed = 1;
+  var score = 0;
+  // Colors
+  var RIGHTCOLOR = { r: 0, g: 255, b: 255 };
+  var LEFTCOLOR  = { r: 255, g: 0, b: 0 };
+  var EXTRACOLOR = { r: 255, g: 255, b: 0 };
+  var EXTRACOLOR2 = { r: 0, g: 255, b: 255 };
+
+  function applyMenjaColors() {
+    if (leftColorName === 'red') {
+      LEFTCOLOR.r = leftContrast; LEFTCOLOR.g = 0; LEFTCOLOR.b = 0;
+    } else if (leftColorName === 'green') {
+      LEFTCOLOR.r = 0; LEFTCOLOR.g = leftContrast; LEFTCOLOR.b = 0;
+    } else {
+      LEFTCOLOR.r = 0; LEFTCOLOR.g = 0; LEFTCOLOR.b = leftContrast;
+    }
+
+    if (rightColorName === 'red') {
+      RIGHTCOLOR.r = rightContrast; RIGHTCOLOR.g = 0; RIGHTCOLOR.b = 0;
+    } else if (rightColorName === 'green') {
+      RIGHTCOLOR.r = 0; RIGHTCOLOR.g = rightContrast; RIGHTCOLOR.b = 0;
+    } else if (rightColorName === 'cyan') {
+      RIGHTCOLOR.r = 0; RIGHTCOLOR.g = rightContrast; RIGHTCOLOR.b = rightContrast;
+    } else {
+      RIGHTCOLOR.r = 0; RIGHTCOLOR.g = 0; RIGHTCOLOR.b = rightContrast;
+    }
+  }
+
   $(document).ready(function(){
     window.addEventListener('message', function(event) {
-          // console.log("Message : " + event.data.msg); // Message received from child
-          // console.log("leftColor :" + event.data.leftColorName); // Message received from child
-          // console.log("rightColor :" + event.data.rightColorName); // Message received from child
-          // console.log("leftContrast :" + event.data.leftContrast); // Message received from child
-          // console.log("rightContrast :" + event.data.rightContrast); // Message received from child
-          leftContrast = +event.data.leftContrast;
-          rightContrast = +event.data.leftContrast;
-          leftColorName = event.data.leftColorName;
-          rightColorName = event.data.rightColorName;
-          var sessionDuration = (event.data.time && !isNaN(event.data.time) && event.data.time > 10000) ? event.data.time : (20 * 60 * 1000);
-          setTimeout(function(){
-            console.log("Page is redirecting to Games"); 
-            message={msg:"Game Ended",game:"Menja",score:score}; 
-            window.parent.postMessage(message, "*");
-          }, sessionDuration);
-       
-    // globalConfig.js
-// ============================================================================
-// ============================================================================
+      if (!event.data) return;
+      leftContrast = +event.data.leftContrast || 255;
+      rightContrast = +(event.data.rightContrast || event.data.leftContrast) || 255;
+      if (event.data.leftColorName) leftColorName = event.data.leftColorName;
+      if (event.data.rightColorName) rightColorName = event.data.rightColorName;
+      applyMenjaColors();
 
-// Provides global variables used by the entire program.
-// Most of this should be configuration.
-
-// Timing multiplier for entire game engine.
-let gameSpeed = 1;
-var score=0;
-// Colors
-var RIGHTCOLOR=   { r:0, g:0, b: 0 };
-var LEFTCOLOR =  { r: 0, g: 0, b: 0 };
-var EXTRACOLOR ={ r: 255, g: 255, b: 0 };
-var EXTRACOLOR2 ={ r: 0, g: 255, b: 255 };
-// console.log("leftColorName game: "+leftColorName)
-// console.log("rightColorNAme game : "+rightColorName)
-if(leftColorName=='red'){
-      // console.log('lr')
-  LEFTCOLOR.r=leftContrast;
-}
-else if(leftColorName=='green'){
-  // console.log('lg')
-  LEFTCOLOR.g=leftContrast;
-}else{
-  // console.log('lb')
-  LEFTCOLOR.b=leftContrast; 
-}
-
-if(rightColorName=='red'){
-// console.log('rr')
- RIGHTCOLOR.r=rightContrast;
-}
-else if(rightColorName=='green'){
-  // console.log('rg')
-  RIGHTCOLOR.g=rightContrast;
-}else{
-  // console.log('rb')
-  RIGHTCOLOR.b=rightContrast;
-}
-// console.log(LEFTCOLOR)
-// console.log(RIGHTCOLOR)
-// console.log(EXTRACOLOR)
-// console.log(EXTRACOLOR2)
+      window.parent.postMessage("Game Started", "*");
+      var sessionDuration = (event.data.time && !isNaN(event.data.time) && event.data.time > 10000) ? event.data.time : (20 * 60 * 1000);
+      setTimeout(function(){
+        console.log("Page is redirecting to Games"); 
+        message = { msg: "Game Ended", game: "Menja", score: score }; 
+        window.parent.postMessage(message, "*");
+      }, sessionDuration);
+    });
+  });
 
 
 const allColors = [ EXTRACOLOR, RIGHTCOLOR,LEFTCOLOR,EXTRACOLOR2];
@@ -2554,13 +2540,12 @@ if ('PointerEvent' in window) {
 // ============================================================================
 // ============================================================================
 
-setupCanvases();
-
+$(document).ready(function() {
+  setupCanvases();
   setGameMode(GAME_MODE_CASUAL);
   setActiveMenu(null);
   resetGame();
 });
-  });
 </script>
 </body>
 </html>

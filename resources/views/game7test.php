@@ -1,314 +1,313 @@
 <!DOCTYPE html>
 <html lang="en">
-
 <head>
   <meta charset="UTF-8">
   <meta http-equiv="X-UA-Compatible" content="IE=edge">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Jump and Run Game</title>
-  <!-- <link rel="stylesheet" href="css/game7style.css"> -->\
-  <script src="https://code.jquery.com/jquery-3.6.3.min.js"
-    integrity="sha256-pvPw+upLPUjgMXY0G+8O0xUf+/Im1MZjXxxgOcBQBXU=" crossorigin="anonymous"></script>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>Bouncing Ball Agility - LazyEye Therapy</title>
+  <script src="https://code.jquery.com/jquery-3.6.3.min.js" crossorigin="anonymous"></script>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
   <style>
     * {
       margin: 0;
       padding: 0;
-    }
-    :root {
-  --character-bg-color: red;
-  --obstacle-bg-color: blue;
-  --ground-bg-color: blue;
-}
-    body {
-      width: 100%;
-      height: 100vh;
-      position: relative;
-      overflow: hidden;
-      background-color: black;
+      box-sizing: border-box;
+      user-select: none;
+      -webkit-user-select: none;
     }
 
+    :root {
+      --character-bg-color: #ef4444;
+      --obstacle-bg-color: #06b6d4;
+      --ground-bg-color: #06b6d4;
+    }
+
+    body {
+      width: 100vw;
+      height: 100vh;
+      overflow: hidden;
+      background: radial-gradient(circle at center, #0f172a 0%, #020617 100%);
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+      position: relative;
+    }
+
+    /* Top HUD */
+    .runner-hud {
+      position: absolute;
+      top: 16px;
+      left: 50%;
+      transform: translateX(-50%);
+      z-index: 50;
+      display: flex;
+      align-items: center;
+      gap: 16px;
+      background: rgba(15, 23, 42, 0.85);
+      border: 1px solid rgba(255, 255, 255, 0.15);
+      border-radius: 20px;
+      padding: 8px 20px;
+      backdrop-filter: blur(8px);
+      box-shadow: 0 8px 24px rgba(0, 0, 0, 0.6);
+    }
+
+    .eye-legend {
+      display: flex;
+      gap: 12px;
+      font-size: 11px;
+      font-weight: 600;
+      color: #f1f5f9;
+    }
+
+    .legend-item {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .eye-dot {
+      width: 10px;
+      height: 10px;
+      border-radius: 50%;
+    }
+
+    .score-badge {
+      font-size: 16px;
+      font-weight: 800;
+      color: #38bdf8;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    /* Ground */
     #ground {
       width: 100%;
-      height: 100px;
+      height: 90px;
       background-color: var(--ground-bg-color);
       position: absolute;
       bottom: 0;
+      left: 0;
+      box-shadow: 0 -4px 20px rgba(6, 182, 212, 0.3);
     }
 
+    /* Character Ball */
     #character {
-      width: 50px;
-      height: 50px;
+      width: 48px;
+      height: 48px;
       background-color: var(--character-bg-color);
       border-radius: 50%;
       position: absolute;
-      bottom: 100px;
-      right: calc(100% - 680px);
+      bottom: 90px;
+      left: 80px;
+      box-shadow: 0 0 15px currentColor;
+      transition: transform 0.05s linear;
+      z-index: 20;
     }
 
+    /* Obstacles */
     .obstacle {
-      width: 30px;
-      height: 100px;
-      background-color: var(--obstacle-bg-color);
       position: absolute;
-      bottom: 100px;
-      right: 0;
+      bottom: 90px;
+      width: 28px;
+      background-color: var(--obstacle-bg-color);
+      border-radius: 6px 6px 0 0;
+      box-shadow: 0 0 10px currentColor;
+      z-index: 10;
     }
 
-    h2 {
-      font-family: sans-serif;
-      margin-top: 10px;
-      margin-left: 10px;
-    }
-
-    #score {
-      color: red;
+    .jump-prompt {
+      position: absolute;
+      bottom: 120px;
+      left: 50%;
+      transform: translateX(-50%);
+      font-size: 13px;
+      color: rgba(255, 255, 255, 0.5);
+      pointer-events: none;
+      letter-spacing: 0.5px;
     }
   </style>
 </head>
-
 <body>
-  <div id="ground"></div>
+
+  <!-- Top Status HUD -->
+  <div class="runner-hud">
+    <div class="eye-legend">
+      <div class="legend-item">
+        <span class="eye-dot" id="dotLeft" style="background: var(--character-bg-color);"></span>
+        <span>Jumping Ball (Left Eye)</span>
+      </div>
+      <div class="legend-item">
+        <span class="eye-dot" id="dotRight" style="background: var(--obstacle-bg-color);"></span>
+        <span>Hurdles & Ground (Right Eye)</span>
+      </div>
+    </div>
+    <div class="score-badge">
+      <i class="fa-solid fa-star"></i>
+      <span>Score:</span>
+      <span id="scoreVal">0</span>
+    </div>
+  </div>
+
+  <div class="jump-prompt">Tap Screen or Press Space / Up Arrow to Jump</div>
+
   <div id="character"></div>
-  <div class="obstacles"></div>
-  <h2 style="color:red">Score: <span id="score">0</span></h2>
+  <div class="obstacles-container"></div>
+  <div id="ground"></div>
+
   <script>
-    var leftColor='',rightColor='',state
-    window.onload = function () {
-      // localStorage.clear();
-      state = localStorage.getItem("game_state");
-      if(!state){
-      localStorage.clear()
-      // localStorage.setItem("seconds",10000);
-      }
-      let name = localStorage.getItem("name");
-      let seconds = localStorage.getItem("seconds");
-      let temp_score = localStorage.getItem("score");
-      // console.log("state :" + state)
-      // console.log("name :" + name)
-      // console.log("score:" + temp_score)
-      // console.log("seconds:" + seconds)
-      if (temp_score&&state) {
-        score = +(temp_score)
-        drawScore();
-      }
-      else
-        score = 0
-      localStorage.setItem("game_state",1)
-    }
-    window.onbeforeunload = function () {
-      // localStorage.clear();
-      // if (state != 2) {
-        localStorage.setItem("name", "Abhishek Pal");
-        // localStorage.setItem("state", 1);
-        localStorage.setItem("score", score);
-        localStorage.setItem("seconds",sw.now);
-        // state = 0;
-      // }
-    }
-
-    $(document).ready(function () {
-      $(window).focus();
-     
-    })
-
-    window.addEventListener('message', function (event) {
-      console.log("MESSAGE RECEIVED");
-        // console.log("msg : "+event.data.msg);
-        // console.log("leftcolor : "+event.data.leftColor);
-        // console.log("rightcolor : "+event.data.rightColor);
-        console.log("time : "+event.data.time);
-        // console.log("Name : "+localStorage.getItem("name"));
-        // console.log("Score : "+localStorage.getItem("score"));
-        if(!state){
-      // localStorage.clear()
-      localStorage.setItem("seconds",0);
-        let rawMin = (event.data.time / 1000) / 60;
-        user_allotted_time = (!rawMin || isNaN(rawMin) || rawMin <= 0) ? 20 : rawMin;
-        leftColor = event.data.leftColor;
-        rightColor = event.data.rightColor;
-        
-        const root = document.querySelector(':root');
-        root.style.setProperty('--obstacle-bg-color', rightColor);
-        root.style.setProperty('--ground-bg-color', rightColor);
-        root.style.setProperty('--character-bg-color', leftColor);
-        setInterval(drawScore,500);
-        sw.now = localStorage.getItem("seconds")
-        sw.start();
-    });
-
-    // localStorage.setItem("secs",200)
-// let s = localStorage.getItem("seconds")
-var user_allotted_time;
-var sw = {
-  // (A) PROPERTIES
-  etime : null, // html time display
-  erst : null,  // html reset button
-  ego : null,   // html start/stop button
-  timer : null, // timer object
-  now : localStorage.getItem("seconds"),      // current elapsed time
-
-  // (B) INITIALIZE
-  init : () => {
- 
-  },
-
-  // (C) START!
-  start : () => {
-    sw.timer = setInterval(sw.tick, 1000);
-   
-  },
-
-  // (D) STOP
-  stop : () => {
-    clearInterval(sw.timer);
-    sw.timer = null;
-   
-  },
-
-  // (E) TIMER ACTION
-  tick : () => {
-    // (E1) CALCULATE HOURS, MINS, SECONDS
-    sw.now++;
-    let hours = 0, mins = 0, secs = 0,
-    remain = sw.now;
-    hours = Math.floor(remain / 3600);
-    remain -= hours * 3600;
-    mins = Math.floor(remain / 60);
-    remain -= mins * 60;
-    secs = remain;
-    if(mins==user_allotted_time){
-      localStorage.clear()
-         message = { msg: 'Game Ended',game:"Bouncing Ball", score: score }
-          window.parent.postMessage(message, "*");
-          console.log('Game ended by Game js')
-    }
-    // (E2) UPDATE THE DISPLAY TIMER
-    if (hours<10) { hours = "0" + hours; }
-    if (mins<10) { mins = "0" + mins; }
-    if (secs<10) { secs = "0" + secs; }
-    // sw.etime.innerHTML = hours + ":" + mins + ":" + secs;
-    console.log(hours + ":" + mins + ":" + secs);
-  },
-
-  // (F) RESET
-  reset : () => {
-    if (sw.timer != null) { sw.stop(); }
-    sw.now = -1;
-    sw.tick();
-  }
-};
-window.addEventListener("load", sw.init);
-
-    let score=0;
-    let character = document.getElementById('character');
-    let characterBottom = parseInt(window.getComputedStyle(character).getPropertyValue('bottom'));
-    let characterRight = parseInt(window.getComputedStyle(character).getPropertyValue('right'));
-    let characterWidth = parseInt(window.getComputedStyle(character).getPropertyValue('width'));
-
-    let ground = document.getElementById('ground');
-
-    let groundBottom = parseInt(window.getComputedStyle(ground).getPropertyValue('Bottom'));
-    let groundHeight = parseInt(window.getComputedStyle(ground).getPropertyValue('height'));
-
+    let leftColor = '#ef4444';
+    let rightColor = '#06b6d4';
+    let score = 0;
     let isJumping = false;
-    let upTime;
-    let downTime;
-    let displayScore = document.getElementById('score');
+    let characterY = 90; // bottom in px
+    let groundHeight = 90;
+    let jumpVelocity = 0;
+    const gravity = 0.6;
+    let animId = null;
 
+    const character = document.getElementById('character');
+    const scoreVal = document.getElementById('scoreVal');
+    const obstaclesContainer = document.querySelector('.obstacles-container');
 
+    function updateColors(left, right) {
+      if (left) leftColor = left;
+      if (right) rightColor = right;
+
+      const root = document.querySelector(':root');
+      root.style.setProperty('--character-bg-color', leftColor);
+      root.style.setProperty('--obstacle-bg-color', rightColor);
+      root.style.setProperty('--ground-bg-color', rightColor);
+
+      document.getElementById('dotLeft').style.background = leftColor;
+      document.getElementById('dotRight').style.background = rightColor;
+    }
 
     function jump() {
-      console.log(isJumping)
-      if (isJumping) return;
-      upTime = setInterval(() => {
-        if (characterBottom >= groundHeight + 250) {
-          clearInterval(upTime);
-          downTime = setInterval(() => {
-            if (characterBottom <= groundHeight + 10) {
-              clearInterval(downTime)
-              // score += 1;
-              // displayScore.textContent = score;
-              isJumping = false;
-            }
-            characterBottom -= 10;
-            character.style.bottom = characterBottom + 'px';
-          }, 20)
-        }
-        characterBottom += 10;
-        character.style.bottom = characterBottom + 'px';
+      if (!isJumping) {
         isJumping = true;
-      }, 20)
+        jumpVelocity = 14;
+      }
     }
 
-    function drawScore() {
-      score++;
-      // console.log(score)
-      displayScore.textContent = score;
-     }
-
-    // setInterval(drawScore, 100);
-
-    function generateObstacle() {
-      let obstacles = document.querySelector('.obstacles');
-      let obstacle = document.createElement('div');
-      obstacle.setAttribute('class', 'obstacle');
-      obstacles.appendChild(obstacle);
-
-      let randomTimeout = Math.floor(Math.random() * 1000) + 1500;
-      let obstacleRight = -30;
-      let obstacleBottom = 100;
-      let obstacleWidth = 30;
-      let temp = Math.floor(Math.random() * 60)
-      let obstacleHeight = temp + 40;
-      // console.log(temp )
-      obstacle.style.background = 'rgb(${Math.floor(Math.random() * 255)}, ${Math.floor(Math.random() * 255)},${Math.floor(Math.random() * 255)})';
-
-
-      function removeObstacles(className) { //function to remove obstacle using class
-        const elements = document.getElementsByClassName(className);
-        console.log("elements:" + elements)
-        while (elements.length > 0) {
-          elements[0].parentNode.removeChild(elements[0]);
-        }
-      }
-
-
-      function moveObstacle() {
-        obstacleRight += 4;
-        obstacle.style.right = obstacleRight + 'px';
-        obstacle.style.bottom = obstacleBottom + 'px';
-        obstacle.style.width = obstacleWidth + 'px';
-        obstacle.style.height = obstacleHeight + 'px';
-        if (characterRight >= obstacleRight - characterWidth && characterRight <= obstacleRight + obstacleWidth && characterBottom <= obstacleBottom + obstacleHeight) {
-         
-          clearInterval(obstacleInterval);
-          clearTimeout(obstacleTimeout);
-         
-          location.reload()
-          return false;
-
-        }
-      }
-      let obstacleInterval = setInterval(moveObstacle, 20);
-      let obstacleTimeout = setTimeout(generateObstacle, randomTimeout);
- 
-    }
-    generateObstacle()
-
-    function control(e) {
-      console.log(e.key)
-      if (e.key == "ArrowUp" || e.key == '') {
+    // Input handlers: Space, Up Arrow, Click, Touch
+    window.addEventListener('keydown', (e) => {
+      if (e.key === ' ' || e.key === 'ArrowUp' || e.key === 'w' || e.key === 'W') {
+        e.preventDefault();
         jump();
+      }
+    });
 
-        // obstacleRight = -30+"px";
+    window.addEventListener('pointerdown', (e) => {
+      jump();
+    });
+
+    // Main Game Loop for Character Physics
+    function gameLoop() {
+      if (isJumping) {
+        characterY += jumpVelocity;
+        jumpVelocity -= gravity;
+
+        if (characterY <= groundHeight) {
+          characterY = groundHeight;
+          isJumping = false;
+          jumpVelocity = 0;
+        }
+        character.style.bottom = characterY + 'px';
       }
 
+      animId = requestAnimationFrame(gameLoop);
     }
 
+    // Obstacle Generator
+    let obstacles = [];
+    let spawnTimer = null;
 
+    function spawnObstacle() {
+      const obstacleEl = document.createElement('div');
+      obstacleEl.className = 'obstacle';
+      const h = Math.floor(Math.random() * 45) + 40;
+      obstacleEl.style.height = h + 'px';
+      obstacleEl.style.left = window.innerWidth + 'px';
+      obstaclesContainer.appendChild(obstacleEl);
 
-    document.addEventListener('keydown', control);
+      obstacles.push({
+        el: obstacleEl,
+        x: window.innerWidth,
+        width: 28,
+        height: h,
+        cleared: false
+      });
+
+      const nextInterval = Math.floor(Math.random() * 800) + 1600;
+      spawnTimer = setTimeout(spawnObstacle, nextInterval);
+    }
+
+    // Obstacle Movement & Collision Loop
+    let obstacleSpeed = 5;
+    setInterval(() => {
+      const charLeft = 80;
+      const charRight = 80 + 48;
+      const charBottom = characterY;
+
+      for (let i = obstacles.length - 1; i >= 0; i--) {
+        const obs = obstacles[i];
+        obs.x -= obstacleSpeed;
+        obs.el.style.left = obs.x + 'px';
+
+        // Collision Check (AABB)
+        const obsLeft = obs.x;
+        const obsRight = obs.x + obs.width;
+        const obsTop = groundHeight + obs.height;
+
+        if (charRight > obsLeft && charLeft < obsRight && charBottom < obsTop) {
+          // Soft collision: flash red and reset score slightly
+          character.style.opacity = '0.4';
+          setTimeout(() => { character.style.opacity = '1'; }, 200);
+          score = Math.max(0, score - 2);
+          scoreVal.innerText = score;
+        }
+
+        // Passed obstacle: award score
+        if (!obs.cleared && obsRight < charLeft) {
+          obs.cleared = true;
+          score += 5;
+          scoreVal.innerText = score;
+        }
+
+        // Offscreen removal
+        if (obs.x < -40) {
+          obs.el.remove();
+          obstacles.splice(i, 1);
+        }
+      }
+    }, 20);
+
+    // PostMessage Protocol
+    window.addEventListener('message', function(event) {
+      if (!event.data) return;
+      if (event.data.leftColor || event.data.rightColor) {
+        updateColors(event.data.leftColor, event.data.rightColor);
+      }
+
+      window.parent.postMessage("Game Started", "*");
+
+      const sessionDuration = (event.data.time && !isNaN(event.data.time) && event.data.time > 10000)
+        ? event.data.time
+        : (20 * 60 * 1000);
+
+      setTimeout(function() {
+        const message = { msg: 'Game Ended', game: 'Bouncing Ball', score: score };
+        window.parent.postMessage(message, "*");
+        console.log('Game ended by Game js timer');
+      }, sessionDuration);
+    });
+
+    $(document).ready(function() {
+      $(window).focus();
+      updateColors(leftColor, rightColor);
+      requestAnimationFrame(gameLoop);
+      spawnObstacle();
+    });
   </script>
 </body>
-
 </html>

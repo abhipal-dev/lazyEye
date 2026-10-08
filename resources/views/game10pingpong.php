@@ -32,13 +32,13 @@
     <body>
 
       <!-- our "canvas" where we draw things-->
-      <canvas id="canvas"  id="game"></canvas>
+      <canvas id="canvas"></canvas>
 
       <!-- link to script.js -->
       <script>
     var h = window.innerHeight;
     var w = window.innerWidth;    // var w = window.innerWidth;
-    var leftColor ='',rightColor=''; 
+    var leftColor = '#ef4444', rightColor = '#06b6d4'; 
     h = h-(h%32)
     w = w-(w%32)    // w = w-(w%16)
     console.log("Height : "+h) 
@@ -223,6 +223,16 @@
         }
 
         /* moving paddles section end */
+        window.addEventListener('mousemove', function(e) {
+          let rect = canvas.getBoundingClientRect();
+          user.y = Math.max(0, Math.min(canvas.height - user.height, e.clientY - rect.top - user.height / 2));
+        });
+        window.addEventListener('touchmove', function(e) {
+          if (e.touches.length > 0) {
+            let rect = canvas.getBoundingClientRect();
+            user.y = Math.max(0, Math.min(canvas.height - user.height, e.touches[0].clientY - rect.top - user.height / 2));
+          }
+        }, { passive: true });
 
         // reset the ball
         function reset() {

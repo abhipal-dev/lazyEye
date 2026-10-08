@@ -1,333 +1,456 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
-  <title>Basic Snake HTML Game</title>
   <meta charset="UTF-8">
-            <meta name="csrf-token" content="{{ csrf_token() }}" />
-            <meta http-equiv="X-UA-Compatible" content="IE=edge">
-            <meta name="viewport" content="width=device-width, initial-scale=1.0">
-            <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.1/jquery.min.js"></script>
+  <meta name="csrf-token" content="{{ csrf_token() }}" />
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>Snake Macular Fixation - LazyEye Therapy</title>
+  <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.1/jquery.min.js"></script>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 
-            
   <style>
-    *{
-      margin:0;
-      padding:0;
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      user-select: none;
+      -webkit-user-select: none;
     }
-    div.snake_game{
-      width:100%;
-      height:100%;
+
+    body {
+      background: radial-gradient(circle at center, #0f172a 0%, #020617 100%);
+      color: #f8fafc;
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      overflow: hidden;
+      padding: 8px;
     }
-  canvas{
-    background-color:black;
-    width:100%;
-      height:100%;
-  }
- 
+
+    /* Top HUD Bar */
+    .snake-hud-bar {
+      width: 100%;
+      max-width: 820px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      background: rgba(15, 23, 42, 0.85);
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      border-radius: 12px;
+      padding: 8px 16px;
+      margin-bottom: 8px;
+      backdrop-filter: blur(8px);
+    }
+
+    .snake-brand {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .snake-brand h1 {
+      font-size: 16px;
+      font-weight: 800;
+      letter-spacing: 0.5px;
+      background: linear-gradient(135deg, #34d399, #38bdf8);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
+
+    .eye-badges {
+      display: flex;
+      gap: 12px;
+      font-size: 11px;
+      font-weight: 600;
+    }
+
+    .eye-badge-item {
+      display: flex;
+      align-items: center;
+      gap: 5px;
+    }
+
+    .eye-dot {
+      width: 10px;
+      height: 10px;
+      border-radius: 50%;
+      box-shadow: 0 0 6px currentColor;
+    }
+
+    .snake-score-chip {
+      background: rgba(30, 41, 59, 0.8);
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      border-radius: 8px;
+      padding: 4px 12px;
+      font-size: 14px;
+      font-weight: 700;
+      color: #38bdf8;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    /* Playfield */
+    .arena-container {
+      position: relative;
+      border-radius: 12px;
+      padding: 3px;
+      background: linear-gradient(135deg, rgba(52, 211, 153, 0.4), rgba(56, 189, 248, 0.4));
+      box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.7);
+    }
+
+    canvas#game {
+      display: block;
+      background: #000000;
+      border-radius: 9px;
+    }
+
+    /* Mobile On-Screen Controls */
+    .mobile-dpad {
+      display: none;
+      margin-top: 10px;
+      flex-direction: column;
+      align-items: center;
+      gap: 6px;
+      width: 220px;
+    }
+
+    .dpad-row {
+      display: flex;
+      gap: 8px;
+      width: 100%;
+      justify-content: center;
+    }
+
+    .btn-dpad {
+      width: 54px;
+      height: 48px;
+      background: rgba(30, 41, 59, 0.9);
+      border: 1px solid rgba(255, 255, 255, 0.15);
+      border-radius: 10px;
+      color: #f8fafc;
+      font-size: 18px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      touch-action: manipulation;
+    }
+
+    .btn-dpad:active {
+      background: rgba(52, 211, 153, 0.4);
+      border-color: #34d399;
+    }
+
+    @media (max-width: 768px) {
+      .mobile-dpad {
+        display: flex;
+      }
+      .snake-brand h1 {
+        font-size: 14px;
+      }
+    }
   </style>
 </head>
 <body>
-  <div class="snake_game" id="myGame">
-  <!-- width="1270" height="800"  -->
-    <canvas id="game" width="1200" height="800" autofocus></canvas>
+
+  <!-- Top HUD Bar -->
+  <div class="snake-hud-bar">
+    <div class="snake-brand">
+      <i class="fa-solid fa-staff-snake" style="color: #34d399;"></i>
+      <h1>SNAKE FIXATION</h1>
+      <div class="eye-badges">
+        <div class="eye-badge-item">
+          <span class="eye-dot" id="snakeEyeDot" style="color: #ef4444; background: #ef4444;"></span>
+          <span>Snake</span>
+        </div>
+        <div class="eye-badge-item">
+          <span class="eye-dot" id="appleEyeDot" style="color: #06b6d4; background: #06b6d4;"></span>
+          <span>Target</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="snake-score-chip">
+      <span>Score:</span>
+      <span id="scoreVal">0</span>
+    </div>
   </div>
-<script>
-    if( /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent) ) {
-    $('body').css({
-        "-webkit-transform": "rotate(90deg)"
-    }); 
-    var h = window.innerWidth;
-    var w = window.innerHeight;
-}else{
-    var h = window.innerHeight;
-    var w = window.innerWidth;
-}
 
+  <!-- Main Canvas Playfield -->
+  <div class="arena-container">
+    <canvas id="game"></canvas>
+  </div>
 
-  var elem = document.getElementById("myGame");
-  // document.getElementById('game').focus();
-   $(document).ready(function(){
-    $(window).focus();
-        //   setTimeout(function() {
-        //     message={msg:'Game Ended',score:score}
-        //     window.parent.postMessage(message, "*");
-        //     console.log('Game ended by Game js')
-        // }, 300000);
-        }) 
+  <!-- Mobile D-Pad -->
+  <div class="mobile-dpad">
+    <div class="dpad-row">
+      <button class="btn-dpad" id="btnUp"><i class="fa-solid fa-arrow-up"></i></button>
+    </div>
+    <div class="dpad-row">
+      <button class="btn-dpad" id="btnLeft"><i class="fa-solid fa-arrow-left"></i></button>
+      <button class="btn-dpad" id="btnDown"><i class="fa-solid fa-arrow-down"></i></button>
+      <button class="btn-dpad" id="btnRight"><i class="fa-solid fa-arrow-right"></i></button>
+    </div>
+  </div>
 
-    var leftColor ='',rightColor='',colors=[],random_apple_color=''; 
-    h = h-(h%16)
-    w = w-(w%16)
-    //  console.log("width : "+w+" | Height : "+h)   
-    $('canvas').height(h);
-    $('canvas').width(w); 
-    window.addEventListener('message', function(event) {
-      console.log("mESSAGE RECEIVED"); 
-         console.log(event.data.msg);
-         console.log(event.data.leftColor);
-         console.log(event.data.rightColor);
-         console.log("Time : "+event.data.time);
-         leftColor =  event.data.leftColor;
-         rightColor =  event.data.rightColor;
-         colors.push(leftColor)
-         colors.push(rightColor)
-         var sessionDuration = (event.data.time && !isNaN(event.data.time) && event.data.time > 10000) ? event.data.time : (20 * 60 * 1000);
-         setTimeout(function() {
-            message={msg:'Game Ended',game:'Snake',score:score}
-            window.parent.postMessage(message, "*");
-            console.log('Game ended by Game js')
-        }, sessionDuration);
-        window.parent.postMessage("Game Started", "*");
-      
+  <script>
+    const canvas = document.getElementById('game');
+    const context = canvas.getContext('2d');
+    const grid = 20; // 20px grid cells
 
-    });
-var canvas = document.getElementById('game');
-var context = canvas.getContext('2d');
-// canvas.focus()
-// context.focus()
+    // Responsive Canvas Resolution
+    function resizeCanvas() {
+      const maxW = Math.min(window.innerWidth - 30, 800);
+      const isMobile = window.innerWidth <= 768;
+      const maxH = Math.min(window.innerHeight - (isMobile ? 220 : 120), 560);
 
-// the canvas width & height, snake x & y, and the apple x & y, all need to be a multiples of the grid size in order for collision detection to work
-// (e.g. 16 * 25 = 400)
-var control=[],prev_command;
-var grid = 16;
-var count = 0;
-var score=0;
+      // Snap to multiples of grid
+      const w = Math.floor(maxW / grid) * grid;
+      const h = Math.floor(maxH / grid) * grid;
 
-var snake = {
-  x: 16,
-  y: 160,
-
-  // snake velocity. moves one grid length every frame in either the x or y direction
-  dx: grid,
-  dy: 0,
-
-  // keep track of all grids the snake body occupies
-  cells: [],
-
-  // length of the snake. grows when eating an apple
-  maxCells: 4
-};
-var apple = {
-  x: 320,
-  y: 320
-};
-
-// get random whole numbers in a specific range
-// @see https://stackoverflow.com/a/1527820/2124254
-function getRandomInt(min, max) {
-  return Math.floor(Math.random() * (max - min)) + min;
-}
-
-// game loop
-function loop() {
-  requestAnimationFrame(loop);
-  // slow game loop to 15 fps instead of 60 (60/15 = 4)
-  if (++count < 8) {
-    return;
-  }
-
-  count = 0;
-  context.clearRect(0,0,canvas.width,canvas.height);
-
-  // move snake by it's velocity
-  snake.x += snake.dx;
-  snake.y += snake.dy;
-
-  // wrap snake position horizontally on edge of screen
-  if (snake.x < 0) {
-    snake.x = canvas.width - grid;
-  }
-  else if (snake.x >= canvas.width) {
-    snake.x = 0;
-  }
-
-  // wrap snake position vertically on edge of screen
-  if (snake.y < 0) {
-    snake.y = canvas.height - grid;
-  }
-  else if (snake.y >= canvas.height) {
-    snake.y = 0;
-  }
-
-  // keep track of where snake has been. front of the array is always the head
-  snake.cells.unshift({x: snake.x, y: snake.y});
-
-  // remove cells as we move away from them
-  if (snake.cells.length > snake.maxCells) {
-    snake.cells.pop();
-    // console.log('first Runnnnn  dx->'+snake.dx+"  dy->"+snake.dy)
-    if(control.length){
-  // console.log("prev_command : "+prev_command)
-  // console.log("control[0] : "+control[0])
-  if((control[0]%2)==(prev_command%2)){
-    // alert("*********************")
-    control.shift()
-  }
-  else  if (control[0] == 37 && snake.dx === 0) {
-    prev_command = control[0]
-    // console.log('37 Runnnnn  dx->'+snake.dx+"  dy->"+snake.dy)
-    control.shift()
-    snake.dx = -grid;
-    snake.dy = 0;
-  }
-  // up arrow key
-  else if (control[0] == 38 && snake.dy === 0) {
-    prev_command = control[0]
-    // console.log('38 Runnnnn  dx->'+snake.dx+"  dy->"+snake.dy)
-    control.shift()
-    snake.dy = -grid;
-    snake.dx = 0;
-  }
-  // right arrow key
-  else if (control[0] == 39 && snake.dx === 0) {
-    prev_command = control[0]
-    control.shift()
-    // console.log('39 Runnnnn  dx->'+snake.dx+"  dy->"+snake.dy)
-    snake.dx = grid;
-    snake.dy = 0;
-  }
-  // down arrow key
-  else if (control[0] == 40 && snake.dy === 0) {
-    prev_command = control[0]
-    control.shift()
-    // console.log('40 Runnnnn  dx->'+snake.dx+"  dy->"+snake.dy)
-    snake.dy = grid;
-    snake.dx = 0;
-  } 
-  }
-  }
-
-  // draw apple
-  context.fillStyle = random_apple_color;
-  context.fillRect(apple.x, apple.y, grid-1, grid-1);
-
-  // draw snake one cell at a time
-  context.fillStyle = 'white';
-  snake.cells.forEach(function(cell, index) {
-
-    // drawing 1 px smaller than the grid creates a grid effect in the snake body so you can see how long it is
-    context.fillRect(cell.x, cell.y, grid-1, grid-1);
-
-    // snake ate apple
-    if (cell.x === apple.x && cell.y === apple.y) {
-      // console.log()
-      snake.maxCells++;
-      score++; //****************************** Score ***********************************************/   
-      // canvas is 400x400 which is 25x25 grids
-      apple.x = getRandomInt(0, 25) * grid;
-      apple.y = getRandomInt(0, 25) * grid;
-      console.log(score)
-      random_apple_color = colors[Math.floor(Math.random() * colors.length)];
+      canvas.width = Math.max(300, w);
+      canvas.height = Math.max(300, h);
     }
 
-    // check collision with all cells after this one (modified bubble sort)
-    for (var i = index + 1; i < snake.cells.length; i++) {
+    resizeCanvas();
 
-      // snake occupies same space as a body part. reset game
-      if (cell.x === snake.cells[i].x && cell.y === snake.cells[i].y) {
-        snake.x = 160;
-        snake.y = 160;
-        snake.cells = [];
-        snake.maxCells = 4;
-        snake.dx = grid;
-        snake.dy = 0;
+    // Therapy Dichoptic Colors
+    let leftColor = '#ef4444';
+    let rightColor = '#06b6d4';
+    let snakeColor = leftColor;
+    let appleColor = rightColor;
 
-        apple.x = getRandomInt(0, 25) * grid;
-        apple.y = getRandomInt(0, 25) * grid;
+    function updateColors(left, right) {
+      if (left) leftColor = left;
+      if (right) rightColor = right;
+      snakeColor = leftColor;
+      appleColor = rightColor;
+
+      document.getElementById('snakeEyeDot').style.color = snakeColor;
+      document.getElementById('snakeEyeDot').style.background = snakeColor;
+      document.getElementById('appleEyeDot').style.color = appleColor;
+      document.getElementById('appleEyeDot').style.background = appleColor;
+    }
+
+    let count = 0;
+    let score = 0;
+
+    let snake = {
+      x: grid * 5,
+      y: grid * 5,
+      dx: grid,
+      dy: 0,
+      cells: [],
+      maxCells: 4
+    };
+
+    let apple = {
+      x: grid * 10,
+      y: grid * 10
+    };
+
+    function getRandomInt(min, max) {
+      return Math.floor(Math.random() * (max - min)) + min;
+    }
+
+    function respawnApple() {
+      const cols = Math.floor(canvas.width / grid);
+      const rows = Math.floor(canvas.height / grid);
+      apple.x = getRandomInt(1, cols - 1) * grid;
+      apple.y = getRandomInt(1, rows - 1) * grid;
+    }
+
+    respawnApple();
+
+    // Direction Queue to prevent instant self-collision
+    let nextDx = grid;
+    let nextDy = 0;
+
+    function loop() {
+      requestAnimationFrame(loop);
+
+      // Control game speed (runs every 6 frames ~ 10 fps)
+      if (++count < 6) return;
+      count = 0;
+
+      context.clearRect(0, 0, canvas.width, canvas.height);
+
+      // Subtle arena grid
+      context.strokeStyle = 'rgba(255, 255, 255, 0.03)';
+      context.lineWidth = 1;
+      for (let x = 0; x < canvas.width; x += grid) {
+        context.beginPath();
+        context.moveTo(x, 0);
+        context.lineTo(x, canvas.height);
+        context.stroke();
       }
-    }
-  });
-}
+      for (let y = 0; y < canvas.height; y += grid) {
+        context.beginPath();
+        context.moveTo(0, y);
+        context.lineTo(canvas.width, y);
+        context.stroke();
+      }
 
-// listen to keyboard events to move the snake
-document.addEventListener('keydown', function(e) {
-  // prevent snake from backtracking on itself by checking that it's
-  // not already moving on the same axis (pressing left while moving
-  // left won't do anything, and pressing right while moving left
-  // shouldn't let you collide with your own body)
+      // Apply queued direction
+      snake.dx = nextDx;
+      snake.dy = nextDy;
 
-  if(e.which===37||e.which===38||e.which===39||e.which===40)
-  if(control.length && (control[control.length-1]==e.which)){
-      // control.pop()
-  }
-  else{
-    // console.log("array last : "+prev_input%2)
-    console.log("input : "+e.which%2)
-    // if(!((prev_input%2)==(e.which%2))){
-    //   prev_input=e.which
-      control.push(e.which)
-    // }
-    
-  }
-});
+      // Move snake
+      snake.x += snake.dx;
+      snake.y += snake.dy;
 
+      // Wrap around walls
+      if (snake.x < 0) {
+        snake.x = canvas.width - grid;
+      } else if (snake.x >= canvas.width) {
+        snake.x = 0;
+      }
 
-// Touch Test
-let pageWidth = window.innerWidth || document.body.clientWidth;
-let treshold = Math.max(1,Math.floor(0.01 * (pageWidth)));
-let touchstartX = 0;
-let touchstartY = 0;
-let touchendX = 0;
-let touchendY = 0;
+      if (snake.y < 0) {
+        snake.y = canvas.height - grid;
+      } else if (snake.y >= canvas.height) {
+        snake.y = 0;
+      }
 
-const limit = Math.tan(45 * 1.5 / 180 * Math.PI);
-//const gestureZone = document.getElementById('modalContent');
+      snake.cells.unshift({ x: snake.x, y: snake.y });
 
-canvas.addEventListener('touchstart', function(event) {
-    event.preventDefault()  
-  touchstartX = event.changedTouches[0].screenX;
-    touchstartY = event.changedTouches[0].screenY;
-}, false);
+      if (snake.cells.length > snake.maxCells) {
+        snake.cells.pop();
+      }
 
-canvas.addEventListener('touchend', function(event) {
-      event.preventDefault()
-    touchendX = event.changedTouches[0].screenX;
-    touchendY = event.changedTouches[0].screenY;
-    handleGesture(event);
-}, false);
+      // Draw Apple (Right Eye Color)
+      context.fillStyle = appleColor;
+      context.beginPath();
+      const appleRadius = (grid - 2) / 2;
+      context.arc(apple.x + grid / 2, apple.y + grid / 2, appleRadius, 0, Math.PI * 2);
+      context.fill();
 
-function handleGesture(e) {
-    let x = touchendX - touchstartX;
-    let y = touchendY - touchstartY;
-    let xy = Math.abs(x / y);
-    let yx = Math.abs(y / x);
-    if (Math.abs(x) > treshold || Math.abs(y) > treshold || snake.dx === 0 ) {
-        if (yx <= limit) {
-            if (x < 0) {
-                console.log("left");
-              if (snake.dx === 0){ 
-              snake.dx = grid;
-               snake.dy = 0;};
-            } else {
-                console.log("right");
-              if (snake.dx === 0){
-              snake.dx = -grid;
-               snake.dy = 0;}
-            }
+      // Draw Snake (Left Eye Color)
+      context.fillStyle = snakeColor;
+      snake.cells.forEach((cell, index) => {
+        // Head has rounded border or subtle brightness
+        if (index === 0) {
+          context.fillStyle = snakeColor;
+        } else {
+          context.fillStyle = snakeColor;
         }
-        if (xy <= limit) {
-            if (y < 0 ) {
-                console.log("top");
-              if (snake.dy === 0){
-              
-              snake.dy =grid;
-                    snake.dx = 0;}
-            } else {
-           
-              console.log("bottom");
-              if (snake.dy === 0){
-                 snake.dy = -grid;
-                snake.dx = 0;
-            }}
+        context.fillRect(cell.x + 1, cell.y + 1, grid - 2, grid - 2);
+
+        // Snake ate Apple
+        if (cell.x === apple.x && cell.y === apple.y) {
+          snake.maxCells++;
+          score++;
+          document.getElementById('scoreVal').innerText = score;
+          respawnApple();
         }
-    } else {
-        console.log("tap");
+
+        // Self-collision detection
+        for (let i = index + 1; i < snake.cells.length; i++) {
+          if (cell.x === snake.cells[i].x && cell.y === snake.cells[i].y) {
+            // Reset snake
+            snake.x = grid * 5;
+            snake.y = grid * 5;
+            snake.cells = [];
+            snake.maxCells = 4;
+            snake.dx = grid;
+            snake.dy = 0;
+            nextDx = grid;
+            nextDy = 0;
+            respawnApple();
+          }
+        }
+      });
     }
-}
 
-// start the game
-requestAnimationFrame(loop);
+    // Direction input handlers
+    function turnUp() {
+      if (snake.dy === 0) { nextDx = 0; nextDy = -grid; }
+    }
+    function turnDown() {
+      if (snake.dy === 0) { nextDx = 0; nextDy = grid; }
+    }
+    function turnLeft() {
+      if (snake.dx === 0) { nextDx = -grid; nextDy = 0; }
+    }
+    function turnRight() {
+      if (snake.dx === 0) { nextDx = grid; nextDy = 0; }
+    }
 
-</script>
+    // Keyboard events
+    document.addEventListener('keydown', function(e) {
+      if (e.which === 37 || e.key === 'a' || e.key === 'A') turnLeft();
+      else if (e.which === 38 || e.key === 'w' || e.key === 'W') turnUp();
+      else if (e.which === 39 || e.key === 'd' || e.key === 'D') turnRight();
+      else if (e.which === 40 || e.key === 's' || e.key === 'S') turnDown();
+    });
+
+    // Mobile D-Pad buttons
+    document.getElementById('btnUp').addEventListener('click', turnUp);
+    document.getElementById('btnDown').addEventListener('click', turnDown);
+    document.getElementById('btnLeft').addEventListener('click', turnLeft);
+    document.getElementById('btnRight').addEventListener('click', turnRight);
+
+    // Touch Swipe Detection (Correct Direction!)
+    let touchstartX = 0;
+    let touchstartY = 0;
+
+    canvas.addEventListener('touchstart', function(e) {
+      touchstartX = e.changedTouches[0].clientX;
+      touchstartY = e.changedTouches[0].clientY;
+    }, { passive: true });
+
+    canvas.addEventListener('touchend', function(e) {
+      const dx = e.changedTouches[0].clientX - touchstartX;
+      const dy = e.changedTouches[0].clientY - touchstartY;
+
+      if (Math.abs(dx) > Math.abs(dy)) {
+        if (Math.abs(dx) > 20) {
+          if (dx > 0) turnRight();
+          else turnLeft();
+        }
+      } else {
+        if (Math.abs(dy) > 20) {
+          if (dy > 0) turnDown();
+          else turnUp();
+        }
+      }
+    }, { passive: true });
+
+    // Handle Window Resize
+    window.addEventListener('resize', () => {
+      resizeCanvas();
+    });
+
+    // Parent postMessage Communication
+    window.addEventListener('message', function(event) {
+      if (!event.data) return;
+      if (event.data.leftColor || event.data.rightColor) {
+        updateColors(event.data.leftColor, event.data.rightColor);
+      }
+
+      window.parent.postMessage("Game Started", "*");
+
+      const sessionDuration = (event.data.time && !isNaN(event.data.time) && event.data.time > 10000)
+        ? event.data.time
+        : (20 * 60 * 1000);
+
+      setTimeout(function() {
+        const message = { msg: 'Game Ended', game: 'Snake', score: score };
+        window.parent.postMessage(message, "*");
+        console.log('Game ended by Game js timer');
+      }, sessionDuration);
+    });
+
+    $(document).ready(function() {
+      $(window).focus();
+      updateColors(leftColor, rightColor);
+      requestAnimationFrame(loop);
+    });
+  </script>
 </body>
 </html>

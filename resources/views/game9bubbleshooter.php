@@ -37,19 +37,24 @@ $(document).ready(function(){
 $(window).focus();
 }) 
 
+var leftColor = '#ef4444', rightColor = '#06b6d4';
+
 window.addEventListener('message', function(event) {
- console.log(event.data.msg);
-console.log(event.data.leftColor);
-console.log(event.data.rightColor);
-leftColor =  event.data.leftColor;
-rightColor =  event.data.rightColor;
-window.parent.postMessage("Game Started", "*");
-var sessionDuration = (event.data.time && !isNaN(event.data.time) && event.data.time > 10000) ? event.data.time : (20 * 60 * 1000);
-setTimeout(function() {
-                    message={msg:'Game Ended',game:"Bubble Shooter",score:score}
-                    window.parent.postMessage(message, "*");
-                    console.log('Game ended by Game js')
-                }, sessionDuration);
+  if (!event.data) return;
+  if (event.data.leftColor) leftColor = event.data.leftColor;
+  if (event.data.rightColor) rightColor = event.data.rightColor;
+  if (typeof colorMap !== 'undefined') {
+    colorMap['R'] = leftColor;
+    colorMap['L'] = rightColor;
+  }
+  window.parent.postMessage("Game Started", "*");
+  var sessionDuration = (event.data.time && !isNaN(event.data.time) && event.data.time > 10000) ? event.data.time : (20 * 60 * 1000);
+  setTimeout(function() {
+    var message = { msg: 'Game Ended', game: "Bubble Shooter", score: score };
+    window.parent.postMessage(message, "*");
+    console.log('Game ended by Game js');
+  }, sessionDuration);
+});
 
 
 const canvas = document.getElementById('game');
@@ -517,11 +522,21 @@ shootDir = 0;
 }
 });
 
+// Aim and shoot on click / touch
+canvas.addEventListener('pointerdown', (e) => {
+  if (curBubble && curBubble.dx === 0 && curBubble.dy === 0) {
+    const rect = canvas.getBoundingClientRect();
+    const clickX = e.clientX - rect.left;
+    const clickY = e.clientY - rect.top;
+    const angle = Math.atan2(clickX - curBubble.x, -(clickY - curBubble.y));
+    shootDeg = Math.max(degToRad(-75), Math.min(degToRad(75), angle));
+    curBubble.dx = Math.sin(shootDeg) * curBubble.speed;
+    curBubble.dy = -Math.cos(shootDeg) * curBubble.speed;
+  }
+});
+
 // start the game
 requestAnimationFrame(loop);
-
-
-});
 </script>
 </body>
 </html>

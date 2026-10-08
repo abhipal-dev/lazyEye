@@ -176,6 +176,7 @@ setTimeout(function() {
                     window.parent.postMessage(message, "*");
                     console.log('Game ended by Game js')
                 }, sessionDuration);
+});
 
 
 /*
@@ -705,7 +706,6 @@ function getTreeY(x, baseHeight, amplitude) {
 const sineBaseY = window.innerHeight - baseHeight;
 return Math.sinus(x) * amplitude + sineBaseY;
 }
-});
 </script>
 
 </body>
