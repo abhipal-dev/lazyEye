@@ -1,64 +1,87 @@
-<p align="center"><a href="https://laravel.com" target="_blank"><img src="https://raw.githubusercontent.com/laravel/art/master/logo-lockup/5%20SVG/2%20CMYK/1%20Full%20Color/laravel-logolockup-cmyk-red.svg" width="400"></a></p>
+# 👁️ LazyEye — Digital Dichoptic Vision Therapy Platform
 
 <p align="center">
-<a href="https://travis-ci.org/laravel/framework"><img src="https://travis-ci.org/laravel/framework.svg" alt="Build Status"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/dt/laravel/framework" alt="Total Downloads"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/v/laravel/framework" alt="Latest Stable Version"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/l/laravel/framework" alt="License"></a>
+  <img src="public/images/lazyeye-logo.svg" alt="LazyEye Logo" width="160">
+  <br>
+  <strong>A full-stack clinical rehabilitation platform for Amblyopia (Lazy Eye) treatment using interactive dichoptic games and anaglyph red-cyan filtering.</strong>
 </p>
 
-## About Laravel
+<p align="center">
+  <a href="https://lazyeye.onrender.com" target="_blank"><img src="https://img.shields.io/badge/Live%20Demo-Render-blue?style=for-the-badge&logo=render" alt="Live Demo"></a>
+  <img src="https://img.shields.io/badge/Laravel-8.75-red?style=for-the-badge&logo=laravel" alt="Laravel 8">
+  <img src="https://img.shields.io/badge/React-18.2-61DAFB?style=for-the-badge&logo=react" alt="React 18">
+  <img src="https://img.shields.io/badge/PHP-8.1-777BB4?style=for-the-badge&logo=php" alt="PHP 8.1">
+  <img src="https://img.shields.io/badge/Docker-Ready-2496ED?style=for-the-badge&logo=docker" alt="Docker">
+</p>
 
-Laravel is a web application framework with expressive, elegant syntax. We believe development must be an enjoyable and creative experience to be truly fulfilling. Laravel takes the pain out of development by easing common tasks used in many web projects, such as:
+---
 
-- [Simple, fast routing engine](https://laravel.com/docs/routing).
-- [Powerful dependency injection container](https://laravel.com/docs/container).
-- Multiple back-ends for [session](https://laravel.com/docs/session) and [cache](https://laravel.com/docs/cache) storage.
-- Expressive, intuitive [database ORM](https://laravel.com/docs/eloquent).
-- Database agnostic [schema migrations](https://laravel.com/docs/migrations).
-- [Robust background job processing](https://laravel.com/docs/queues).
-- [Real-time event broadcasting](https://laravel.com/docs/broadcasting).
+## 🌐 Live Platform
 
-Laravel is accessible, powerful, and provides tools required for large, robust applications.
+The application is deployed and live at:  
+👉 **[https://lazyeye.onrender.com](https://lazyeye.onrender.com)**
 
-## Learning Laravel
+---
 
-Laravel has the most extensive and thorough [documentation](https://laravel.com/docs) and video tutorial library of all modern web application frameworks, making it a breeze to get started with the framework.
+## 📚 Complete Project Documentation
 
-If you don't feel like reading, [Laracasts](https://laracasts.com) can help. Laracasts contains over 1500 video tutorials on a range of topics including Laravel, modern PHP, unit testing, and JavaScript. Boost your skills by digging into our comprehensive video library.
+Detailed technical and deployment guides have been compiled in the [`docs/`](docs/) directory:
 
-## Laravel Sponsors
+1. 📖 [**Project Architecture, Structure & User Levels**](docs/PROJECT_STRUCTURE_AND_USER_LEVELS.md)
+   - Complete file-by-file directory explanation.
+   - Comprehensive **5-tier role system**: `root` Superadmin, `admin` Clinic Administrator, `doctor` Optometrist / Vision Therapist, `user` Enrolled Patient, and `Unpaid User`.
+   - Feature permission matrix and database ER diagrams.
+   - Clinical lifecycle sequence flow from registration to therapy completion.
 
-We would like to extend our thanks to the following sponsors for funding Laravel development. If you are interested in becoming a sponsor, please visit the Laravel [Patreon page](https://patreon.com/taylorotwell).
+2. 🚀 [**Build, Release & Render Deployment Guide**](docs/BUILD_AND_DEPLOYMENT_GUIDE.md)
+   - Local asset build pipeline (`npm run dev` / `npm run prod`).
+   - Git push and version control workflow.
+   - Step-by-step Render configuration (Docker runtime, environment variables, Apache DocumentRoot).
+   - HTTPS proxy termination and mixed-content troubleshooting.
 
-### Premium Partners
+---
 
-- **[Vehikl](https://vehikl.com/)**
-- **[Tighten Co.](https://tighten.co)**
-- **[Kirschbaum Development Group](https://kirschbaumdevelopment.com)**
-- **[64 Robots](https://64robots.com)**
-- **[Cubet Techno Labs](https://cubettech.com)**
-- **[Cyber-Duck](https://cyber-duck.co.uk)**
-- **[Many](https://www.many.co.uk)**
-- **[Webdock, Fast VPS Hosting](https://www.webdock.io/en)**
-- **[DevSquad](https://devsquad.com)**
-- **[Curotec](https://www.curotec.com/services/technologies/laravel/)**
-- **[OP.GG](https://op.gg)**
-- **[WebReinvent](https://webreinvent.com/?utm_source=laravel&utm_medium=github&utm_campaign=patreon-sponsors)**
-- **[Lendio](https://lendio.com)**
+## 🎮 Therapy Games Included
 
-## Contributing
+The platform includes **10 interactive HTML5/Canvas dichoptic vision therapy games**:
+- **Snake Game** (`/game1snake`): Non-dominant eye macular fixation and dual-channel fusion.
+- **Flappy Bird** (`/game2flappybird`): High-frequency saccades and altitude depth judgment.
+- **Menja 3D** (`/game12menja`): Dynamic 3D block slicing challenge stimulating visual reflexes.
+- **Tetris Fusion** (`/game8tetris`): Dichoptic pattern alignment and spatial orientation.
+- **Bubble Shooter** (`/game9bubbleshooter`): Foveal aiming and peripheral stereoscopic acuity.
+- **Ping-Pong 3D** (`/game10pingpong`): Dynamic velocity tracking and reaction agility.
+- **Sticky Holds** (`/game11stickyholds`): Rock climbing agility puzzle demanding sustained binocular fusion.
+- **Maze Labyrinth** (`/game5maze`): Split-cue maze navigation.
+- **Ball Catcher** (`/game3ballcatcher`): Hand-eye motor coordination.
+- **Bouncing Ball** (`/game7test`): Dynamic trajectory prediction under dichoptic viewing.
 
-Thank you for considering contributing to the Laravel framework! The contribution guide can be found in the [Laravel documentation](https://laravel.com/docs/contributions).
+---
 
-## Code of Conduct
+## ⚡ Quick Start (Local Setup)
 
-In order to ensure that the Laravel community is welcoming to all, please review and abide by the [Code of Conduct](https://laravel.com/docs/contributions#code-of-conduct).
+```bash
+# 1. Clone repository
+git clone https://github.com/abhipal-dev/lazyEye.git
+cd lazyEye
 
-## Security Vulnerabilities
+# 2. Install PHP and JS dependencies
+composer install
+npm install
 
-If you discover a security vulnerability within Laravel, please send an e-mail to Taylor Otwell via [taylor@laravel.com](mailto:taylor@laravel.com). All security vulnerabilities will be promptly addressed.
+# 3. Compile frontend assets
+npm run dev
 
-## License
+# 4. Configure environment
+cp .env.example .env
+php artisan key:generate
 
-The Laravel framework is open-sourced software licensed under the [MIT license](https://opensource.org/licenses/MIT).
+# 5. Start development server
+php artisan serve
+```
+
+Visit `http://localhost:8000` in your browser.
+
+---
+
+## 🔒 License
+This project is proprietary and maintained by [abhipal-dev](https://github.com/abhipal-dev).
