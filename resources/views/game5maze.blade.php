@@ -360,11 +360,12 @@
                 ele.style.setProperty('--joystick-head-color', leftColor);
                 ele.style.setProperty('--ball-color', rightColor);
                 ele.style.setProperty('--end-color', '#ffffff');
+                var sessionDuration = (event.data.time && !isNaN(event.data.time) && event.data.time > 10000) ? event.data.time : (20 * 60 * 1000);
                 setTimeout(function() {
                   message={msg:'Game Ended',game:"Maze",score:'Completed'}
                   window.parent.postMessage(message, "*");
                   console.log('Game ended by Game js')
-              }, event.data.time);
+              }, sessionDuration);
               });
              
       });

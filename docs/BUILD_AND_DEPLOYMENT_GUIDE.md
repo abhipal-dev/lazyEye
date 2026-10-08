@@ -244,3 +244,4 @@ To prevent browser mixed-content blocks (`Blocked insecure script http://...`), 
 ### 4. Changes to React components do not reflect on live site
 - **Cause**: Code was pushed without recompiling `public/js/app.js`.
 - **Fix**: Run `npm run prod` locally, then execute `git add public/js/app.js`, commit, and `git push origin main`.
+

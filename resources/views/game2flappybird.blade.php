@@ -106,12 +106,12 @@ body {
         
         const root = document.querySelector(':root');
         root.style.setProperty('--second-pipe-bg-color',rightColor);
-        root.style.setProperty('--first-pipe-bg-color',leftColor);
+        var sessionDuration = (event.data.time && !isNaN(event.data.time) && event.data.time > 10000) ? event.data.time : (20 * 60 * 1000);
 		setTimeout(function() {
             message={msg:'Game Ended',game:'Flappy Bird',score:score}
             window.parent.postMessage(message, "*");
             console.log('Game ended by Game js')
-        }, event.data.time);
+        }, sessionDuration);
         window.parent.postMessage("Game Started", "*");
     });
 

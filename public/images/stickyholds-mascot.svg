@@ -1,0 +1,78 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 320 320" width="100%" height="100%">
+  <defs>
+    <linearGradient id="rockWall" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" stop-color="#334155" />
+      <stop offset="100%" stop-color="#1e293b" />
+    </linearGradient>
+    <linearGradient id="holdRed" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#f87171" />
+      <stop offset="100%" stop-color="#dc2626" />
+    </linearGradient>
+    <linearGradient id="holdCyan" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#38bdf8" />
+      <stop offset="100%" stop-color="#0284c7" />
+    </linearGradient>
+    <linearGradient id="holdAmber" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#fbbf24" />
+      <stop offset="100%" stop-color="#d97706" />
+    </linearGradient>
+    <linearGradient id="climberGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#10b981" />
+      <stop offset="100%" stop-color="#047857" />
+    </linearGradient>
+    <filter id="rockShadow" x="-10%" y="-10%" width="120%" height="120%">
+      <feDropShadow dx="0" dy="8" stdDeviation="6" flood-color="#0f172a" flood-opacity="0.25" />
+    </filter>
+  </defs>
+
+  <g filter="url(#rockShadow)">
+    <!-- Climbing Wall Plate -->
+    <rect x="40" y="30" width="240" height="260" rx="20" fill="url(#rockWall)" />
+
+    <!-- Screw bolt holes -->
+    <circle cx="60" cy="50" r="4" fill="#64748b" />
+    <circle cx="260" cy="50" r="4" fill="#64748b" />
+    <circle cx="60" cy="270" r="4" fill="#64748b" />
+    <circle cx="260" cy="270" r="4" fill="#64748b" />
+
+    <!-- Color-filtered climbing grips/holds -->
+    <!-- Cyan Hold 1 -->
+    <path d="M 80 80 C 105 75 125 90 115 110 C 105 125 75 115 80 80 Z" fill="url(#holdCyan)" />
+    <!-- Red Hold 1 -->
+    <path d="M 205 75 C 235 70 245 95 230 110 C 215 120 195 100 205 75 Z" fill="url(#holdRed)" />
+    <!-- Yellow Hold -->
+    <path d="M 75 200 C 95 190 115 210 105 225 C 90 235 70 220 75 200 Z" fill="url(#holdAmber)" />
+    <!-- Red Hold 2 -->
+    <path d="M 210 210 C 235 205 245 225 235 240 C 220 250 200 235 210 210 Z" fill="url(#holdRed)" />
+
+    <!-- Climber Mascot (Cute Frog/Gecko gripping center) -->
+    <!-- Body -->
+    <ellipse cx="160" cy="165" rx="36" ry="46" fill="url(#climberGrad)" />
+    
+    <!-- Climber Arms grabbing holds -->
+    <!-- Left Arm -->
+    <path d="M 135 150 Q 110 125 110 105" stroke="#10b981" stroke-width="14" stroke-linecap="round" fill="none" />
+    <!-- Right Arm -->
+    <path d="M 185 150 Q 210 125 215 105" stroke="#10b981" stroke-width="14" stroke-linecap="round" fill="none" />
+
+    <!-- Climber Legs -->
+    <path d="M 140 195 Q 110 215 100 215" stroke="#047857" stroke-width="13" stroke-linecap="round" fill="none" />
+    <path d="M 180 195 Q 210 215 218 220" stroke="#047857" stroke-width="13" stroke-linecap="round" fill="none" />
+
+    <!-- Big Curious Eyes -->
+    <circle cx="145" cy="140" r="12" fill="#ffffff" />
+    <circle cx="175" cy="140" r="12" fill="#ffffff" />
+    <circle cx="146" cy="138" r="7" fill="#0f172a" />
+    <circle cx="174" cy="138" r="7" fill="#0f172a" />
+    <circle cx="144" cy="135" r="3" fill="#ffffff" />
+    <circle cx="172" cy="135" r="3" fill="#ffffff" />
+
+    <!-- Determined Smile -->
+    <path d="M 154 158 Q 160 164 166 158" stroke="#ffffff" stroke-width="3" stroke-linecap="round" fill="none" />
+
+    <!-- Chalk dust marks -->
+    <circle cx="112" cy="100" r="5" fill="#ffffff" opacity="0.4" />
+    <circle cx="218" cy="100" r="5" fill="#ffffff" opacity="0.4" />
+  </g>
+</svg>
+

@@ -332,13 +332,12 @@ a {
           rightContrast = +event.data.leftContrast;
           leftColorName = event.data.leftColorName;
           rightColorName = event.data.rightColorName;
-          console.log(event.data.time)
+          var sessionDuration = (event.data.time && !isNaN(event.data.time) && event.data.time > 10000) ? event.data.time : (20 * 60 * 1000);
           setTimeout(function(){
             console.log("Page is redirecting to Games"); 
-     message={msg:"Game Ended",game:"Menja",score:score   
-     } 
-      window.parent.postMessage(message, "*");
-          }, event.data.time);
+            message={msg:"Game Ended",game:"Menja",score:score}; 
+            window.parent.postMessage(message, "*");
+          }, sessionDuration);
        
     // globalConfig.js
 // ============================================================================

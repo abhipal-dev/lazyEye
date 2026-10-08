@@ -122,8 +122,8 @@
         if(!state){
       // localStorage.clear()
       localStorage.setItem("seconds",0);
-      }
-        user_allotted_time = (event.data.time/1000)/60;
+        let rawMin = (event.data.time / 1000) / 60;
+        user_allotted_time = (!rawMin || isNaN(rawMin) || rawMin <= 0) ? 20 : rawMin;
         leftColor = event.data.leftColor;
         rightColor = event.data.rightColor;
         

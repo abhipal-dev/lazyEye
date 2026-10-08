@@ -18,3 +18,4 @@ Welcome to the LazyEye Vision Therapy technical documentation.
    - Render deployment settings (Docker container, Apache DocumentRoot, Environment variables).
    - HTTPS and reverse-proxy mixed-content resolution.
    - Troubleshooting common build & permission errors.
+

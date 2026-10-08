@@ -220,6 +220,7 @@ export default class UserDashboard extends React.Component {
         return (
             <>
                 <p id="score_history" style={{ 'display': "none" }}>{this.state.data.user_game_records}</p>
+                <span id="time" style={{ display: "none" }}>{this.state.data?.user_playing_time || 20}</span>
 
                 {/* Admin Mode Floating Banner */}
                 {isAdmin && (

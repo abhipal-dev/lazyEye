@@ -35,13 +35,18 @@ export default class Home extends React.Component {
                                 </div>
                             </div>
                             <div className="col-12 col-lg-5 order-0 order-lg-1 text-center" data-aos="zoom-in">
-                                <div className="position-relative d-inline-block">
+                                <div className="hero-photo-wrapper">
                                     <img 
-                                        src="/images/hero-vision-therapy.svg" 
-                                        alt="Child doing dichoptic lazy eye vision therapy" 
-                                        className="hero-card-img"
-                                        style={{ maxHeight: '420px', width: 'auto' }}
+                                        src="/images/LazyEyeGirl.jpg" 
+                                        alt="Child undergoing vision therapy with 3D anaglyph glasses" 
+                                        className="hero-photo-img"
                                     />
+                                    <div className="hero-photo-badge hero-badge-top">
+                                        <i className="fa-solid fa-circle-check text-success me-1"></i> Clinically Tested
+                                    </div>
+                                    <div className="hero-photo-badge hero-badge-bottom">
+                                        <i className="fa-solid fa-glasses text-primary me-1"></i> Red/Cyan Glasses
+                                    </div>
                                 </div>
                             </div>
                         </div>

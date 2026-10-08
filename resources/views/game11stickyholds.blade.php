@@ -170,11 +170,12 @@ console.log(event.data.rightColor);
 leftColor =  event.data.leftColor;
 rightColor =  event.data.rightColor;
 window.parent.postMessage("Game Started", "*");
+var sessionDuration = (event.data.time && !isNaN(event.data.time) && event.data.time > 10000) ? event.data.time : (20 * 60 * 1000);
 setTimeout(function() {
                     message={msg:'Game Ended',game:"Sticky Holds",score:score}
                     window.parent.postMessage(message, "*");
                     console.log('Game ended by Game js')
-                }, event.data.time);
+                }, sessionDuration);
 
 
 /*

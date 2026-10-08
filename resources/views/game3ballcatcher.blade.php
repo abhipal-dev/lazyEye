@@ -213,11 +213,12 @@
         window.addEventListener('message', function(event) {
                  window.parent.postMessage('Game Started', "*");
                  console.log(event.data.msg); 
+                 var sessionDuration = (event.data.time && !isNaN(event.data.time) && event.data.time > 10000) ? event.data.time : (20 * 60 * 1000);
 				 setTimeout(function() {
             message={msg:'Game Ended',game:"Ball Catcher",score:score}
             window.parent.postMessage(message, "*");
             console.log('Game ended by Game js')
-        }, event.data.time);   
+        }, sessionDuration);   
          });
 		
 		});

@@ -1092,288 +1092,315 @@ a:hover {
 }
 
 /* ========================================================
-   FEATURED GAMES CAROUSEL (Patient View)
+/* ========================================================
+   FEATURED CLINICAL EXERCISE HERO BANNER (Patient View)
+   Human-crafted, zero-overlap controls, rich artwork
    ======================================================== */
-.therapy-carousel-wrap {
+.therapy-hero-card {
   position: relative;
   border-radius: 1.5rem;
   overflow: hidden;
   margin-bottom: 2.25rem;
-  box-shadow: 0 16px 36px rgba(0, 0, 0, 0.14);
-}
-
-.therapy-carousel-slide {
-  border-radius: 1.5rem;
-  padding: 2.5rem 3rem;
+  padding: 1.75rem 2.25rem 2rem 2.25rem;
   color: #ffffff;
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  min-height: 250px;
-  position: relative;
-  overflow: hidden;
+  box-shadow: 0 16px 36px rgba(15, 23, 42, 0.16);
   transition: all 0.4s ease;
 }
 
-.therapy-carousel-content {
-  max-width: 60%;
-  z-index: 2;
+.therapy-hero-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  margin-bottom: 1.25rem;
+  position: relative;
+  z-index: 5;
 }
 
-.therapy-carousel-tag {
-  display: inline-block;
-  font-size: 0.85rem;
+.therapy-hero-badge {
+  display: inline-flex;
+  align-items: center;
+  background: rgba(255, 255, 255, 0.2);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+  border: 1px solid rgba(255, 255, 255, 0.35);
+  padding: 0.35rem 0.9rem;
+  border-radius: 9999px;
+  font-size: 0.8rem;
   font-weight: 700;
+  letter-spacing: 0.04em;
   text-transform: uppercase;
-  letter-spacing: 0.08em;
-  opacity: 0.95;
-  margin-bottom: 0.4rem;
-}
-
-.therapy-carousel-title {
-  font-size: clamp(1.4rem, 2.7vw, 2.3rem);
-  font-weight: 800;
-  line-height: 1.2;
-  margin-bottom: 0.85rem;
   color: #ffffff;
 }
 
-.therapy-carousel-desc {
-  font-size: 0.95rem;
-  opacity: 0.92;
-  line-height: 1.55;
-  margin-bottom: 1.4rem;
-  display: -webkit-box;
-  -webkit-line-clamp: 2;
-  -webkit-box-orient: vertical;
-  overflow: hidden;
+.therapy-hero-controls {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
 }
 
-.therapy-carousel-btn {
+.therapy-hero-counter {
+  font-size: 0.82rem;
+  font-weight: 700;
+  opacity: 0.9;
+  letter-spacing: 0.05em;
+  background: rgba(0, 0, 0, 0.2);
+  padding: 0.3rem 0.75rem;
+  border-radius: 9999px;
+  border: 1px solid rgba(255, 255, 255, 0.2);
+}
+
+.therapy-nav-btn {
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.22);
+  backdrop-filter: blur(6px);
+  -webkit-backdrop-filter: blur(6px);
+  border: 1px solid rgba(255, 255, 255, 0.35);
+  color: #ffffff;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  font-size: 0.85rem;
+}
+
+.therapy-nav-btn:hover {
+  background: rgba(255, 255, 255, 0.45);
+  transform: scale(1.08);
+}
+
+.therapy-hero-body {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 2rem;
+  position: relative;
+  z-index: 4;
+}
+
+.therapy-hero-text {
+  flex: 1;
+  max-width: 620px;
+}
+
+.therapy-hero-title {
+  font-size: clamp(1.4rem, 2.5vw, 2.1rem);
+  font-weight: 800;
+  line-height: 1.25;
+  margin-bottom: 0.75rem;
+  color: #ffffff;
+}
+
+.therapy-hero-desc {
+  font-size: 0.95rem;
+  line-height: 1.6;
+  opacity: 0.94;
+  margin-bottom: 1.25rem;
+  color: #f1f5f9;
+}
+
+.therapy-chip {
+  display: inline-flex;
+  align-items: center;
+  background: rgba(0, 0, 0, 0.22);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  padding: 0.3rem 0.75rem;
+  border-radius: 9999px;
+  font-size: 0.8rem;
+  font-weight: 600;
+  color: #ffffff;
+}
+
+.therapy-hero-btn {
   background: #ffffff;
   color: #0f172a !important;
   border: none;
   font-weight: 800;
   font-size: 0.95rem;
-  padding: 0.7rem 1.75rem;
+  padding: 0.75rem 1.85rem;
   border-radius: 9999px;
-  box-shadow: 0 6px 18px rgba(0, 0, 0, 0.22);
+  box-shadow: 0 6px 18px rgba(0, 0, 0, 0.25);
   display: inline-flex;
   align-items: center;
   gap: 0.5rem;
-  transition: all 0.25s ease;
   cursor: pointer;
+  transition: all 0.25s ease;
   text-decoration: none;
 }
 
-.therapy-carousel-btn:hover {
+.therapy-hero-btn:hover {
   transform: translateY(-2px);
-  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.32);
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.35);
   background: #f8fafc;
 }
 
-.therapy-carousel-art {
-  width: 220px;
-  height: 220px;
+.therapy-hero-art {
+  width: 200px;
+  height: 200px;
+  min-width: 200px;
   display: flex;
   align-items: center;
   justify-content: center;
-  z-index: 2;
   position: relative;
 }
 
-.therapy-carousel-art img {
+.therapy-hero-art img {
   max-width: 100%;
   max-height: 100%;
   object-fit: contain;
-  filter: drop-shadow(0 12px 24px rgba(0, 0, 0, 0.28));
-  animation: floatMascot 4s ease-in-out infinite;
+  filter: drop-shadow(0 14px 28px rgba(0, 0, 0, 0.3));
+  animation: heroFloatMascot 4s ease-in-out infinite;
 }
 
-@keyframes floatMascot {
+@keyframes heroFloatMascot {
   0%, 100% { transform: translateY(0); }
-  50% { transform: translateY(-8px); }
+  50% { transform: translateY(-7px); }
 }
 
-.carousel-nav-btn {
-  position: absolute;
-  top: 50%;
-  transform: translateY(-50%);
-  width: 44px;
-  height: 44px;
-  border-radius: 50%;
-  background: rgba(255, 255, 255, 0.25);
-  backdrop-filter: blur(8px);
-  border: 1px solid rgba(255, 255, 255, 0.4);
-  color: #ffffff;
+.therapy-hero-dots {
   display: flex;
   align-items: center;
   justify-content: center;
-  cursor: pointer;
-  z-index: 3;
-  transition: all 0.2s ease;
+  gap: 0.45rem;
+  margin-top: 1.25rem;
+  position: relative;
+  z-index: 5;
 }
 
-.carousel-nav-btn:hover {
-  background: rgba(255, 255, 255, 0.5);
-  transform: translateY(-50%) scale(1.08);
-}
-
-.carousel-nav-prev { left: 1rem; }
-.carousel-nav-next { right: 1rem; }
-
-.carousel-dots {
-  position: absolute;
-  bottom: 0.85rem;
-  left: 3rem;
-  display: flex;
-  gap: 0.5rem;
-  z-index: 3;
-}
-
-.carousel-dot {
+.therapy-dot {
   width: 9px;
   height: 9px;
   border-radius: 9999px;
-  background: rgba(255, 255, 255, 0.4);
+  border: none;
+  padding: 0;
+  background: rgba(255, 255, 255, 0.35);
   cursor: pointer;
   transition: all 0.3s ease;
 }
 
-.carousel-dot.active {
-  width: 26px;
+.therapy-dot.active {
+  width: 28px;
   background: #ffffff;
 }
 
-/* Carousel Responsive Breakpoints */
-@media (max-width: 992px) {
-  .therapy-carousel-slide {
-    padding: 2.25rem 3.5rem;
-  }
-  .therapy-carousel-content {
-    max-width: 65%;
-  }
-  .therapy-carousel-art {
-    width: 170px;
-    height: 170px;
-  }
-}
-
 @media (max-width: 768px) {
-  .therapy-carousel-slide {
+  .therapy-hero-card {
+    padding: 1.5rem 1.25rem;
+  }
+  .therapy-hero-body {
     flex-direction: column-reverse;
     text-align: center;
-    padding: 2.25rem 2.25rem 3.5rem 2.25rem;
-    min-height: auto;
+    gap: 1.25rem;
   }
-  .therapy-carousel-content {
+  .therapy-hero-text {
     max-width: 100%;
   }
-  .therapy-carousel-desc {
-    -webkit-line-clamp: 3;
-    margin-bottom: 1.15rem;
+  .therapy-hero-desc {
+    font-size: 0.9rem;
   }
-  .therapy-carousel-art {
-    width: 130px;
-    height: 130px;
-    margin-bottom: 1rem;
-  }
-  .therapy-carousel-btn {
+  .therapy-hero-btn {
     margin: 0 auto;
   }
-  .carousel-dots {
-    left: 50%;
-    transform: translateX(-50%);
-    bottom: 0.75rem;
-  }
-  .carousel-nav-btn {
-    width: 36px;
-    height: 36px;
-  }
-  .carousel-nav-prev { left: 0.5rem; }
-  .carousel-nav-next { right: 0.5rem; }
-}
-
-@media (max-width: 576px) {
-  .therapy-carousel-slide {
-    padding: 1.75rem 1.75rem 3.25rem 1.75rem;
-  }
-  .therapy-carousel-title {
-    font-size: 1.35rem;
-  }
-  .therapy-carousel-desc {
-    font-size: 0.88rem;
+  .therapy-hero-art {
+    width: 140px;
+    height: 140px;
+    min-width: 140px;
   }
 }
 
 /* ========================================================
-   MODERN GAME CARDS (Image 3 Grid Style)
+   HUMAN-CRAFTED THERAPY GAME CARDS (Substantial, Large Mascots)
    ======================================================== */
-.game-card-v3 {
+.therapy-game-card {
   background: var(--bg-card);
   border: 1px solid var(--border-color);
   border-radius: 1.25rem;
-  padding: 1.5rem;
+  overflow: hidden;
   display: flex;
   flex-direction: column;
-  justify-content: space-between;
   transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
   box-shadow: var(--card-shadow);
   position: relative;
-  overflow: hidden;
 }
 
-.game-card-v3:hover {
-  transform: translateY(-6px);
+.therapy-game-card:hover {
+  transform: translateY(-5px);
   box-shadow: var(--card-shadow-hover);
   border-color: var(--primary);
 }
 
-.game-card-art-box {
-  height: 130px;
+.game-cover-banner {
+  height: 165px;
   display: flex;
   align-items: center;
   justify-content: center;
-  margin-bottom: 1.15rem;
   position: relative;
-  background: radial-gradient(circle at center, var(--bg-surface-secondary) 0%, transparent 70%);
-  border-radius: 1rem;
+  padding: 1rem;
+  overflow: hidden;
 }
 
-.game-card-art-box img {
-  max-width: 100px;
-  max-height: 100px;
+.game-cover-icon {
+  width: 130px;
+  height: 130px;
+  max-width: 130px;
+  max-height: 130px;
   object-fit: contain;
-  transition: transform 0.3s ease;
+  filter: drop-shadow(0 10px 20px rgba(0, 0, 0, 0.16));
+  transition: transform 0.35s cubic-bezier(0.34, 1.56, 0.64, 1);
 }
 
-.game-card-v3:hover .game-card-art-box img {
-  transform: scale(1.1) rotate(2deg);
+.therapy-game-card:hover .game-cover-icon {
+  transform: scale(1.12) rotate(2deg);
 }
 
-.game-card-v3 .game-title {
-  font-size: 1.15rem;
-  font-weight: 700;
-  color: var(--text-main);
-  margin-bottom: 0.3rem;
-}
-
-.game-card-v3 .game-badge {
+.game-card-tag {
+  position: absolute;
+  top: 0.85rem;
+  right: 0.85rem;
   font-size: 0.72rem;
   font-weight: 700;
   text-transform: uppercase;
   letter-spacing: 0.05em;
   padding: 0.25rem 0.65rem;
   border-radius: 9999px;
-  display: inline-block;
-  margin-bottom: 0.75rem;
+  backdrop-filter: blur(6px);
+  -webkit-backdrop-filter: blur(6px);
 }
 
-.game-card-v3 .game-description {
-  font-size: 0.84rem;
+/* Tag Color Variants */
+.badge-emerald { background: rgba(16, 185, 129, 0.15); color: #10b981; border: 1px solid rgba(16, 185, 129, 0.3); }
+.badge-sky     { background: rgba(14, 165, 233, 0.15); color: #0284c7; border: 1px solid rgba(14, 165, 233, 0.3); }
+.badge-indigo  { background: rgba(99, 102, 241, 0.15); color: #6366f1; border: 1px solid rgba(99, 102, 241, 0.3); }
+.badge-purple  { background: rgba(168, 85, 247, 0.15); color: #a855f7; border: 1px solid rgba(168, 85, 247, 0.3); }
+.badge-amber   { background: rgba(245, 158, 11, 0.15); color: #d97706; border: 1px solid rgba(245, 158, 11, 0.3); }
+.badge-teal    { background: rgba(20, 184, 166, 0.15); color: #0d9488; border: 1px solid rgba(20, 184, 166, 0.3); }
+.badge-slate   { background: rgba(100, 116, 139, 0.15); color: #64748b; border: 1px solid rgba(100, 116, 139, 0.3); }
+.badge-yellow  { background: rgba(234, 179, 8, 0.15); color: #ca8a04; border: 1px solid rgba(234, 179, 8, 0.3); }
+.badge-rose    { background: rgba(244, 63, 94, 0.15); color: #e11d48; border: 1px solid rgba(244, 63, 94, 0.3); }
+.badge-blue    { background: rgba(59, 130, 246, 0.15); color: #2563eb; border: 1px solid rgba(59, 130, 246, 0.3); }
+
+.game-card-info {
+  padding: 1.25rem 1.4rem 1.4rem 1.4rem;
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+}
+
+.game-title {
+  font-size: 1.18rem;
+  font-weight: 700;
+  color: var(--text-main);
+  margin-bottom: 0.4rem;
+}
+
+.game-description {
+  font-size: 0.85rem;
   color: var(--text-sub);
   line-height: 1.55;
-  margin-bottom: 1.25rem;
+  margin-bottom: 1.2rem;
   display: -webkit-box;
   -webkit-line-clamp: 3;
   -webkit-box-orient: vertical;
@@ -1381,32 +1408,98 @@ a:hover {
   min-height: 3.9rem;
 }
 
-.game-card-v3 .game-play-btn {
+.game-card-meta {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  font-size: 0.8rem;
+  color: var(--text-sub);
+  margin-bottom: 1rem;
+  padding-top: 0.5rem;
+  border-top: 1px solid var(--border-color);
+}
+
+.game-play-btn {
   width: 100%;
-  padding: 0.65rem 1rem;
+  padding: 0.7rem 1rem;
   border-radius: 0.75rem;
   background: var(--primary-gradient);
   color: #ffffff;
   border: none;
   font-weight: 700;
-  font-size: 0.9rem;
+  font-size: 0.92rem;
   cursor: pointer;
-  box-shadow: 0 4px 12px rgba(37, 99, 235, 0.25);
+  box-shadow: 0 4px 14px rgba(37, 99, 235, 0.28);
   display: flex;
   align-items: center;
   justify-content: center;
   gap: 0.4rem;
   transition: all 0.25s ease;
+  margin-top: auto;
 }
 
-.game-card-v3 .game-play-btn:hover:not(:disabled) {
+.game-play-btn:hover:not(:disabled) {
   transform: translateY(-2px);
-  box-shadow: 0 6px 18px rgba(37, 99, 235, 0.4);
+  box-shadow: 0 6px 20px rgba(37, 99, 235, 0.42);
 }
 
-.game-card-v3.is-played {
+.therapy-game-card.is-played {
   border-color: var(--success);
   background: linear-gradient(to bottom, var(--bg-card), rgba(16, 185, 129, 0.08));
+}
+
+/* ========================================================
+   WELCOME HERO HUMAN PHOTO FRAME & BADGES
+   ======================================================== */
+.hero-photo-wrapper {
+  position: relative;
+  display: inline-block;
+  border-radius: 2rem;
+  overflow: visible;
+  padding: 0.5rem;
+}
+
+.hero-photo-img {
+  max-height: 420px;
+  width: auto;
+  border-radius: 1.75rem;
+  box-shadow: 0 20px 45px -10px rgba(15, 23, 42, 0.25);
+  display: block;
+  object-fit: cover;
+  border: 4px solid var(--bg-card);
+}
+
+.hero-photo-badge {
+  position: absolute;
+  background: var(--bg-card);
+  color: var(--text-main);
+  padding: 0.5rem 1rem;
+  border-radius: 9999px;
+  font-size: 0.82rem;
+  font-weight: 700;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.12);
+  border: 1px solid var(--border-color);
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+  z-index: 10;
+  animation: floatBadge 3.5s ease-in-out infinite;
+}
+
+.hero-badge-top {
+  top: 15px;
+  right: -15px;
+}
+
+.hero-badge-bottom {
+  bottom: 20px;
+  left: -15px;
+  animation-delay: 1.8s;
+}
+
+@keyframes floatBadge {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-6px); }
 }
 
 .game-card-v3.is-played .game-play-btn {

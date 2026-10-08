@@ -85,11 +85,13 @@ $(document).ready(function () {
       }
     }
     if (event.data.msg == 'Game Ended') {
-      Swal.fire(
-        `${event.data.game} Time Out!`,
-        'Game Ended. Your score is : ' + event.data.score,
-        'error'
-      )
+      Swal.fire({
+        title: `${event.data.game || 'Session'} Finished!`,
+        text: 'Great effort! Your session score is: ' + (event.data.score !== undefined ? event.data.score : 0),
+        icon: 'success',
+        confirmButtonColor: '#2563eb',
+        confirmButtonText: 'Continue'
+      });
 
       markPlayedGame(event.data.game);
 
@@ -152,13 +154,19 @@ $('#iframe').on('load', function () {
     rightColor = rightDiv.innerHTML
     let leftContrast = l.value
     let rightContrast = r.value
-    // console.log("left Color User : "+leftColorName)
-    // console.log("right Color User : "+rightColorName)
-    // console.log("left Contrast User : "+leftContrast)
-    // console.log("right Contrast User : "+rightContrast)
-    let minute = +($('#time').text());
-    console.log(minute)
-    message = { time: minute * 60 * 1000, leftColorName: leftColorName, leftColor: leftColor, rightColorName: rightColorName, rightColor: rightColor, leftContrast: l.value, rightContrast: r.value, msg: "Hello" }
+    let rawMin = +($('#time').text());
+    let minute = (!rawMin || isNaN(rawMin) || rawMin <= 0) ? 20 : rawMin;
+    console.log("Prescribed game minutes: " + minute);
+    message = { 
+      time: minute * 60 * 1000, 
+      leftColorName: leftColorName, 
+      leftColor: leftColor, 
+      rightColorName: rightColorName, 
+      rightColor: rightColor, 
+      leftContrast: l.value, 
+      rightContrast: r.value, 
+      msg: "Hello" 
+    };
     document.querySelector("iframe").contentWindow.postMessage(message, "*");
   }
 });

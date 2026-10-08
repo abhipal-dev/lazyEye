@@ -13,57 +13,69 @@ export default class Games extends React.Component {
 
         this.carouselSlides = [
             {
-                tag: 'Snake',
-                title: "It's time to play with blocks!",
-                desc: 'Hunt moving targets, stimulate non-dominant macular fixation, and break amblyopic suppression through dual-channel contrast filtering.',
+                tag: 'Binocular Fusion',
+                tagIcon: 'fa-eye',
+                title: 'Snake Macular Fixation',
+                desc: 'Guide the snake to hunt moving targets. Red and cyan filtering splits the snake and food between eyes, stimulating binocular cortical fusion and reducing amblyopic suppression.',
                 mascot: '/images/snake-mascot.svg',
                 route: '/game1snake',
-                bg: 'linear-gradient(135deg, #0d9488 0%, #06b6d4 100%)',
+                bg: 'linear-gradient(135deg, #065f46 0%, #047857 50%, #0f766e 100%)',
+                time: '20 mins',
                 gameKey: 'Snake'
             },
             {
-                tag: 'Menza',
-                title: "It's time to play with blocks!",
-                desc: 'Slice dynamic 3D blocks to exercise contrast sensitivity, visual reflexes, and stereoscopic depth judgment with dichoptic red-cyan separation.',
+                tag: 'Visual Reflexes',
+                tagIcon: 'fa-bolt',
+                title: 'Menja 3D Geometric Slicing',
+                desc: 'Slice dynamic 3D blocks in rapid succession as they fly toward you. Sharpens reaction velocity, stereoscopic depth judgment, and contrast sensitivity.',
                 mascot: '/images/menja-mascot.svg',
                 route: '/game12menja',
-                bg: 'linear-gradient(135deg, #0284c7 0%, #4f46e5 100%)',
+                bg: 'linear-gradient(135deg, #1e3a8a 0%, #1d4ed8 50%, #0369a1 100%)',
+                time: '20 mins',
                 gameKey: 'Menja'
             },
             {
-                tag: 'Flappy Bird',
-                title: 'Fly through obstacles with dual-eye focus!',
-                desc: 'Navigate through narrow gates requiring high-frequency binocular fusion and saccadic reaction. Both eyes must work together to judge altitude.',
+                tag: 'Depth & Saccades',
+                tagIcon: 'fa-plane-departure',
+                title: 'Flappy Bird Dual-Eye Flight',
+                desc: 'Navigate altitude obstacles requiring rapid saccadic eye movements. Color separation ensures both eyes must communicate in real time to judge clearances.',
                 mascot: '/images/flappy-mascot.svg',
                 route: '/game2flappybird',
-                bg: 'linear-gradient(135deg, #2563eb 0%, #38bdf8 100%)',
+                bg: 'linear-gradient(135deg, #0369a1 0%, #0284c7 50%, #0284c7 100%)',
+                time: '15 mins',
                 gameKey: 'Flappy Bird'
             },
             {
-                tag: 'Tetris Fusion',
-                title: 'Stack & align dichoptic falling tetrominoes!',
-                desc: 'Color-filtered blocks separate active tetrominoes and pit boundaries between eyes, forcing simultaneous cortical processing to score lines.',
+                tag: 'Pattern Synthesis',
+                tagIcon: 'fa-cubes',
+                title: 'Tetris Fusion Alignment',
+                desc: 'Rotate and place color-filtered falling tetrominoes. Playing board boundaries and falling shapes are split between eyes, demanding simultaneous cortical vision.',
                 mascot: '/images/tetris-mascot.svg',
                 route: '/game8tetris',
-                bg: 'linear-gradient(135deg, #7c3aed 0%, #c026d3 100%)',
+                bg: 'linear-gradient(135deg, #581c87 0%, #7e22ce 50%, #9333ea 100%)',
+                time: '20 mins',
                 gameKey: 'Tetris'
             },
             {
-                tag: 'Bubble Shooter',
-                title: 'Target, aim and burst color bubbles!',
-                desc: 'Precision foveal aiming exercises peripheral stereoscopic acuity and active visual processing in the amblyopic eye.',
+                tag: 'Spatial Targeting',
+                tagIcon: 'fa-bullseye',
+                title: 'Bubble Shooter Precision Aim',
+                desc: 'Aim and pop matching bubble clusters to stimulate foveal fixation, peripheral vision, and active engagement in the non-dominant eye.',
                 mascot: '/images/bubbles-mascot.svg',
                 route: '/game9bubbleshooter',
-                bg: 'linear-gradient(135deg, #d97706 0%, #e11d48 100%)',
+                bg: 'linear-gradient(135deg, #9a3412 0%, #c2410c 50%, #ea580c 100%)',
+                time: '15 mins',
                 gameKey: 'Bubble Shooter'
             },
             {
-                tag: 'Ping Pong 3D',
-                title: 'Defend your court with rapid paddle tracking!',
-                desc: 'High-velocity rally tracking forces binocular fusion and dynamic motion stereopsis as the ball travels across depth planes.',
+                tag: 'Speed Tracking',
+                tagIcon: 'fa-table-tennis-paddle-ball',
+                title: 'Ping-Pong 3D Dynamic Rally',
+                desc: 'Defend your table with rapid paddle tracking. High-velocity returns challenge binocular alignment and dynamic stereoscopic motion tracking.',
                 mascot: '/images/pingpong-mascot.svg',
                 route: '/game10pingpong',
-                bg: 'linear-gradient(135deg, #059669 0%, #10b981 100%)',
+                bg: 'linear-gradient(135deg, #115e59 0%, #0f766e 50%, #059669 100%)',
+                time: '15 mins',
                 gameKey: 'Ping Pong'
             }
         ];
@@ -74,9 +86,10 @@ export default class Games extends React.Component {
                 name: 'Snake Game',
                 route: '/game1snake',
                 badge: 'Binocular Focus',
-                badgeClass: 'bg-success-subtle text-success',
+                badgeClass: 'badge-emerald',
                 art: '/images/snake-mascot.svg',
-                desc: 'Guide the snake to collect targets while dichoptically splitting snake and food between eyes to force binocular fusion and reduce amblyopic suppression.',
+                bannerBg: 'linear-gradient(135deg, rgba(16, 185, 129, 0.14) 0%, rgba(5, 150, 105, 0.25) 100%)',
+                desc: 'Guide the snake to hunt targets. Red-cyan color separation splits the snake and food between eyes, actively training binocular fusion and breaking suppression.',
                 time: '20 mins'
             },
             {
@@ -84,9 +97,10 @@ export default class Games extends React.Component {
                 name: 'Flappy Bird',
                 route: '/game2flappybird',
                 badge: 'Depth Perception',
-                badgeClass: 'bg-primary-subtle text-primary',
+                badgeClass: 'badge-sky',
                 art: '/images/flappy-mascot.svg',
-                desc: 'Navigate obstacles requiring precise timing and dual-eye coordination. Suppressed visual elements encourage both eyes to work simultaneously.',
+                bannerBg: 'linear-gradient(135deg, rgba(14, 165, 233, 0.14) 0%, rgba(2, 132, 199, 0.25) 100%)',
+                desc: 'Navigate flight obstacles with precise timing. Suppressed visual elements encourage both eyes to coordinate simultaneously to judge altitude.',
                 time: '15 mins'
             },
             {
@@ -94,9 +108,10 @@ export default class Games extends React.Component {
                 name: 'Menja 3D',
                 route: '/game12menja',
                 badge: 'Spatial Reflex',
-                badgeClass: 'bg-info-subtle text-info',
+                badgeClass: 'badge-indigo',
                 art: '/images/menja-mascot.svg',
-                desc: 'Dynamic 3D block slicing challenge that stimulates visual reflexes, contrast sensitivity, and motor coordination with dichoptic red-cyan separation.',
+                bannerBg: 'linear-gradient(135deg, rgba(99, 102, 241, 0.14) 0%, rgba(79, 70, 229, 0.25) 100%)',
+                desc: 'Dynamic 3D block slicing challenge that exercises rapid cortical processing, stereoscopic depth judgment, and contrast sensitivity.',
                 time: '20 mins'
             },
             {
@@ -104,18 +119,20 @@ export default class Games extends React.Component {
                 name: 'Tetris Fusion',
                 route: '/game8tetris',
                 badge: 'Pattern Synthesis',
-                badgeClass: 'bg-purple-subtle text-purple',
+                badgeClass: 'badge-purple',
                 art: '/images/tetris-mascot.svg',
-                desc: 'Classic falling-block puzzle adapted for vision therapy. Color-filtered tetrominoes train spatial orientation, hand-eye coordination, and binocular alignment.',
+                bannerBg: 'linear-gradient(135deg, rgba(168, 85, 247, 0.14) 0%, rgba(126, 34, 206, 0.25) 100%)',
+                desc: 'Falling-block puzzle adapted for vision therapy. Color-filtered tetrominoes train spatial orientation, hand-eye coordination, and binocular alignment.',
                 time: '20 mins'
             },
             {
                 id: 'BubbleShooter',
                 name: 'Bubble Shooter',
                 route: '/game9bubbleshooter',
-                badge: 'Color Fusion',
-                badgeClass: 'bg-danger-subtle text-danger',
+                badge: 'Foveal Targeting',
+                badgeClass: 'badge-amber',
                 art: '/images/bubbles-mascot.svg',
+                bannerBg: 'linear-gradient(135deg, rgba(245, 158, 11, 0.14) 0%, rgba(217, 119, 6, 0.25) 100%)',
                 desc: 'Aim and match color-separated bubbles to stimulate peripheral stereoscopic vision and promote active visual processing in the non-dominant eye.',
                 time: '15 mins'
             },
@@ -124,8 +141,9 @@ export default class Games extends React.Component {
                 name: 'Ping-Pong 3D',
                 route: '/game10pingpong',
                 badge: 'Speed Tracking',
-                badgeClass: 'bg-warning-subtle text-warning',
+                badgeClass: 'badge-teal',
                 art: '/images/pingpong-mascot.svg',
+                bannerBg: 'linear-gradient(135deg, rgba(20, 184, 166, 0.14) 0%, rgba(13, 148, 136, 0.25) 100%)',
                 desc: 'Rapid dichoptic paddle response game that sharpens reaction velocity, spatial tracking, and dynamic binocular depth judgment.',
                 time: '15 mins'
             },
@@ -134,19 +152,21 @@ export default class Games extends React.Component {
                 name: 'Sticky Holds',
                 route: '/game11stickyholds',
                 badge: 'Agility Fixation',
-                badgeClass: 'bg-secondary-subtle text-secondary',
-                art: '/images/Sticky-Holds.png',
-                desc: 'Rock climbing agility puzzle demanding visual fixation, depth processing, and sustained binocular engagement to reach new heights.',
+                badgeClass: 'badge-slate',
+                art: '/images/stickyholds-mascot.svg',
+                bannerBg: 'linear-gradient(135deg, rgba(100, 116, 139, 0.14) 0%, rgba(51, 65, 85, 0.25) 100%)',
+                desc: 'Rock climbing agility puzzle demanding sustained visual fixation, depth processing, and bilateral coordination to reach the top hold.',
                 time: '15 mins'
             },
             {
                 id: 'Maze',
                 name: 'Maze Labyrinth',
                 route: '/game5maze',
-                badge: 'Contrast Maze',
-                badgeClass: 'bg-dark-subtle text-dark',
-                art: '/images/Maze.png',
-                desc: 'Solve intricate labyrinths with split visual cues, boosting visual search efficiency and neuro-visual pathway activation.',
+                badge: 'Spatial Search',
+                badgeClass: 'badge-yellow',
+                art: '/images/maze.png',
+                bannerBg: 'linear-gradient(135deg, rgba(234, 179, 8, 0.14) 0%, rgba(202, 138, 4, 0.25) 100%)',
+                desc: 'Solve intricate labyrinths with split visual cues, boosting visual search efficiency, spatial mapping, and neuro-visual pathway activation.',
                 time: '15 mins'
             },
             {
@@ -154,8 +174,9 @@ export default class Games extends React.Component {
                 name: 'Ball Catcher',
                 route: '/game3ballcatcher',
                 badge: 'Hand-Eye Sync',
-                badgeClass: 'bg-info-subtle text-info',
-                art: '/images/ballcatcher.jpeg',
+                badgeClass: 'badge-rose',
+                art: '/images/ballcatcher-mascot.svg',
+                bannerBg: 'linear-gradient(135deg, rgba(244, 63, 94, 0.14) 0%, rgba(225, 29, 72, 0.25) 100%)',
                 desc: 'Track and catch falling targets across visual fields to improve saccadic eye movements and visual-motor integration.',
                 time: '15 mins'
             },
@@ -163,10 +184,11 @@ export default class Games extends React.Component {
                 id: 'BouncingBall',
                 name: 'Bouncing Ball',
                 route: '/game7test',
-                badge: 'Dynamic Tracking',
-                badgeClass: 'bg-primary-subtle text-primary',
-                art: '/images/bouncing-ball.png',
-                desc: 'Anticipate dynamic trajectories and rebounds under dichoptic viewing to enhance depth perception and tracking agility.',
+                badge: 'Trajectory Tracking',
+                badgeClass: 'badge-blue',
+                art: '/images/bouncingball-mascot.svg',
+                bannerBg: 'linear-gradient(135deg, rgba(59, 130, 246, 0.14) 0%, rgba(29, 78, 216, 0.25) 100%)',
+                desc: 'Anticipate dynamic rebounds and speed variations under dichoptic viewing to enhance depth perception and tracking agility.',
                 time: '15 mins'
             }
         ];
@@ -187,7 +209,7 @@ export default class Games extends React.Component {
             if (!this.state.isPaused) {
                 this.nextSlide();
             }
-        }, 5000);
+        }, 6000);
     }
 
     stopCarouselTimer = () => {
@@ -258,9 +280,9 @@ export default class Games extends React.Component {
         }
     }
 
-    // Change src of iframes
+    // Launch game in fullscreen iframe
     changesrc = (framesrc) => {
-        console.log('Button Clicked: ' + framesrc);
+        console.log('Starting game session:', framesrc);
         var elem = document.getElementById('iframe');
         if (elem) {
             elem.src = framesrc;
@@ -282,111 +304,166 @@ export default class Games extends React.Component {
                 {/* Header Title Bar */}
                 <div className="d-flex align-items-center justify-content-between flex-wrap gap-2 mb-3">
                     <div>
-                        <h3 className="fw-bold mb-1 text-main"><i className="fa-solid fa-gamepad text-primary me-2"></i>Therapy Games</h3>
-                        <p className="text-muted small mb-0">Play assigned games wearing your dichoptic red/cyan glasses to eliminate suppression</p>
+                        <h3 className="fw-bold mb-1 text-main d-flex align-items-center gap-2">
+                            <i className="fa-solid fa-gamepad text-primary"></i>
+                            Therapy Games
+                        </h3>
+                        <p className="text-muted small mb-0">
+                            Play prescribed games with your calibrated red/cyan glasses to eliminate visual suppression.
+                        </p>
                     </div>
                     <button 
                         type="button" 
-                        className="btn btn-outline-primary btn-sm rounded-pill px-3 shadow-sm"
+                        className="btn btn-outline-primary btn-sm rounded-pill px-3 shadow-sm d-flex align-items-center gap-2"
                         data-bs-toggle="modal" 
                         data-bs-target="#colorSettingModal"
                     >
-                        <i className="fa-solid fa-sliders me-1"></i> Calibrate Colors
+                        <i className="fa-solid fa-sliders"></i>
+                        <span>Calibrate Glasses</span>
                     </button>
                 </div>
 
-                {/* Featured Games Carousel (Image 2 & 3 Style) */}
+                {/* Featured Workout Hero Banner (Human-crafted, No Overlapping Toggler) */}
                 <div 
-                    className="therapy-carousel-wrap"
+                    className="therapy-hero-card"
+                    style={{ background: current.bg }}
                     onMouseEnter={() => this.setState({ isPaused: true })}
                     onMouseLeave={() => this.setState({ isPaused: false })}
                 >
-                    <div 
-                        className="therapy-carousel-slide" 
-                        style={{ background: current.bg }}
-                    >
-                        <div className="therapy-carousel-content">
-                            <span className="therapy-carousel-tag">{current.tag}</span>
-                            <h2 className="therapy-carousel-title">{current.title}</h2>
-                            <p className="therapy-carousel-desc">{current.desc}</p>
+                    {/* Top Bar inside banner: category tag and clean controls */}
+                    <div className="therapy-hero-header">
+                        <span className="therapy-hero-badge">
+                            <i className={`fa-solid ${current.tagIcon} me-1`}></i>
+                            {current.tag}
+                        </span>
+
+                        {/* Unobtrusive navigation controls placed cleanly in the corner */}
+                        <div className="therapy-hero-controls">
+                            <span className="therapy-hero-counter">
+                                {this.state.currentSlide + 1} / {this.carouselSlides.length}
+                            </span>
                             <button 
-                                className="therapy-carousel-btn"
-                                onClick={() => this.changesrc(current.route)}
+                                type="button" 
+                                className="therapy-nav-btn" 
+                                onClick={this.prevSlide}
+                                aria-label="Previous Exercise"
+                                title="Previous Exercise"
                             >
-                                <i className="fa-solid fa-circle-play text-primary"></i> Play Now
+                                <i className="fa-solid fa-chevron-left"></i>
                             </button>
-                        </div>
-                        <div className="therapy-carousel-art d-none d-sm-flex">
-                            <img src={current.mascot} alt={current.tag} />
+                            <button 
+                                type="button" 
+                                className="therapy-nav-btn" 
+                                onClick={this.nextSlide}
+                                aria-label="Next Exercise"
+                                title="Next Exercise"
+                            >
+                                <i className="fa-solid fa-chevron-right"></i>
+                            </button>
                         </div>
                     </div>
 
-                    {/* Navigation Arrows */}
-                    <button 
-                        className="carousel-nav-btn carousel-nav-prev"
-                        onClick={this.prevSlide}
-                        aria-label="Previous Slide"
-                    >
-                        <i className="fa-solid fa-chevron-left"></i>
-                    </button>
-                    <button 
-                        className="carousel-nav-btn carousel-nav-next"
-                        onClick={this.nextSlide}
-                        aria-label="Next Slide"
-                    >
-                        <i className="fa-solid fa-chevron-right"></i>
-                    </button>
+                    {/* Main Slide Content: Text on left, Mascot on right */}
+                    <div className="therapy-hero-body">
+                        <div className="therapy-hero-text">
+                            <h2 className="therapy-hero-title">{current.title}</h2>
+                            <p className="therapy-hero-desc">{current.desc}</p>
+                            
+                            <div className="d-flex align-items-center flex-wrap gap-2 mb-3">
+                                <span className="therapy-chip">
+                                    <i className="fa-regular fa-clock text-warning me-1"></i> {current.time}
+                                </span>
+                                <span className="therapy-chip">
+                                    <i className="fa-solid fa-glasses text-info me-1"></i> Red/Cyan Filter
+                                </span>
+                            </div>
 
-                    {/* Indicators */}
-                    <div className="carousel-dots">
+                            <button 
+                                type="button"
+                                className="therapy-hero-btn"
+                                onClick={() => this.changesrc(current.route)}
+                            >
+                                <i className="fa-solid fa-circle-play text-primary"></i>
+                                <span>Start Session</span>
+                            </button>
+                        </div>
+
+                        {/* Large Mascot Art */}
+                        <div className="therapy-hero-art">
+                            <img src={current.mascot} alt={current.title} />
+                        </div>
+                    </div>
+
+                    {/* Bottom Slide Indicators */}
+                    <div className="therapy-hero-dots">
                         {this.carouselSlides.map((slide, index) => (
-                            <div 
+                            <button
                                 key={index} 
-                                className={`carousel-dot ${index === this.state.currentSlide ? 'active' : ''}`}
+                                type="button"
+                                className={`therapy-dot ${index === this.state.currentSlide ? 'active' : ''}`}
                                 onClick={() => this.goToSlide(index)}
+                                aria-label={`Go to slide ${index + 1}`}
                             />
                         ))}
                     </div>
                 </div>
 
                 {/* Section Subheading */}
-                <div className="d-flex align-items-center justify-content-between mb-3">
-                    <h5 className="fw-bold text-main mb-0">All Prescribed Therapy Games</h5>
-                    <span className="badge bg-secondary-subtle text-secondary small rounded-pill px-3 py-1">
+                <div className="d-flex align-items-center justify-content-between mb-3 mt-4">
+                    <div>
+                        <h5 className="fw-bold text-main mb-0">All Prescribed Therapy Games</h5>
+                        <p className="text-muted small mb-0">Select any engine to begin your daily dichoptic vision exercise.</p>
+                    </div>
+                    <span className="badge bg-primary-subtle text-primary small rounded-pill px-3 py-1 fw-bold">
                         10 Clinical Engines
                     </span>
                 </div>
 
-                {/* Games Grid with Rich Descriptions (Image 3 Style) */}
+                {/* Games Grid with Large Icons & Rich Aesthetic Cards */}
                 <div className="row g-4">
                     {this.allGames.map((game) => (
                         <div key={game.id} className="col-12 col-md-6 col-xl-4">
-                            <div className={`game-card-v3 h-100 ${game.id}`}>
-                                <div>
-                                    <div className="game-card-art-box">
-                                        <img src={game.art} alt={game.name} />
-                                    </div>
-                                    <div className="d-flex align-items-center justify-content-between gap-2 mb-1">
-                                        <h5 className="game-title mb-0">{game.name}</h5>
-                                        <span className={`badge ${game.badgeClass} game-badge mb-0`}>
-                                            {game.badge}
-                                        </span>
-                                    </div>
+                            <div className={`therapy-game-card h-100 ${game.id}`}>
+                                {/* Themed Visual Artwork Banner */}
+                                <div 
+                                    className="game-cover-banner" 
+                                    style={{ background: game.bannerBg }}
+                                >
+                                    <img 
+                                        src={game.art} 
+                                        alt={game.name} 
+                                        className="game-cover-icon"
+                                    />
+                                    <span className={`game-card-tag ${game.badgeClass}`}>
+                                        {game.badge}
+                                    </span>
+                                </div>
+
+                                {/* Card Body Details */}
+                                <div className="game-card-info">
+                                    <h5 className="game-title">{game.name}</h5>
                                     <p className="game-description">
                                         {game.desc}
                                     </p>
-                                </div>
 
-                                <div className="mt-auto pt-2">
-                                    <div className="d-flex align-items-center justify-content-between small text-muted mb-2 px-1">
-                                        <span><i className="fa-regular fa-clock me-1 text-primary"></i> Target: {game.time}</span>
-                                        <span className="text-primary fw-semibold"><i className="fa-solid fa-glasses me-1"></i> Red/Cyan</span>
+                                    <div className="game-card-meta">
+                                        <span>
+                                            <i className="fa-regular fa-clock me-1 text-primary"></i>
+                                            Target: {game.time}
+                                        </span>
+                                        <span className="text-primary fw-semibold">
+                                            <i className="fa-solid fa-glasses me-1"></i>
+                                            Red/Cyan
+                                        </span>
                                     </div>
+
                                     <button 
+                                        type="button"
                                         className="game-play-btn openGame" 
                                         onClick={() => this.changesrc(game.route)}
                                     >
-                                        <i className="fa-solid fa-play me-1"></i> Play Game
+                                        <i className="fa-solid fa-play me-2"></i>
+                                        Play Game
                                     </button>
                                 </div>
                             </div>

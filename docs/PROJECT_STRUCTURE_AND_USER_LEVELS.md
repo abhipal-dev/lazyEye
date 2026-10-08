@@ -309,3 +309,4 @@ sequenceDiagram
     Doctor->>System: Submits Clinical Consultation & updates prescribed target
     System->>DB: Inserts into 'doctor_consultations' & updates user_playing_time
 ```
+

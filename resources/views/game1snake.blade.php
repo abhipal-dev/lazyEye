@@ -71,13 +71,12 @@
          rightColor =  event.data.rightColor;
          colors.push(leftColor)
          colors.push(rightColor)
-         random_apple_color = leftColor;
-         console.log(colors)
+         var sessionDuration = (event.data.time && !isNaN(event.data.time) && event.data.time > 10000) ? event.data.time : (20 * 60 * 1000);
          setTimeout(function() {
             message={msg:'Game Ended',game:'Snake',score:score}
             window.parent.postMessage(message, "*");
             console.log('Game ended by Game js')
-        }, event.data.time);
+        }, sessionDuration);
         window.parent.postMessage("Game Started", "*");
       
 
