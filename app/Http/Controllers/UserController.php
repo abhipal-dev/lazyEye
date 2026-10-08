@@ -43,7 +43,17 @@ class UserController extends Controller
         return response()->json($data);
     }
 
+    protected static $dbReady = false;
+
     public static function ensureDatabaseReady($forceSeed = false){
+        if (self::$dbReady && !$forceSeed) {
+            return;
+        }
+        if (\Cache::has('db_schema_ready') && !$forceSeed) {
+            self::$dbReady = true;
+            return;
+        }
+
         try {
             // 1. Ensure users table exists with all necessary columns
             if (!Schema::hasTable('users')) {
@@ -126,6 +136,9 @@ class UserController extends Controller
             if ($userCount === 0 || $forceSeed) {
                 self::populateClinicalDemoData();
             }
+
+            \Cache::forever('db_schema_ready', true);
+            self::$dbReady = true;
         } catch (\Throwable $e) {
             \Log::error('Database auto-initialization error: ' . $e->getMessage());
         }

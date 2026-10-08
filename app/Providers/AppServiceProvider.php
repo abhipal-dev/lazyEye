@@ -27,11 +27,5 @@ class AppServiceProvider extends ServiceProvider
         if (config('app.env') === 'production' || env('APP_ENV') === 'production' || str_contains(env('APP_URL', ''), 'https://') || request()->server('HTTP_X_FORWARDED_PROTO') === 'https') {
             URL::forceScheme('https');
         }
-
-        try {
-            \App\Http\Controllers\UserController::ensureDatabaseReady();
-        } catch (\Throwable $e) {
-            \Log::warning('AppServiceProvider auto-initialization deferred: ' . $e->getMessage());
-        }
     }
 }
