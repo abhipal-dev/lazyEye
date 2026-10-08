@@ -86,7 +86,6 @@ class AuthController extends Controller
                         'messages' => 'Database Error: ' . $e->getMessage()
                     ]);
                 }
-            }
     }
     public function logout(){
         \Session::flush();
