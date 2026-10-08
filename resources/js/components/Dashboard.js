@@ -84,6 +84,12 @@ export default class Dashboard extends React.Component {
 
     render() {
         const { stats } = this.state;
+        const role = this.props.currentUser?.accounttype || stats.role || 'admin';
+        const isDoctor = (role === 'doctor');
+        const isRoot = (role === 'root');
+        const isAdmin = (role === 'admin');
+        const currentName = this.props.currentUser?.fullname || (isDoctor ? 'Doctor' : 'Administrator');
+
         const weeklyData = stats.weekly_sessions?.data || [30, 40, 45, 42, 50, 60, 52];
         const maxVal = Math.max(...weeklyData, 1);
 
@@ -114,25 +120,60 @@ export default class Dashboard extends React.Component {
                 <div className="d-flex align-items-center justify-content-between flex-wrap gap-3 mt-4 mb-3">
                     <div>
                         <h2 className="fw-bold mb-1 text-main">
-                            <i className="fa-solid fa-gauge-high text-primary me-2"></i>Clinical Overview Dashboard
+                            {isDoctor ? (
+                                <><i className="fa-solid fa-user-doctor text-info me-2"></i>Doctor Clinical Practice</>
+                            ) : isRoot ? (
+                                <><i className="fa-solid fa-crown text-warning me-2"></i>Master Superadmin Console</>
+                            ) : (
+                                <><i className="fa-solid fa-gauge-high text-primary me-2"></i>Clinic Operations Dashboard</>
+                            )}
                         </h2>
-                        <p className="text-sub small mb-0">Real-time vision therapy analytics, patient adherence, and staff controls</p>
+                        <p className="text-sub small mb-0">
+                            {isDoctor ? (
+                                <>Welcome back, <strong>{currentName}</strong> &bull; Therapy compliance and recovery tracking for your assigned cohort</>
+                            ) : isRoot ? (
+                                <>Master system jurisdiction &bull; System administrators, multi-clinic records, and database supervision</>
+                            ) : (
+                                <>Real-time patient adherence, clinical reviews, and optometrist staff management</>
+                            )}
+                        </p>
                     </div>
                     <div className="d-flex align-items-center gap-2 flex-wrap">
-                        <button 
-                            className="btn btn-sm btn-outline-success rounded-pill px-3 shadow-sm d-flex align-items-center gap-1 fw-bold"
-                            onClick={this.handleSeedDemoData}
-                            title="Generate realistic clinical patients, doctors, and game sessions"
-                        >
-                            <i className="fa-solid fa-wand-magic-sparkles"></i> Seed Demo Data
-                        </button>
-                        <button 
-                            className="btn btn-sm btn-primary rounded-pill px-3 shadow-sm d-flex align-items-center gap-1 fw-bold"
-                            data-bs-toggle="modal" 
-                            data-bs-target="#createStaffModal"
-                        >
-                            <i className="fa-solid fa-user-plus"></i> Add User / Doctor
-                        </button>
+                        {isDoctor ? (
+                            <>
+                                <button 
+                                    className="btn btn-sm btn-danger rounded-pill px-3 shadow-sm d-flex align-items-center gap-1 fw-bold"
+                                    data-bs-toggle="modal" 
+                                    data-bs-target="#logConsultationModal"
+                                >
+                                    <i className="fa-solid fa-stethoscope"></i> Log Clinical Review
+                                </button>
+                                <button 
+                                    className="btn btn-sm btn-primary rounded-pill px-3 shadow-sm d-flex align-items-center gap-1 fw-bold"
+                                    data-bs-toggle="modal" 
+                                    data-bs-target="#createStaffModal"
+                                >
+                                    <i className="fa-solid fa-user-plus"></i> Enroll Patient
+                                </button>
+                            </>
+                        ) : (
+                            <>
+                                <button 
+                                    className="btn btn-sm btn-outline-success rounded-pill px-3 shadow-sm d-flex align-items-center gap-1 fw-bold"
+                                    onClick={this.handleSeedDemoData}
+                                    title="Generate realistic clinical patients, doctors, and game sessions"
+                                >
+                                    <i className="fa-solid fa-wand-magic-sparkles"></i> Seed Demo Data
+                                </button>
+                                <button 
+                                    className="btn btn-sm btn-primary rounded-pill px-3 shadow-sm d-flex align-items-center gap-1 fw-bold"
+                                    data-bs-toggle="modal" 
+                                    data-bs-target="#createStaffModal"
+                                >
+                                    <i className="fa-solid fa-user-plus"></i> {isRoot ? 'Add User / Staff / Admin' : 'Add User / Doctor'}
+                                </button>
+                            </>
+                        )}
                         <a 
                             href="/user" 
                             className="btn btn-sm btn-outline-primary rounded-pill px-3 shadow-sm d-flex align-items-center gap-1 fw-bold"
@@ -144,7 +185,7 @@ export default class Dashboard extends React.Component {
 
                 {/* 4 Primary KPI Cards */}
                 <div className="row g-3 mb-4">
-                    {/* Active Patients */}
+                    {/* Card 1: Patients */}
                     <div className="col-12 col-sm-6 col-xl-3">
                         <div 
                             className="card border-0 shadow-sm h-100 p-3 cursor-pointer fetchUsers"
@@ -156,92 +197,186 @@ export default class Dashboard extends React.Component {
                             }}
                         >
                             <div className="d-flex align-items-center justify-content-between mb-2">
-                                <span className="small text-white-50 fw-bold text-uppercase tracking-wider">Active Patients</span>
+                                <span className="small text-white-50 fw-bold text-uppercase tracking-wider">
+                                    {isDoctor ? 'My Assigned Patients' : 'Active Patients'}
+                                </span>
                                 <div className="rounded-circle p-2 bg-white bg-opacity-25 d-flex align-items-center justify-content-center" style={{ width: 38, height: 38 }}>
                                     <i className="fa-solid fa-users text-white"></i>
                                 </div>
                             </div>
                             <h2 className="fw-bold mb-1 text-white">{stats.total_patients}</h2>
                             <div className="d-flex align-items-center justify-content-between small text-white-50 mt-1">
-                                <span>Prescribed Therapy</span>
+                                <span>{isDoctor ? 'Assigned to Your Care' : 'Prescribed Therapy'}</span>
                                 <span className="text-white fw-bold">View Patients <i className="fa-solid fa-arrow-right ms-1"></i></span>
                             </div>
                         </div>
                     </div>
 
-                    {/* Doctors & Vision Therapists */}
+                    {/* Card 2: Doctors or Doctor Consultations */}
                     <div className="col-12 col-sm-6 col-xl-3">
-                        <div 
-                            className="card border-0 shadow-sm h-100 p-3 cursor-pointer fetchDoctors"
-                            style={{ 
-                                background: 'linear-gradient(135deg, #0284c7, #0369a1)', 
-                                borderRadius: '1rem', 
-                                color: '#fff',
-                                transition: 'transform 0.2s ease'
-                            }}
-                        >
-                            <div className="d-flex align-items-center justify-content-between mb-2">
-                                <span className="small text-white-50 fw-bold text-uppercase tracking-wider">Doctors & Therapists</span>
-                                <div className="rounded-circle p-2 bg-white bg-opacity-25 d-flex align-items-center justify-content-center" style={{ width: 38, height: 38 }}>
-                                    <i className="fa-solid fa-user-doctor text-white"></i>
+                        {isDoctor ? (
+                            <div 
+                                className="card border-0 shadow-sm h-100 p-3 cursor-pointer fetchConsultations"
+                                style={{ 
+                                    background: 'linear-gradient(135deg, #ef4444, #b91c1c)', 
+                                    borderRadius: '1rem', 
+                                    color: '#fff',
+                                    transition: 'transform 0.2s ease'
+                                }}
+                            >
+                                <div className="d-flex align-items-center justify-content-between mb-2">
+                                    <span className="small text-white-50 fw-bold text-uppercase tracking-wider">My Clinical Reviews</span>
+                                    <div className="rounded-circle p-2 bg-white bg-opacity-25 d-flex align-items-center justify-content-center" style={{ width: 38, height: 38 }}>
+                                        <i className="fa-solid fa-stethoscope text-white"></i>
+                                    </div>
+                                </div>
+                                <h2 className="fw-bold mb-1 text-white">{stats.total_consultations}</h2>
+                                <div className="d-flex align-items-center justify-content-between small text-white-50 mt-1">
+                                    <span>Recorded Consultations</span>
+                                    <span className="text-white fw-bold">View Reviews <i className="fa-solid fa-arrow-right ms-1"></i></span>
                                 </div>
                             </div>
-                            <h2 className="fw-bold mb-1 text-white">{stats.total_doctors}</h2>
-                            <div className="d-flex align-items-center justify-content-between small text-white-50 mt-1">
-                                <span>Certified Clinical Staff</span>
-                                <span className="text-white fw-bold">View Doctors <i className="fa-solid fa-arrow-right ms-1"></i></span>
+                        ) : (
+                            <div 
+                                className="card border-0 shadow-sm h-100 p-3 cursor-pointer fetchDoctors"
+                                style={{ 
+                                    background: 'linear-gradient(135deg, #0284c7, #0369a1)', 
+                                    borderRadius: '1rem', 
+                                    color: '#fff',
+                                    transition: 'transform 0.2s ease'
+                                }}
+                            >
+                                <div className="d-flex align-items-center justify-content-between mb-2">
+                                    <span className="small text-white-50 fw-bold text-uppercase tracking-wider">Doctors &amp; Staff</span>
+                                    <div className="rounded-circle p-2 bg-white bg-opacity-25 d-flex align-items-center justify-content-center" style={{ width: 38, height: 38 }}>
+                                        <i className="fa-solid fa-user-doctor text-white"></i>
+                                    </div>
+                                </div>
+                                <h2 className="fw-bold mb-1 text-white">{stats.total_doctors}</h2>
+                                <div className="d-flex align-items-center justify-content-between small text-white-50 mt-1">
+                                    <span>Certified Clinical Staff</span>
+                                    <span className="text-white fw-bold">View Doctors <i className="fa-solid fa-arrow-right ms-1"></i></span>
+                                </div>
                             </div>
-                        </div>
+                        )}
                     </div>
 
-                    {/* Pending Registrations */}
+                    {/* Card 3: Adherence Rate for Doctor / Reviews for Admin / Admins for Root */}
                     <div className="col-12 col-sm-6 col-xl-3">
-                        <div 
-                            className="card border-0 shadow-sm h-100 p-3 cursor-pointer fetchRegisters"
-                            style={{ 
-                                background: 'linear-gradient(135deg, #f59e0b, #d97706)', 
-                                borderRadius: '1rem', 
-                                color: '#fff',
-                                transition: 'transform 0.2s ease'
-                            }}
-                        >
-                            <div className="d-flex align-items-center justify-content-between mb-2">
-                                <span className="small text-white-50 fw-bold text-uppercase tracking-wider">Pending Approvals</span>
-                                <div className="rounded-circle p-2 bg-white bg-opacity-25 d-flex align-items-center justify-content-center" style={{ width: 38, height: 38 }}>
-                                    <i className="fa-solid fa-user-clock text-white"></i>
+                        {isDoctor ? (
+                            <div 
+                                className="card border-0 shadow-sm h-100 p-3"
+                                style={{ 
+                                    background: 'linear-gradient(135deg, #10b981, #059669)', 
+                                    borderRadius: '1rem', 
+                                    color: '#fff' 
+                                }}
+                            >
+                                <div className="d-flex align-items-center justify-content-between mb-2">
+                                    <span className="small text-white-50 fw-bold text-uppercase tracking-wider">Cohort Adherence</span>
+                                    <div className="rounded-circle p-2 bg-white bg-opacity-25 d-flex align-items-center justify-content-center" style={{ width: 38, height: 38 }}>
+                                        <i className="fa-solid fa-chart-pie text-white"></i>
+                                    </div>
+                                </div>
+                                <h2 className="fw-bold mb-1 text-white">{stats.compliance_rate}%</h2>
+                                <div className="d-flex align-items-center justify-content-between small text-white-50 mt-1">
+                                    <span>Target Adherence</span>
+                                    <span className="badge bg-white text-success fw-bold py-1 px-2">High Adherence</span>
                                 </div>
                             </div>
-                            <h2 className="fw-bold mb-1 text-white">{stats.pending_registers}</h2>
-                            <div className="d-flex align-items-center justify-content-between small text-white-50 mt-1">
-                                <span className="badge bg-white text-dark py-1 px-2">{stats.pending_registers > 0 ? 'Requires Action' : 'All Clear'}</span>
-                                <span className="text-white fw-bold">Review <i className="fa-solid fa-arrow-right ms-1"></i></span>
+                        ) : isRoot ? (
+                            <div 
+                                className="card border-0 shadow-sm h-100 p-3 cursor-pointer fetchAdmins"
+                                style={{ 
+                                    background: 'linear-gradient(135deg, #10b981, #059669)', 
+                                    borderRadius: '1rem', 
+                                    color: '#fff',
+                                    transition: 'transform 0.2s ease'
+                                }}
+                            >
+                                <div className="d-flex align-items-center justify-content-between mb-2">
+                                    <span className="small text-white-50 fw-bold text-uppercase tracking-wider">System Administrators</span>
+                                    <div className="rounded-circle p-2 bg-white bg-opacity-25 d-flex align-items-center justify-content-center" style={{ width: 38, height: 38 }}>
+                                        <i className="fa-solid fa-user-shield text-white"></i>
+                                    </div>
+                                </div>
+                                <h2 className="fw-bold mb-1 text-white">{stats.total_admins}</h2>
+                                <div className="d-flex align-items-center justify-content-between small text-white-50 mt-1">
+                                    <span>Root &amp; Clinic Admins</span>
+                                    <span className="text-white fw-bold">Manage Admins <i className="fa-solid fa-arrow-right ms-1"></i></span>
+                                </div>
                             </div>
-                        </div>
+                        ) : (
+                            <div 
+                                className="card border-0 shadow-sm h-100 p-3 cursor-pointer fetchConsultations"
+                                style={{ 
+                                    background: 'linear-gradient(135deg, #8b5cf6, #7c3aed)', 
+                                    borderRadius: '1rem', 
+                                    color: '#fff',
+                                    transition: 'transform 0.2s ease'
+                                }}
+                            >
+                                <div className="d-flex align-items-center justify-content-between mb-2">
+                                    <span className="small text-white-50 fw-bold text-uppercase tracking-wider">Clinical Reviews</span>
+                                    <div className="rounded-circle p-2 bg-white bg-opacity-25 d-flex align-items-center justify-content-center" style={{ width: 38, height: 38 }}>
+                                        <i className="fa-solid fa-stethoscope text-white"></i>
+                                    </div>
+                                </div>
+                                <h2 className="fw-bold mb-1 text-white">{stats.total_consultations}</h2>
+                                <div className="d-flex align-items-center justify-content-between small text-white-50 mt-1">
+                                    <span>Logged Consultations</span>
+                                    <span className="text-white fw-bold">View Reviews <i className="fa-solid fa-arrow-right ms-1"></i></span>
+                                </div>
+                            </div>
+                        )}
                     </div>
 
-                    {/* Clinic Administrators */}
+                    {/* Card 4: Avg Time for Doctor / Pending Intake for Admin & Root */}
                     <div className="col-12 col-sm-6 col-xl-3">
-                        <div 
-                            className="card border-0 shadow-sm h-100 p-3 cursor-pointer fetchAdmins"
-                            style={{ 
-                                background: 'linear-gradient(135deg, #10b981, #059669)', 
-                                borderRadius: '1rem', 
-                                color: '#fff',
-                                transition: 'transform 0.2s ease'
-                            }}
-                        >
-                            <div className="d-flex align-items-center justify-content-between mb-2">
-                                <span className="small text-white-50 fw-bold text-uppercase tracking-wider">System Administrators</span>
-                                <div className="rounded-circle p-2 bg-white bg-opacity-25 d-flex align-items-center justify-content-center" style={{ width: 38, height: 38 }}>
-                                    <i className="fa-solid fa-user-shield text-white"></i>
+                        {isDoctor ? (
+                            <div 
+                                className="card border-0 shadow-sm h-100 p-3"
+                                style={{ 
+                                    background: 'linear-gradient(135deg, #0284c7, #0369a1)', 
+                                    borderRadius: '1rem', 
+                                    color: '#fff' 
+                                }}
+                            >
+                                <div className="d-flex align-items-center justify-content-between mb-2">
+                                    <span className="small text-white-50 fw-bold text-uppercase tracking-wider">Avg Daily Prescribed</span>
+                                    <div className="rounded-circle p-2 bg-white bg-opacity-25 d-flex align-items-center justify-content-center" style={{ width: 38, height: 38 }}>
+                                        <i className="fa-solid fa-stopwatch text-white"></i>
+                                    </div>
+                                </div>
+                                <h2 className="fw-bold mb-1 text-white">{stats.avg_training_time} <span className="fs-6 fw-normal text-white-50">min</span></h2>
+                                <div className="d-flex align-items-center justify-content-between small text-white-50 mt-1">
+                                    <span>Prescribed Therapy Plan</span>
+                                    <span className="badge bg-white text-info fw-bold py-1 px-2">Standard</span>
                                 </div>
                             </div>
-                            <h2 className="fw-bold mb-1 text-white">{stats.total_admins}</h2>
-                            <div className="d-flex align-items-center justify-content-between small text-white-50 mt-1">
-                                <span>Root & Clinic Ops</span>
-                                <span className="text-white fw-bold">View Admins <i className="fa-solid fa-arrow-right ms-1"></i></span>
+                        ) : (
+                            <div 
+                                className="card border-0 shadow-sm h-100 p-3 cursor-pointer fetchRegisters"
+                                style={{ 
+                                    background: 'linear-gradient(135deg, #f59e0b, #d97706)', 
+                                    borderRadius: '1rem', 
+                                    color: '#fff',
+                                    transition: 'transform 0.2s ease'
+                                }}
+                            >
+                                <div className="d-flex align-items-center justify-content-between mb-2">
+                                    <span className="small text-white-50 fw-bold text-uppercase tracking-wider">Pending Registrations</span>
+                                    <div className="rounded-circle p-2 bg-white bg-opacity-25 d-flex align-items-center justify-content-center" style={{ width: 38, height: 38 }}>
+                                        <i className="fa-solid fa-user-clock text-white"></i>
+                                    </div>
+                                </div>
+                                <h2 className="fw-bold mb-1 text-white">{stats.pending_registers}</h2>
+                                <div className="d-flex align-items-center justify-content-between small text-white-50 mt-1">
+                                    <span className="badge bg-white text-dark py-1 px-2">{stats.pending_registers > 0 ? 'Requires Action' : 'All Clear'}</span>
+                                    <span className="text-white fw-bold">Review <i className="fa-solid fa-arrow-right ms-1"></i></span>
+                                </div>
                             </div>
-                        </div>
+                        )}
                     </div>
                 </div>
 
@@ -414,20 +549,26 @@ export default class Dashboard extends React.Component {
                         <div className="d-flex align-items-center gap-2 flex-wrap">
                             <span className="fw-bold text-main small me-2"><i className="fa-solid fa-filter me-1 text-primary"></i>Quick Records:</span>
                             <button className="btn btn-sm btn-outline-primary rounded-pill px-3 fetchUsers">
-                                <i className="fa-solid fa-users me-1"></i> Patients ({stats.total_patients})
+                                <i className="fa-solid fa-users me-1"></i> {isDoctor ? 'My Patients' : 'Patients'} ({stats.total_patients})
                             </button>
-                            <button className="btn btn-sm btn-outline-info rounded-pill px-3 fetchDoctors">
-                                <i className="fa-solid fa-user-doctor me-1"></i> Doctors ({stats.total_doctors})
-                            </button>
+                            {!isDoctor && (
+                                <button className="btn btn-sm btn-outline-info rounded-pill px-3 fetchDoctors">
+                                    <i className="fa-solid fa-user-doctor me-1"></i> Doctors ({stats.total_doctors})
+                                </button>
+                            )}
                             <button className="btn btn-sm btn-outline-danger rounded-pill px-3 fetchConsultations">
-                                <i className="fa-solid fa-stethoscope me-1"></i> Clinical Reviews
+                                <i className="fa-solid fa-stethoscope me-1"></i> {isDoctor ? 'My Reviews' : 'Clinical Reviews'} ({stats.total_consultations})
                             </button>
-                            <button className="btn btn-sm btn-outline-success rounded-pill px-3 fetchAdmins">
-                                <i className="fa-solid fa-user-shield me-1"></i> Admins ({stats.total_admins})
-                            </button>
-                            <button className="btn btn-sm btn-outline-warning rounded-pill px-3 fetchRegisters">
-                                <i className="fa-solid fa-user-clock me-1"></i> Pending Approvals ({stats.pending_registers})
-                            </button>
+                            {isRoot && (
+                                <button className="btn btn-sm btn-outline-success rounded-pill px-3 fetchAdmins">
+                                    <i className="fa-solid fa-user-shield me-1"></i> Admins ({stats.total_admins})
+                                </button>
+                            )}
+                            {!isDoctor && (
+                                <button className="btn btn-sm btn-outline-warning rounded-pill px-3 fetchRegisters">
+                                    <i className="fa-solid fa-user-clock me-1"></i> Pending Approvals ({stats.pending_registers})
+                                </button>
+                            )}
                         </div>
                         <div className="small" style={{ color: 'var(--text-muted)' }}>
                             Click any category above to view data records below &darr;

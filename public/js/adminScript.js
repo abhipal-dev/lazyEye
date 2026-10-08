@@ -245,6 +245,10 @@ function fetchAdmins() {
                 <th colspan="2" class="text-center">Action</th>
                 </tr>
             `);
+            if (!data || data.length === 0) {
+                $('tbody').append(`<tr><td colspan="10" class="text-center text-muted py-4"><i class="fa-solid fa-lock text-warning me-2"></i>Restricted Access: Only Root Superadmin can view and manage system administrators.</td></tr>`);
+                return;
+            }
             data.forEach((e) => {
                 let badge = (e.accounttype === 'root')
                     ? '<span class="badge bg-dark-subtle text-dark border"><i class="fa-solid fa-crown me-1 text-warning"></i>Root Superadmin</span>'
@@ -290,11 +294,11 @@ function fetchUsers() {
                 <th>Gender</th>
                 <th>Target</th>
                 <th>Enrolled (Local)</th>
-                <th colspan="3" class="text-center">Action</th>
+                <th colspan="4" class="text-center">Action</th>
                 </tr>
             `);
             if (!data || data.length === 0) {
-                $('tbody').append(`<tr><td colspan="11" class="text-center text-muted py-4">No active patients found.</td></tr>`);
+                $('tbody').append(`<tr><td colspan="12" class="text-center text-muted py-4">No active patients found.</td></tr>`);
                 return;
             }
 
@@ -339,6 +343,7 @@ function fetchUsers() {
                     <td>`+ e.gender + `</td>
                     <td>`+ (e.user_playing_time || 20) + ` mins/day</td> 
                     <td>`+ localEnrolled + `</td>
+                    <td class="text-center"><button class="btn btn-sm btn-outline-success rounded-pill px-2 view-activity-btn" data-patient-id="`+ e.id + `" data-patient-name="`+ (e.fullname || '') + `" title="View Patient Activity Report & Heatmap"><i class="fa-solid fa-fire text-danger me-1"></i>Activity</button></td>
                     <td class="text-center"><button class="btn btn-sm btn-outline-info rounded-pill px-2 log-review-btn" data-patient-id="`+ e.id + `" data-patient-name="`+ (e.fullname || '') + `" data-doctor-id="`+ (e.doctor_id || 23) + `" title="Log Clinical Review"><i class="fa-solid fa-stethoscope me-1"></i>Review</button></td>
                     <td class="text-center"><button class="btn btn-sm btn-outline-primary rounded-pill px-3 edit" data-bs-toggle="modal" data-bs-target="#editModal" data-id="`+ e.id + `" data-fullname="`+ (e.fullname || '') + `" data-username="`+ (e.username || '') + `" data-email="`+ (e.email || '') + `" data-gender="`+ (e.gender || 'Male') + `" data-type="`+ (e.accounttype || 'user') + `" data-time="`+ (e.user_playing_time || 20) + `" data-doctor="`+ (e.doctor_id || '') + `"><i class="fa-solid fa-pen-to-square me-1"></i>Edit</button></td>
                     <td class="text-center"><button class="btn btn-sm btn-outline-danger rounded-pill px-3" onclick="deleteData(`+ e.id + `,'users')"><i class="fa-solid fa-trash me-1"></i>Delete</button></td>
@@ -767,5 +772,257 @@ $(document).on('click', '#layoutSidenav_content', function (e) {
         }
     }
 });
+
+// ==========================================
+// PATIENT ACTIVITY REPORT & HEATMAP HANDLERS
+// ==========================================
+
+function findGameIconAddress(game_name) {
+    if (game_name == 'Snake') return '/images/Snake-icon-1.png';
+    if (game_name == 'Flappy Bird') return '/images/Flappy-Square.png';
+    if (game_name == 'Sticky Holds') return '/images/Sticky-Holds.png';
+    if (game_name == 'Menja') return '/images/Menja-icon.png';
+    if (game_name == 'Tetris') return '/images/Tetris.png';
+    if (game_name == 'Bubble Shooter') return '/images/Bubble.png';
+    if (game_name == 'Ping Pong') return '/images/Ping-Pong.png';
+    if (game_name == 'Maze') return '/images/Maze.png';
+    if (game_name == 'Ball Catcher') return '/images/ballcatcher.jpeg';
+    if (game_name == 'Bouncing Ball') return '/images/bouncing-ball.png';
+    return '/images/lazyeye-icon.svg';
+}
+
+var currentPatientSessions = [];
+
+function openPatientActivity(patientId) {
+    if (!patientId) return;
+
+    $('#pam_patient_name').text('Loading...');
+    $('#pam_heatmap_wrapper').html('<div class="d-flex align-items-center justify-content-center py-4 text-sub"><i class="fa-solid fa-spinner fa-spin me-2"></i> Loading therapy activity heatmap...</div>');
+    $('#pam_sessions_table tbody').html('<tr><td colspan="4" class="text-center py-3 text-muted"><i class="fa-solid fa-spinner fa-spin me-2"></i> Loading records...</td></tr>');
+    $('#pam_consultations_table tbody').html('<tr><td colspan="5" class="text-center py-3 text-muted"><i class="fa-solid fa-spinner fa-spin me-2"></i> Loading consultations...</td></tr>');
+    $('#pam_selected_date_filter').addClass('d-none');
+
+    let modalEl = document.getElementById('patientActivityModal');
+    if (modalEl) {
+        let modal = bootstrap.Modal.getInstance(modalEl) || new bootstrap.Modal(modalEl);
+        modal.show();
+    }
+
+    $.ajax({
+        url: "/fetchPatientActivity",
+        type: "get",
+        data: { patient_id: patientId },
+        success: function (res) {
+            if (res.status !== 'success') {
+                Swal.fire('Error', res.message || 'Could not load patient activity', 'error');
+                return;
+            }
+
+            let p = res.patient;
+            let m = res.metrics;
+            currentPatientSessions = res.recent_sessions || [];
+
+            // Patient Profile Snapshot
+            $('#pam_patient_name').text(p.fullname || 'Patient');
+            $('#pam_patient_username').text('@' + (p.username || ''));
+            $('#pam_patient_email').text(p.email || '');
+            $('#pam_doctor_name').html('<i class="fa-solid fa-user-doctor me-1"></i>' + (p.doctor_name || 'Unassigned'));
+            $('#pam_target_time').text('Target: ' + (p.user_playing_time || 20) + ' mins/day');
+
+            let initial = (p.fullname ? p.fullname.charAt(0) : 'P').toUpperCase();
+            $('#pam_avatar').text(initial);
+
+            // Metrics
+            $('#pam_total_sessions').text(m.total_sessions);
+            $('#pam_total_minutes').text(m.total_duration_minutes + ' min');
+            $('#pam_compliance_rate').text(m.compliance_rate + '%');
+            $('#pam_active_days').text(m.days_active);
+
+            // Render Heatmap Calendar (84 days / 12 weeks)
+            renderPatientHeatmap(res.heatmap_data || []);
+
+            // Render Sessions
+            renderPatientSessions(currentPatientSessions);
+            $('#pam_session_count').text(currentPatientSessions.length);
+
+            // Render Consultations
+            renderPatientConsultations(res.consultations || []);
+            $('#pam_consultation_count').text((res.consultations || []).length);
+        },
+        error: function (xhr) {
+            let msg = 'Failed to retrieve patient activity report.';
+            if (xhr.responseJSON && xhr.responseJSON.message) {
+                msg = xhr.responseJSON.message;
+            }
+            Swal.fire('Restricted Access', msg, 'warning');
+            $('#patientActivityModal').modal('hide');
+        }
+    });
+}
+
+function renderPatientHeatmap(heatmapData) {
+    let heatmapMap = {};
+    (heatmapData || []).forEach(item => {
+        heatmapMap[item.date] = item;
+    });
+
+    let today = new Date();
+    let daysToRender = 84;
+    let startDate = new Date();
+    startDate.setDate(today.getDate() - daysToRender + 1);
+
+    let weeks = [];
+    let curWeek = [];
+    let cur = new Date(startDate);
+
+    while (cur <= today) {
+        let dateStr = cur.toISOString().slice(0, 10);
+        let dayInfo = heatmapMap[dateStr] || { date: dateStr, count: 0, duration_minutes: 0, games: [] };
+        curWeek.push(dayInfo);
+        if (curWeek.length === 7) {
+            weeks.push(curWeek);
+            curWeek = [];
+        }
+        cur.setDate(cur.getDate() + 1);
+    }
+    if (curWeek.length > 0) {
+        weeks.push(curWeek);
+    }
+
+    let html = '<div class="d-flex gap-2 justify-content-start overflow-auto p-2" style="min-width: 640px;">';
+    
+    // Day of week labels
+    html += '<div class="d-flex flex-column gap-1 text-muted" style="font-size: 10px; line-height: 14px; margin-top: 1px;">';
+    html += '<div style="height: 14px;">M</div>';
+    html += '<div style="height: 14px;"></div>';
+    html += '<div style="height: 14px;">W</div>';
+    html += '<div style="height: 14px;"></div>';
+    html += '<div style="height: 14px;">F</div>';
+    html += '<div style="height: 14px;"></div>';
+    html += '<div style="height: 14px;">S</div>';
+    html += '</div>';
+
+    weeks.forEach(week => {
+        html += '<div class="d-flex flex-column gap-1">';
+        week.forEach(day => {
+            let count = day.count;
+            let bgColor = 'var(--bg-surface-secondary, #e2e8f0)';
+            let borderColor = 'var(--border-color, #cbd5e1)';
+            if (count === 1) {
+                bgColor = '#9be9a8';
+                borderColor = '#40c463';
+            } else if (count === 2) {
+                bgColor = '#40c463';
+                borderColor = '#30a14e';
+            } else if (count >= 3) {
+                bgColor = '#216e39';
+                borderColor = '#196127';
+            }
+
+            let gamesStr = (day.games && day.games.length > 0) ? (' • Games: ' + day.games.join(', ')) : '';
+            let title = day.date + ' • ' + count + ' session(s) (' + day.duration_minutes + ' mins)' + gamesStr;
+
+            html += `<div 
+                class="pam-heatmap-cell cursor-pointer rounded-1" 
+                data-date="${day.date}" 
+                data-count="${count}"
+                title="${title}" 
+                style="width: 14px; height: 14px; background-color: ${bgColor}; border: 1px solid ${borderColor}; transition: transform 0.15s ease;"
+                onmouseover="this.style.transform='scale(1.25)'"
+                onmouseout="this.style.transform='scale(1)'"
+            ></div>`;
+        });
+        html += '</div>';
+    });
+
+    html += '</div>';
+    $('#pam_heatmap_wrapper').html(html);
+}
+
+function renderPatientSessions(sessions, filterDate) {
+    let tbody = $('#pam_sessions_table tbody');
+    tbody.html('');
+
+    let list = sessions || [];
+    if (filterDate) {
+        list = list.filter(s => s.played_at && s.played_at.slice(0, 10) === filterDate);
+    }
+
+    if (list.length === 0) {
+        tbody.append(`<tr><td colspan="4" class="text-center py-4 text-muted">No sessions found${filterDate ? ' for ' + filterDate : ''}.</td></tr>`);
+        return;
+    }
+
+    list.forEach(s => {
+        let icon = findGameIconAddress(s.game_name);
+        let mins = Math.floor((s.duration_seconds || 1200) / 60);
+        let secs = (s.duration_seconds || 1200) % 60;
+        let durationFormatted = mins + 'm ' + (secs < 10 ? '0' : '') + secs + 's';
+        let localTime = formatUtcToLocal(s.played_at, 'DD/MM/YYYY hh:mm A');
+
+        tbody.append(`
+            <tr>
+            <td>
+                <div class="d-flex align-items-center gap-2">
+                    <img src="${icon}" style="width: 24px; height: 24px; object-fit: contain;" />
+                    <span class="fw-semibold text-main">${s.game_name}</span>
+                </div>
+            </td>
+            <td><span class="badge bg-primary-subtle text-primary fw-bold">${s.score} pts</span></td>
+            <td><span class="text-sub"><i class="fa-regular fa-clock me-1"></i>${durationFormatted}</span></td>
+            <td class="text-muted small">${localTime}</td>
+            </tr>
+        `);
+    });
+}
+
+function renderPatientConsultations(consultations) {
+    let tbody = $('#pam_consultations_table tbody');
+    tbody.html('');
+
+    if (!consultations || consultations.length === 0) {
+        tbody.append('<tr><td colspan="5" class="text-center py-4 text-muted">No clinical reviews logged for this patient yet.</td></tr>');
+        return;
+    }
+
+    consultations.forEach(c => {
+        let localDate = formatUtcToLocal(c.created_at, 'DD/MM/YYYY');
+        let compBadge = 'bg-info';
+        if (c.compliance_assessment === 'Excellent') compBadge = 'bg-success';
+        else if (c.compliance_assessment === 'Moderate') compBadge = 'bg-warning text-dark';
+        else if (c.compliance_assessment === 'Low') compBadge = 'bg-danger';
+
+        tbody.append(`
+            <tr>
+            <td class="text-nowrap fw-semibold">${localDate}</td>
+            <td><i class="fa-solid fa-user-doctor text-info me-1"></i><strong>${c.doctor_name || 'Dr. Specialist'}</strong></td>
+            <td><span class="badge ${compBadge}">${c.compliance_assessment || 'Good'}</span></td>
+            <td><span class="fw-bold text-primary">${c.prescribed_minutes || 20} mins/day</span></td>
+            <td class="small text-sub">${c.notes || '<span class="text-muted italic">Routine observation</span>'}</td>
+            </tr>
+        `);
+    });
+}
+
+$(document).on('click', '.view-activity-btn', function () {
+    let patientId = $(this).attr('data-patient-id');
+    openPatientActivity(patientId);
+});
+
+$(document).on('click', '.pam-heatmap-cell', function () {
+    let date = $(this).attr('data-date');
+    if (date) {
+        $('#pam_filter_date_label').text(date);
+        $('#pam_selected_date_filter').removeClass('d-none');
+        renderPatientSessions(currentPatientSessions, date);
+    }
+});
+
+$(document).on('click', '#pam_clear_date_filter', function () {
+    $('#pam_selected_date_filter').addClass('d-none');
+    renderPatientSessions(currentPatientSessions);
+});
+
+window.openPatientActivity = openPatientActivity;
 
 

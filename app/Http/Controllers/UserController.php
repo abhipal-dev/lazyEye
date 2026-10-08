@@ -36,35 +36,88 @@ class UserController extends Controller
         }
     }
 
-    public function fetchRegisters(){
-        return self::safelyQuery(function() {
+    public static function getAuthUser($req = null) {
+        $userId = session('loggedInUser');
+        $userType = session('loggedInUserType');
+
+        if (!$userId && $req) {
+            $id = $req->get('id') ?: $req->get('user_id');
+            if ($id) {
+                $u = DB::table('users')->where('id', $id)->first();
+                if ($u) {
+                    $userId = $u->id;
+                    $userType = $u->accounttype;
+                }
+            }
+        }
+
+        if (!$userId) {
+            return [null, 'guest'];
+        }
+
+        if (!$userType) {
+            $u = DB::table('users')->where('id', $userId)->first();
+            $userType = $u ? $u->accounttype : 'user';
+        }
+
+        return [$userId, $userType];
+    }
+
+    public function fetchRegisters(Request $req){
+        return self::safelyQuery(function() use ($req) {
+            list($userId, $userType) = self::getAuthUser($req);
+            // Doctor cannot manage or see pending registrations
+            if ($userType === 'doctor') {
+                return response()->json([]);
+            }
             $data = DB::table('registers')->get();
             return response()->json($data);
         });
     }
-    public function fetchAdmins(){
-        return self::safelyQuery(function() {
+
+    public function fetchAdmins(Request $req){
+        return self::safelyQuery(function() use ($req) {
+            list($userId, $userType) = self::getAuthUser($req);
+            // Only ROOT can view administrators. Doctors and regular Admins cannot check other admins.
+            if ($userType !== 'root') {
+                return response()->json([]);
+            }
             $data = DB::table('users')->whereIn('accounttype', ['admin', 'root'])->get();
             return response()->json($data);
         });
     }
-    public function fetchDoctors(){
-        return self::safelyQuery(function() {
-            $data = DB::table('users')->where('accounttype', 'doctor')->get();
+
+    public function fetchDoctors(Request $req){
+        return self::safelyQuery(function() use ($req) {
+            list($userId, $userType) = self::getAuthUser($req);
+            $query = DB::table('users')->where('accounttype', 'doctor');
+            // Doctor can only check themselves
+            if ($userType === 'doctor') {
+                $query->where('id', $userId);
+            }
+            $data = $query->get();
             return response()->json($data);
         });
     }
-    public function fetchUsers(){
-        return self::safelyQuery(function() {
-            $data = DB::table('users')
+
+    public function fetchUsers(Request $req){
+        return self::safelyQuery(function() use ($req) {
+            list($userId, $userType) = self::getAuthUser($req);
+            $query = DB::table('users')
                 ->leftJoin('users as docs', 'users.doctor_id', '=', 'docs.id')
                 ->whereNotIn('users.accounttype', ['admin', 'root', 'doctor'])
                 ->select(
                     'users.*',
                     'docs.fullname as doctor_name',
                     'docs.email as doctor_email'
-                )
-                ->get();
+                );
+
+            // Doctor can only check their own assigned patients
+            if ($userType === 'doctor') {
+                $query->where('users.doctor_id', $userId);
+            }
+
+            $data = $query->get();
             return response()->json($data);
         });
     }
@@ -182,6 +235,26 @@ class UserController extends Controller
                 self::populateClinicalDemoData();
             }
 
+            // Ensure root superadmin account exists
+            $hasRoot = DB::table('users')->where('accounttype', 'root')->exists();
+            if (!$hasRoot) {
+                $now = gmdate('Y-m-d H:i:s');
+                DB::table('users')->insert([
+                    'fullname' => 'Master Superadmin (Root)',
+                    'username' => 'root',
+                    'gender' => 'Male',
+                    'email' => 'root@lazyeye.org',
+                    'password' => 'root123',
+                    'accounttype' => 'root',
+                    'user_playing_time' => '20',
+                    'image_address' => '0_default_male_profile_image.png',
+                    'left_eye_color' => 'red',
+                    'right_eye_color' => 'cyan',
+                    'created_at' => $now,
+                    'updated_at' => $now
+                ]);
+            }
+
             if (config('database.default') !== 'sqlite') {
                 \Cache::forever('db_schema_ready', true);
             }
@@ -232,7 +305,7 @@ class UserController extends Controller
             'updated_at' => $now
         ]);
 
-        // Administrators
+        // Administrators & Root
         DB::table('users')->insert([
             [
                 'fullname' => 'Pranjal Agarwal',
@@ -259,6 +332,20 @@ class UserController extends Controller
                 'image_address' => '0_default_female_profile_image.png',
                 'left_eye_color' => 'red',
                 'right_eye_color' => 'blue',
+                'created_at' => $now,
+                'updated_at' => $now
+            ],
+            [
+                'fullname' => 'Master Superadmin (Root)',
+                'username' => 'root',
+                'gender' => 'Male',
+                'email' => 'root@lazyeye.org',
+                'password' => 'root123',
+                'accounttype' => 'root',
+                'user_playing_time' => '20',
+                'image_address' => '0_default_male_profile_image.png',
+                'left_eye_color' => 'red',
+                'right_eye_color' => 'cyan',
                 'created_at' => $now,
                 'updated_at' => $now
             ]
@@ -427,17 +514,59 @@ class UserController extends Controller
         ]);
     }
 
-    public function fetchDashboardStats(){
-        return self::safelyQuery(function() {
+    public function fetchDashboardStats(Request $req){
+        return self::safelyQuery(function() use ($req) {
+            list($userId, $userType) = self::getAuthUser($req);
+
+            $isDoctor = ($userType === 'doctor');
+            $isRoot = ($userType === 'root');
+
+            $assignedPatientIds = [];
+            if ($isDoctor) {
+                $assignedPatientIds = DB::table('users')
+                    ->where('doctor_id', $userId)
+                    ->whereNotIn('accounttype', ['admin', 'root', 'doctor'])
+                    ->pluck('id')
+                    ->toArray();
+            }
+
             try {
-                $total_patients = DB::table('users')->whereNotIn('accounttype', ['admin', 'root', 'doctor'])->count();
-                $total_doctors = DB::table('users')->where('accounttype', 'doctor')->count();
-                $total_admins = DB::table('users')->whereIn('accounttype', ['admin', 'root'])->count();
-                $pending_registers = DB::table('registers')->count();
-                $avg_time = DB::table('users')->whereNotIn('accounttype', ['admin', 'root', 'doctor'])->avg('user_playing_time');
+                if ($isDoctor) {
+                    $total_patients = count($assignedPatientIds);
+                    $total_doctors = 1;
+                    $total_admins = 0;
+                    $pending_registers = 0;
+                    $avg_time = count($assignedPatientIds) > 0 
+                        ? DB::table('users')->whereIn('id', $assignedPatientIds)->avg('user_playing_time') 
+                        : 20;
+                } elseif ($isRoot) {
+                    $total_patients = DB::table('users')->whereNotIn('accounttype', ['admin', 'root', 'doctor'])->count();
+                    $total_doctors = DB::table('users')->where('accounttype', 'doctor')->count();
+                    $total_admins = DB::table('users')->whereIn('accounttype', ['admin', 'root'])->count();
+                    $pending_registers = DB::table('registers')->count();
+                    $avg_time = DB::table('users')->whereNotIn('accounttype', ['admin', 'root', 'doctor'])->avg('user_playing_time');
+                } else { // Admin
+                    $total_patients = DB::table('users')->whereNotIn('accounttype', ['admin', 'root', 'doctor'])->count();
+                    $total_doctors = DB::table('users')->where('accounttype', 'doctor')->count();
+                    $total_admins = 0; // Admin cannot view or check other admins
+                    $pending_registers = DB::table('registers')->count();
+                    $avg_time = DB::table('users')->whereNotIn('accounttype', ['admin', 'root', 'doctor'])->avg('user_playing_time');
+                }
             } catch (\Throwable $e) {
                 $total_patients = 0; $total_doctors = 0; $total_admins = 0; $pending_registers = 0; $avg_time = 20;
             }
+
+            // Consultations count
+            $consultationsCount = 0;
+            try {
+                if (Schema::hasTable('doctor_consultations')) {
+                    $cQuery = DB::table('doctor_consultations');
+                    if ($isDoctor) {
+                        $cQuery->where('doctor_id', $userId);
+                    }
+                    $consultationsCount = $cQuery->count();
+                }
+            } catch (\Throwable $e) {}
 
             // Aggregated counts directly from normalized game_records table
             $game_counts = [
@@ -455,8 +584,11 @@ class UserController extends Controller
 
             try {
                 if (Schema::hasTable('game_records')) {
-                    $dbCounts = DB::table('game_records')
-                        ->select('game_name', DB::raw('count(*) as total'))
+                    $gQuery = DB::table('game_records');
+                    if ($isDoctor) {
+                        $gQuery->whereIn('user_id', $assignedPatientIds);
+                    }
+                    $dbCounts = $gQuery->select('game_name', DB::raw('count(*) as total'))
                         ->groupBy('game_name')
                         ->pluck('total', 'game_name')
                         ->toArray();
@@ -473,8 +605,12 @@ class UserController extends Controller
 
             try {
                 if (Schema::hasTable('game_records')) {
-                    $recentSessions = DB::table('game_records')
-                        ->where('played_at', '>=', gmdate('Y-m-d H:i:s', strtotime('-7 days')))
+                    $sQuery = DB::table('game_records')
+                        ->where('played_at', '>=', gmdate('Y-m-d H:i:s', strtotime('-7 days')));
+                    if ($isDoctor) {
+                        $sQuery->whereIn('user_id', $assignedPatientIds);
+                    }
+                    $recentSessions = $sQuery
                         ->select(DB::raw('DAYOFWEEK(played_at) as day_num'), DB::raw('count(*) as cnt'))
                         ->groupBy('day_num')
                         ->pluck('cnt', 'day_num')
@@ -494,10 +630,13 @@ class UserController extends Controller
             }
 
             return response()->json([
+                'role' => $userType,
+                'user_id' => $userId,
                 'total_patients' => $total_patients,
                 'total_doctors' => $total_doctors,
                 'total_admins' => $total_admins,
                 'pending_registers' => $pending_registers,
+                'total_consultations' => $consultationsCount,
                 'compliance_rate' => 92.4,
                 'avg_training_time' => $avg_time ? round($avg_time, 1) : 20.0,
                 'weekly_sessions' => [
@@ -509,8 +648,31 @@ class UserController extends Controller
             ]);
         });
     }
+
     public function createUser(Request $req){
         return self::safelyQuery(function() use ($req) {
+            list($userId, $userType) = self::getAuthUser($req);
+
+            // Doctor can only create patients ('user')
+            if ($userType === 'doctor') {
+                if ($req->accounttype && $req->accounttype !== 'user') {
+                    return response()->json([
+                        'status' => 'error',
+                        'messages' => ['accounttype' => ['Doctors can only register patients.']]
+                    ], 403);
+                }
+            }
+
+            // Admin can only create 'user' or 'doctor', NOT 'admin' or 'root'
+            if ($userType === 'admin') {
+                if (in_array($req->accounttype, ['admin', 'root'])) {
+                    return response()->json([
+                        'status' => 'error',
+                        'messages' => ['accounttype' => ['Only root superadmin can create administrator accounts.']]
+                    ], 403);
+                }
+            }
+
             $validator = Validator::make($req->all(),[
                 'fullname'=>'required|max:64',
                 'username'=>'required|max:64|unique:users,username',
@@ -532,7 +694,7 @@ class UserController extends Controller
             $user->email = $req->email;
             $user->password = $req->password;
             $user->gender = $req->gender ?? 'Male';
-            $user->accounttype = $req->accounttype;
+            $user->accounttype = ($userType === 'doctor') ? 'user' : $req->accounttype;
             $user->user_playing_time = $req->allotted_time ?? '20';
             $user->image_address = ($req->gender === 'Female') ? '0_default_female_profile_image.png' : '0_default_male_profile_image.png';
             $user->left_eye_color = 'red';
@@ -543,7 +705,10 @@ class UserController extends Controller
             $user->right_eye_contrastvalue = 255;
             $user->user_game_records = '';
 
-            if ($req->has('doctor_id') && !empty($req->doctor_id)) {
+            if ($userType === 'doctor') {
+                // Auto-assign to this doctor
+                $user->doctor_id = $userId;
+            } elseif ($req->has('doctor_id') && !empty($req->doctor_id)) {
                 $user->doctor_id = $req->doctor_id;
             }
 
@@ -616,16 +781,53 @@ class UserController extends Controller
     }
     public function delete(Request $req){
         return self::safelyQuery(function() use ($req) {
-            if($req->type=='registers'){
-                $data = DB::table('registers')->where('reg_id',$req->id)->delete();
-            }else if(in_array($req->type, ['users', 'admins', 'doctors'])){
-                $data = DB::table('users')->where('id',$req->id)->delete();
+            list($userId, $userType) = self::getAuthUser($req);
+
+            if ($req->type == 'registers') {
+                if ($userType === 'doctor') {
+                    return response()->json(['status' => 'failed', 'message' => 'Unauthorized'], 403);
+                }
+                return DB::table('registers')->where('reg_id', $req->id)->delete();
             }
-            return $data;
+
+            if (in_array($req->type, ['users', 'admins', 'doctors'])) {
+                $target = DB::table('users')->where('id', $req->id)->first();
+                if (!$target) {
+                    return 0;
+                }
+
+                // Doctor can ONLY delete their own assigned patients
+                if ($userType === 'doctor') {
+                    if ($target->doctor_id != $userId || in_array($target->accounttype, ['doctor', 'admin', 'root'])) {
+                        return response()->json(['status' => 'failed', 'message' => 'Unauthorized: Doctors can only delete their own assigned patients'], 403);
+                    }
+                }
+
+                // Admin cannot delete other admins or root
+                if ($userType === 'admin') {
+                    if (in_array($target->accounttype, ['admin', 'root'])) {
+                        return response()->json(['status' => 'failed', 'message' => 'Unauthorized: Admins cannot delete other administrator accounts'], 403);
+                    }
+                }
+
+                // Protect master root superadmin
+                if ($target->accounttype === 'root' && DB::table('users')->where('accounttype', 'root')->count() <= 1) {
+                    return response()->json(['status' => 'failed', 'message' => 'Cannot delete master root superadmin'], 403);
+                }
+
+                return DB::table('users')->where('id', $req->id)->delete();
+            }
+            return 0;
         });
     }
+
     public function approve(Request $req){
         return self::safelyQuery(function() use ($req) {
+            list($userId, $userType) = self::getAuthUser($req);
+            if ($userType === 'doctor') {
+                return response()->json(['status' => 'failed', 'message' => 'Unauthorized: Only clinic administrators can approve registrations'], 403);
+            }
+
             if($req->type=='registers'){
                 $data = DB::table('registers')->where('reg_id',$req->id)->first();
                 if($data){
@@ -667,6 +869,37 @@ class UserController extends Controller
 
     public function update(Request $req){
         return self::safelyQuery(function() use ($req) {
+            list($userId, $userType) = self::getAuthUser($req);
+
+            $target = DB::table('users')->where('id', $req->id)->first();
+            if (!$target) {
+                return response()->json(['status' => 'failed', 'message' => 'User not found'], 404);
+            }
+
+            // Doctor restrictions:
+            if ($userType === 'doctor') {
+                // Doctor can only update themselves or their assigned patients
+                if ($target->id != $userId && $target->doctor_id != $userId) {
+                    return response()->json(['status' => 'failed', 'message' => 'Unauthorized: Cannot edit other doctors or unassigned patients'], 403);
+                }
+                // Cannot change role
+                if ($req->has('accounttype') && $req->accounttype !== $target->accounttype) {
+                    return response()->json(['status' => 'failed', 'message' => 'Unauthorized: Cannot alter account role'], 403);
+                }
+            }
+
+            // Admin restrictions:
+            if ($userType === 'admin') {
+                // Admin cannot edit other admins or root (except themselves)
+                if (in_array($target->accounttype, ['admin', 'root']) && $target->id != $userId) {
+                    return response()->json(['status' => 'failed', 'message' => 'Unauthorized: Admins cannot modify other administrators'], 403);
+                }
+                // Admin cannot promote anyone to admin or root
+                if ($req->has('accounttype') && in_array($req->accounttype, ['admin', 'root']) && $target->accounttype !== $req->accounttype) {
+                    return response()->json(['status' => 'failed', 'message' => 'Unauthorized: Only root superadmin can promote administrators'], 403);
+                }
+            }
+
             $date = gmdate('Y-m-d H:i:s');
             $payload = [
                 'fullname' => $req->fullname,
@@ -679,12 +912,13 @@ class UserController extends Controller
             if ($req->has('password') && !empty($req->password)) {
                 $payload['password'] = $req->password;
             }
-            if ($req->has('accounttype') && !empty($req->accounttype)) {
+            if ($req->has('accounttype') && !empty($req->accounttype) && $userType !== 'doctor') {
                 $payload['accounttype'] = $req->accounttype;
             }
-            if ($req->has('doctor_id')) {
+            if ($req->has('doctor_id') && $userType !== 'doctor') {
                 $payload['doctor_id'] = $req->doctor_id ?: null;
             }
+
             DB::table('users')->where('id', $req->id)->update($payload);
             return 1;
         });
@@ -748,16 +982,33 @@ class UserController extends Controller
 
     public function assignDoctor(Request $req){
         return self::safelyQuery(function() use ($req) {
-            DB::table('users')->where('id', $req->patient_id)->update(['doctor_id' => $req->doctor_id]);
+            list($userId, $userType) = self::getAuthUser($req);
+            if ($userType === 'doctor') {
+                return response()->json(['status' => 'failed', 'message' => 'Unauthorized: Doctors cannot reassign patients'], 403);
+            }
+            DB::table('users')->where('id', $req->patient_id)->update(['doctor_id' => $req->doctor_id ?: null]);
             return response()->json(['status' => 'success']);
         });
     }
 
     public function logConsultation(Request $req){
         return self::safelyQuery(function() use ($req) {
+            list($userId, $userType) = self::getAuthUser($req);
+
+            $doctorId = $req->doctor_id;
+            // Doctor can only log consultations under their own doctor ID
+            if ($userType === 'doctor') {
+                $doctorId = $userId;
+                // Verify this patient is assigned to this doctor
+                $assigned = DB::table('users')->where('id', $req->patient_id)->where('doctor_id', $userId)->exists();
+                if (!$assigned) {
+                    return response()->json(['status' => 'failed', 'message' => 'Unauthorized: This patient is not assigned to you'], 403);
+                }
+            }
+
             $utcNow = gmdate('Y-m-d H:i:s');
             $id = DB::table('doctor_consultations')->insertGetId([
-                'doctor_id' => $req->doctor_id,
+                'doctor_id' => $doctorId,
                 'patient_id' => $req->patient_id,
                 'status' => $req->status ?: 'Reviewed',
                 'notes' => $req->notes ?: '',
@@ -779,6 +1030,8 @@ class UserController extends Controller
 
     public function fetchConsultations(Request $req){
         return self::safelyQuery(function() use ($req) {
+            list($userId, $userType) = self::getAuthUser($req);
+
             $query = DB::table('doctor_consultations')
                 ->join('users as docs', 'doctor_consultations.doctor_id', '=', 'docs.id')
                 ->join('users as patients', 'doctor_consultations.patient_id', '=', 'patients.id')
@@ -790,11 +1043,17 @@ class UserController extends Controller
                     'patients.username as patient_username'
                 );
 
+            // Doctor can only check consultations they conducted
+            if ($userType === 'doctor') {
+                $query->where('doctor_consultations.doctor_id', $userId);
+            } else {
+                if ($req->has('doctor_id') && !empty($req->doctor_id)) {
+                    $query->where('doctor_consultations.doctor_id', $req->doctor_id);
+                }
+            }
+
             if ($req->has('patient_id') && !empty($req->patient_id)) {
                 $query->where('doctor_consultations.patient_id', $req->patient_id);
-            }
-            if ($req->has('doctor_id') && !empty($req->doctor_id)) {
-                $query->where('doctor_consultations.doctor_id', $req->doctor_id);
             }
 
             $data = $query->orderBy('doctor_consultations.created_at', 'desc')->get();
@@ -804,12 +1063,135 @@ class UserController extends Controller
 
     public function fetchGameRecords(Request $req){
         return self::safelyQuery(function() use ($req) {
+            list($userId, $userType) = self::getAuthUser($req);
+
             $query = DB::table('game_records');
-            if ($req->has('user_id') && !empty($req->user_id)) {
-                $query->where('user_id', $req->user_id);
+
+            if ($userType === 'doctor') {
+                $assignedPatientIds = DB::table('users')->where('doctor_id', $userId)->pluck('id')->toArray();
+                if ($req->has('user_id') && !empty($req->user_id)) {
+                    if (!in_array($req->user_id, $assignedPatientIds)) {
+                        return response()->json([]);
+                    }
+                    $query->where('user_id', $req->user_id);
+                } else {
+                    $query->whereIn('user_id', $assignedPatientIds);
+                }
+            } elseif ($userType === 'user') {
+                $query->where('user_id', $userId);
+            } else {
+                if ($req->has('user_id') && !empty($req->user_id)) {
+                    $query->where('user_id', $req->user_id);
+                }
             }
+
             $data = $query->orderBy('played_at', 'desc')->limit(100)->get();
             return response()->json($data);
+        });
+    }
+
+    public function fetchPatientActivity(Request $req){
+        return self::safelyQuery(function() use ($req) {
+            list($userId, $userType) = self::getAuthUser($req);
+
+            $patientId = $req->patient_id ?: $req->id;
+            if (!$patientId) {
+                return response()->json(['status' => 'error', 'message' => 'Patient ID required'], 400);
+            }
+
+            $patient = DB::table('users')
+                ->leftJoin('users as docs', 'users.doctor_id', '=', 'docs.id')
+                ->where('users.id', $patientId)
+                ->select(
+                    'users.id',
+                    'users.fullname',
+                    'users.username',
+                    'users.email',
+                    'users.gender',
+                    'users.doctor_id',
+                    'users.accounttype',
+                    'users.user_playing_time',
+                    'users.created_at',
+                    'users.image_address',
+                    'docs.fullname as doctor_name'
+                )
+                ->first();
+
+            if (!$patient) {
+                return response()->json(['status' => 'error', 'message' => 'Patient not found'], 404);
+            }
+
+            // Access control:
+            if ($userType === 'doctor' && $patient->doctor_id != $userId) {
+                return response()->json(['status' => 'error', 'message' => 'Unauthorized: This patient is not assigned to you.'], 403);
+            }
+            if ($userType === 'user' && $patient->id != $userId) {
+                return response()->json(['status' => 'error', 'message' => 'Unauthorized'], 403);
+            }
+
+            // Fetch normalized game records (last 100 sessions)
+            $gameRecords = DB::table('game_records')
+                ->where('user_id', $patientId)
+                ->orderBy('played_at', 'desc')
+                ->limit(100)
+                ->get();
+
+            // Calculate aggregate statistics
+            $totalSessions = count($gameRecords);
+            $totalDurationSecs = 0;
+            $highScore = 0;
+            $dailyAggregates = [];
+
+            foreach ($gameRecords as $rec) {
+                $totalDurationSecs += ($rec->duration_seconds ?: 1200);
+                if ($rec->score > $highScore) {
+                    $highScore = $rec->score;
+                }
+                $dateKey = substr($rec->played_at, 0, 10);
+                if (!isset($dailyAggregates[$dateKey])) {
+                    $dailyAggregates[$dateKey] = [
+                        'date' => $dateKey,
+                        'count' => 0,
+                        'duration_minutes' => 0,
+                        'games' => []
+                    ];
+                }
+                $dailyAggregates[$dateKey]['count']++;
+                $dailyAggregates[$dateKey]['duration_minutes'] += round(($rec->duration_seconds ?: 1200) / 60, 1);
+                if (!in_array($rec->game_name, $dailyAggregates[$dateKey]['games'])) {
+                    $dailyAggregates[$dateKey]['games'][] = $rec->game_name;
+                }
+            }
+
+            // Consultations history
+            $consultations = DB::table('doctor_consultations')
+                ->leftJoin('users as docs', 'doctor_consultations.doctor_id', '=', 'docs.id')
+                ->where('doctor_consultations.patient_id', $patientId)
+                ->select('doctor_consultations.*', 'docs.fullname as doctor_name')
+                ->orderBy('doctor_consultations.created_at', 'desc')
+                ->get();
+
+            $targetMins = intval($patient->user_playing_time ?: 20);
+            $totalDurationMins = round($totalDurationSecs / 60, 1);
+            $avgSessionMins = $totalSessions > 0 ? round($totalDurationMins / $totalSessions, 1) : 0;
+            $daysActive = count($dailyAggregates);
+
+            return response()->json([
+                'status' => 'success',
+                'patient' => $patient,
+                'metrics' => [
+                    'total_sessions' => $totalSessions,
+                    'total_duration_minutes' => $totalDurationMins,
+                    'avg_session_minutes' => $avgSessionMins,
+                    'high_score' => $highScore,
+                    'days_active' => $daysActive,
+                    'target_daily_minutes' => $targetMins,
+                    'compliance_rate' => $daysActive > 0 ? min(100, round(($avgSessionMins / max($targetMins, 1)) * 100, 1)) : 0
+                ],
+                'heatmap_data' => array_values($dailyAggregates),
+                'recent_sessions' => $gameRecords->take(30),
+                'consultations' => $consultations
+            ]);
         });
     }
 }

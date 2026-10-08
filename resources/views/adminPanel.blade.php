@@ -29,7 +29,7 @@
             
         </head>
         <body>
-        <section id="admin" data-id="{{$user_id}}"></section>  
+        <section id="admin" data-id="{{$user_id}}" data-role="{{$user_type ?? 'admin'}}"></section>  
         <script src="{{asset('js/app.js')}}"></script>
         <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.8.0/Chart.min.js" crossorigin="anonymous"></script>
             <!-- <script src="assets/demo/chart-area-demo.js"></script> -->

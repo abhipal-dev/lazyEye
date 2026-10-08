@@ -63,6 +63,7 @@ Route::post('/assignDoctor', [UserController::class, 'assignDoctor']);
 Route::post('/logConsultation', [UserController::class, 'logConsultation']);
 Route::get('/fetchConsultations', [UserController::class, 'fetchConsultations']);
 Route::get('/fetchGameRecords', [UserController::class, 'fetchGameRecords']);
+Route::get('/fetchPatientActivity', [UserController::class, 'fetchPatientActivity']);
 
 Route::post('/Approve', [UserController::class, 'approve']);
 
@@ -81,6 +82,7 @@ Route::group(['middleware' => ['loginCheck']], function () {
     Route::get('/Register_view', [AuthController::class, 'register_view'])->name('register');
 
     Route::get('/admin', [AuthController::class, 'admin'])->name('admin');
+    Route::get('/doctor', [AuthController::class, 'admin'])->name('doctor');
 
     Route::get('/user', [AuthController::class, 'user_view'])->name('user');
 

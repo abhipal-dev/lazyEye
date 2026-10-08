@@ -53,9 +53,10 @@ export default class AdminDashboard extends React.Component {
         });
     }
     render() {
-        const role = this.state.data?.accounttype || 'admin';
+        const role = this.state.data?.accounttype || this.props.role || 'admin';
         const isDoctor = (role === 'doctor');
         const isRoot = (role === 'root');
+        const isAdmin = (role === 'admin');
 
         return (
             <>
@@ -65,8 +66,8 @@ export default class AdminDashboard extends React.Component {
                         <img src="/images/lazyeye-icon.svg" className="d-inline-block align-top" alt="Logo" style={{ maxHeight: '34px', width: '34px' }} />
                         <span className="fw-bold d-none d-sm-inline">
                             Lazy<span className="text-primary">Eye</span> 
-                            <span className={`badge ${isDoctor ? 'bg-info' : 'bg-danger'} ms-1 small`}>
-                                {isDoctor ? 'Doctor Portal' : isRoot ? 'Superadmin' : 'Admin'}
+                            <span className={`badge ${isDoctor ? 'bg-info' : isRoot ? 'bg-dark' : 'bg-primary'} ms-1 small`}>
+                                {isDoctor ? 'Doctor Portal' : isRoot ? 'Superadmin' : 'Clinic Admin'}
                             </span>
                         </span>
                     </a>
@@ -89,22 +90,22 @@ export default class AdminDashboard extends React.Component {
                         <ul className="navbar-nav">
                             <li className="nav-item dropdown">
                                 <a className="nav-link dropdown-toggle d-flex align-items-center gap-2 text-main px-2 py-1" id="navbarDropdown" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">
-                                    <div className="rounded-circle d-flex align-items-center justify-content-center text-white fw-bold shadow-sm" style={{ width: 34, height: 34, minWidth: 34, background: isDoctor ? 'linear-gradient(135deg, #0284c7, #0369a1)' : 'linear-gradient(135deg, #2563eb, #1d4ed8)', fontSize: '0.85rem' }}>
+                                    <div className="rounded-circle d-flex align-items-center justify-content-center text-white fw-bold shadow-sm" style={{ width: 34, height: 34, minWidth: 34, background: isDoctor ? 'linear-gradient(135deg, #0284c7, #0369a1)' : isRoot ? 'linear-gradient(135deg, #334155, #0f172a)' : 'linear-gradient(135deg, #2563eb, #1d4ed8)', fontSize: '0.85rem' }}>
                                         {this.state.userProfileImage && !this.state.userProfileImage.includes('default') ? (
                                             <img src={`/${this.state.userProfileImage}`} alt="Avatar" className="rounded-circle w-100 h-100" style={{ objectFit: 'cover' }} />
                                         ) : (
-                                            (this.state.fullname ? this.state.fullname.charAt(0) : 'A').toUpperCase()
+                                            (this.state.fullname ? this.state.fullname.charAt(0) : (isDoctor ? 'D' : 'A')).toUpperCase()
                                         )}
                                     </div>
                                     <div className="d-none d-md-flex flex-column text-start lh-sm me-1">
-                                        <span className="fw-bold text-main" style={{ fontSize: '0.86rem' }}>{this.state.fullname || 'Administrator'}</span>
-                                        <span className="text-muted" style={{ fontSize: '0.72rem' }}>{isDoctor ? 'Vision Therapist' : isRoot ? 'Superadmin' : 'Clinic Administrator'}</span>
+                                        <span className="fw-bold text-main" style={{ fontSize: '0.86rem' }}>{this.state.fullname || (isDoctor ? 'Doctor' : 'Administrator')}</span>
+                                        <span className="text-muted" style={{ fontSize: '0.72rem' }}>{isDoctor ? 'Vision Specialist' : isRoot ? 'Master Superadmin' : 'Clinic Operations'}</span>
                                     </div>
                                 </a>
                                 <ul className="dropdown-menu dropdown-menu-end shadow" aria-labelledby="navbarDropdown">
                                     <li className="user-dropdown-header">
                                         <div className="d-flex align-items-center gap-2">
-                                            <div className="rounded-circle text-white d-flex align-items-center justify-content-center fw-bold shadow-sm" style={{ width: 40, height: 40, minWidth: 40, background: isDoctor ? 'linear-gradient(135deg, #0284c7, #0369a1)' : 'linear-gradient(135deg, #2563eb, #1d4ed8)', fontSize: '0.95rem' }}>
+                                            <div className="rounded-circle text-white d-flex align-items-center justify-content-center fw-bold shadow-sm" style={{ width: 40, height: 40, minWidth: 40, background: isDoctor ? 'linear-gradient(135deg, #0284c7, #0369a1)' : isRoot ? 'linear-gradient(135deg, #334155, #0f172a)' : 'linear-gradient(135deg, #2563eb, #1d4ed8)', fontSize: '0.95rem' }}>
                                                 {(this.state.fullname ? this.state.fullname.charAt(0) : 'A').toUpperCase()}
                                             </div>
                                             <div className="text-truncate">
@@ -113,7 +114,7 @@ export default class AdminDashboard extends React.Component {
                                             </div>
                                         </div>
                                         <div className="mt-2 pt-2 border-top d-flex align-items-center justify-content-between" style={{ borderColor: 'var(--border-color)' }}>
-                                            <span className={`badge ${isDoctor ? 'bg-info-subtle text-info' : isRoot ? 'bg-dark-subtle text-dark' : 'bg-danger-subtle text-danger'} small`}>
+                                            <span className={`badge ${isDoctor ? 'bg-info-subtle text-info' : isRoot ? 'bg-dark-subtle text-dark' : 'bg-primary-subtle text-primary'} small`}>
                                                 <i className={`fa-solid ${isDoctor ? 'fa-user-doctor' : isRoot ? 'fa-crown' : 'fa-user-shield'} me-1`}></i>
                                                 {isDoctor ? 'Doctor / Therapist' : isRoot ? 'Root Superadmin' : 'Clinic Administrator'}
                                             </span>
@@ -151,33 +152,47 @@ export default class AdminDashboard extends React.Component {
                         <nav className="sb-sidenav accordion" id="sidenavAccordion">
                             <div className="sb-sidenav-menu">
                                 <div className="nav">
-                                    <div className="sb-sidenav-menu-heading">Administrative Controls</div>
+                                    <div className="sb-sidenav-menu-heading">
+                                        {isDoctor ? 'Clinical Practice' : isRoot ? 'Superadmin Jurisdiction' : 'Clinic Operations'}
+                                    </div>
                                     <a className="nav-link dashboardButton cursor-pointer">
                                         <div className="sb-nav-link-icon"><i className="fa-solid fa-gauge-high"></i></div>
-                                        Overview Dashboard
+                                        {isDoctor ? 'Clinical Overview' : 'Overview Dashboard'}
                                     </a>
 
-                                    <div className="sb-sidenav-menu-heading">User & Patient Records</div>
+                                    <div className="sb-sidenav-menu-heading">
+                                        {isDoctor ? 'Assigned Patients' : 'User & Patient Records'}
+                                    </div>
                                     <a className="nav-link fetchUsers cursor-pointer">
-                                        <div className="sb-nav-link-icon"><i className="fa-solid fa-users"></i></div>
-                                        Active Patients
+                                        <div className="sb-nav-link-icon"><i className="fa-solid fa-users text-primary"></i></div>
+                                        {isDoctor ? 'My Assigned Patients' : 'Active Patients'}
                                     </a>
-                                    <a className="nav-link fetchDoctors cursor-pointer">
-                                        <div className="sb-nav-link-icon"><i className="fa-solid fa-user-doctor text-info"></i></div>
-                                        Doctors & Staff
-                                    </a>
+
+                                    {!isDoctor && (
+                                        <a className="nav-link fetchDoctors cursor-pointer">
+                                            <div className="sb-nav-link-icon"><i className="fa-solid fa-user-doctor text-info"></i></div>
+                                            Doctors &amp; Staff
+                                        </a>
+                                    )}
+
                                     <a className="nav-link fetchConsultations cursor-pointer">
                                         <div className="sb-nav-link-icon"><i className="fa-solid fa-stethoscope text-danger"></i></div>
-                                        Clinical Reviews
+                                        {isDoctor ? 'My Clinical Reviews' : 'Clinical Reviews'}
                                     </a>
-                                    <a className="nav-link fetchRegisters cursor-pointer">
-                                        <div className="sb-nav-link-icon"><i className="fa-solid fa-user-plus text-warning"></i></div>
-                                        Pending Registrations
-                                    </a>
-                                    <a className="nav-link fetchAdmins cursor-pointer">
-                                        <div className="sb-nav-link-icon"><i className="fa-solid fa-user-shield text-success"></i></div>
-                                        Administrators
-                                    </a>
+
+                                    {!isDoctor && (
+                                        <a className="nav-link fetchRegisters cursor-pointer">
+                                            <div className="sb-nav-link-icon"><i className="fa-solid fa-user-plus text-warning"></i></div>
+                                            Pending Registrations
+                                        </a>
+                                    )}
+
+                                    {isRoot && (
+                                        <a className="nav-link fetchAdmins cursor-pointer">
+                                            <div className="sb-nav-link-icon"><i className="fa-solid fa-user-shield text-success"></i></div>
+                                            Administrators
+                                        </a>
+                                    )}
 
                                     <div className="sb-sidenav-menu-heading">Clinical Modules</div>
                                     <a className="nav-link" href="/user">
@@ -185,10 +200,10 @@ export default class AdminDashboard extends React.Component {
                                         Patient Therapy View
                                     </a>
 
-                                    <div className="sb-sidenav-menu-heading">Admin Profile</div>
+                                    <div className="sb-sidenav-menu-heading">Profile &amp; Security</div>
                                     <a className="nav-link" data-bs-toggle="modal" data-bs-target="#userDetailsModal">
                                         <div className="sb-nav-link-icon"><i className="fa-solid fa-id-card"></i></div>
-                                        Admin Account
+                                        Account Profile
                                     </a>
                                     <a className="nav-link" data-bs-toggle="modal" data-bs-target="#uploadImageModal">
                                         <div className="sb-nav-link-icon"><i className="fa-solid fa-camera"></i></div>
@@ -201,7 +216,9 @@ export default class AdminDashboard extends React.Component {
                                 </div>
                             </div>
                             <div className="sb-sidenav-footer">
-                                <div className="small">System Administrator</div>
+                                <div className="small">
+                                    {isDoctor ? 'Certified Vision Specialist' : isRoot ? 'Root Superadmin' : 'Clinic Administrator'}
+                                </div>
                                 <div className="fw-bold text-primary text-truncate">{this.state.data.fullname || this.state.username}</div>
                             </div>
                         </nav>
@@ -216,9 +233,9 @@ export default class AdminDashboard extends React.Component {
                     >
                         <main>
                             <div className="container-fluid px-2 px-sm-3 px-md-4">
-                                <Dashboard />
+                                <Dashboard currentUser={this.state.data} />
                                 <div id="table-section">
-                                    <Table />
+                                    <Table currentUser={this.state.data} />
                                 </div>
                             </div>
                         </main>
@@ -303,7 +320,8 @@ export default class AdminDashboard extends React.Component {
                                 <div className="modal-content" style={{ backgroundColor: 'var(--bg-card)', borderColor: 'var(--border-color)' }}>
                                     <div className="modal-header border-bottom" style={{ borderColor: 'var(--border-color)' }}>
                                         <h4 className="modal-title fw-bold text-main" id="createStaffModalLabel">
-                                            <i className="fa-solid fa-user-plus text-primary me-2"></i>Add New Doctor, Patient or Admin
+                                            <i className="fa-solid fa-user-plus text-primary me-2"></i>
+                                            {isDoctor ? 'Enroll New Assigned Patient' : isRoot ? 'Add Patient, Doctor or Administrator' : 'Add New Patient or Doctor'}
                                         </h4>
                                         <button type="button" className="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                                     </div>
@@ -312,15 +330,15 @@ export default class AdminDashboard extends React.Component {
                                             <div className="row g-3">
                                                 <div className="form-group col-12 col-md-6">
                                                     <label className="form-label small fw-semibold text-secondary">Full Name</label>
-                                                    <input type="text" name="fullname" className="form-control" placeholder="e.g. Dr. Priya Verma" required />
+                                                    <input type="text" name="fullname" className="form-control" placeholder={isDoctor ? "e.g. John Doe" : "e.g. Dr. Priya Verma"} required />
                                                 </div>
                                                 <div className="form-group col-12 col-md-6">
                                                     <label className="form-label small fw-semibold text-secondary">Username</label>
-                                                    <input type="text" name="username" className="form-control" placeholder="e.g. dr_priya" required />
+                                                    <input type="text" name="username" className="form-control" placeholder={isDoctor ? "e.g. patient_john" : "e.g. dr_priya"} required />
                                                 </div>
                                                 <div className="form-group col-12 col-md-6">
                                                     <label className="form-label small fw-semibold text-secondary">Email Address</label>
-                                                    <input type="email" name="email" className="form-control" placeholder="priya@lazyeyeclinic.com" required />
+                                                    <input type="email" name="email" className="form-control" placeholder="user@lazyeyeclinic.com" required />
                                                 </div>
                                                 <div className="form-group col-12 col-md-6">
                                                     <label className="form-label small fw-semibold text-secondary">Initial Password</label>
@@ -328,10 +346,22 @@ export default class AdminDashboard extends React.Component {
                                                 </div>
                                                 <div className="form-group col-12 col-md-6">
                                                     <label className="form-label small fw-semibold text-secondary">Account Role</label>
-                                                    <select name="accounttype" className="form-select" required>
-                                                        <option value="doctor">Doctor / Optometrist</option>
-                                                        <option value="user">Patient (User)</option>
-                                                        <option value="admin">Clinic Administrator</option>
+                                                    <select name="accounttype" id="create_accounttype_select" className="form-select" required>
+                                                        {isDoctor ? (
+                                                            <option value="user">Patient (Assigned to You)</option>
+                                                        ) : isRoot ? (
+                                                            <>
+                                                                <option value="user">Patient (User)</option>
+                                                                <option value="doctor">Doctor / Optometrist</option>
+                                                                <option value="admin">Clinic Administrator</option>
+                                                                <option value="root">Root Superadmin</option>
+                                                            </>
+                                                        ) : (
+                                                            <>
+                                                                <option value="user">Patient (User)</option>
+                                                                <option value="doctor">Doctor / Optometrist</option>
+                                                            </>
+                                                        )}
                                                     </select>
                                                 </div>
                                                 <div className="form-group col-12 col-md-6">
@@ -471,6 +501,172 @@ export default class AdminDashboard extends React.Component {
                         </footer>
                     </div>
                 </div>
+
+                {/* Comprehensive Patient Activity Report & Heatmap Modal */}
+                <div className="modal fade" id="patientActivityModal" tabIndex={-1} aria-labelledby="patientActivityModalLabel" aria-hidden="true">
+                    <div className="modal-dialog modal-dialog-centered modal-xl modal-dialog-scrollable">
+                        <div className="modal-content" style={{ backgroundColor: 'var(--bg-card)', borderColor: 'var(--border-color)' }}>
+                            <div className="modal-header border-bottom py-3" style={{ borderColor: 'var(--border-color)' }}>
+                                <div className="d-flex align-items-center gap-2">
+                                    <div className="rounded-circle bg-danger-subtle text-danger d-flex align-items-center justify-content-center" style={{ width: 40, height: 40 }}>
+                                        <i className="fa-solid fa-fire fa-lg"></i>
+                                    </div>
+                                    <div>
+                                        <h5 className="modal-title fw-bold text-main mb-0" id="patientActivityModalLabel">
+                                            Patient Clinical Activity &amp; Therapy Heatmap
+                                        </h5>
+                                        <small className="text-sub" id="pam_patient_subtitle">Detailed compliance, game history, and binocular engagement</small>
+                                    </div>
+                                </div>
+                                <button type="button" className="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                            </div>
+                            <div className="modal-body p-4">
+                                {/* Patient Profile Snapshot Banner */}
+                                <div className="card border-0 p-3 mb-4 shadow-sm" style={{ backgroundColor: 'var(--bg-surface-secondary)', borderRadius: '1rem', border: '1px solid var(--border-color)' }}>
+                                    <div className="d-flex align-items-center justify-content-between flex-wrap gap-3">
+                                        <div className="d-flex align-items-center gap-3">
+                                            <div className="rounded-circle text-white fw-bold d-flex align-items-center justify-content-center shadow-sm" id="pam_avatar" style={{ width: 52, height: 52, minWidth: 52, background: 'linear-gradient(135deg, #2563eb, #1d4ed8)', fontSize: '1.2rem' }}>
+                                                P
+                                            </div>
+                                            <div>
+                                                <h4 className="fw-bold mb-0 text-main" id="pam_patient_name">Patient Name</h4>
+                                                <div className="d-flex align-items-center gap-2 small mt-1 flex-wrap">
+                                                    <span className="badge bg-secondary-subtle text-secondary" id="pam_patient_username">@username</span>
+                                                    <span className="text-sub">&bull;</span>
+                                                    <span className="text-sub" id="pam_patient_email">email@example.com</span>
+                                                    <span className="text-sub">&bull;</span>
+                                                    <span className="badge bg-info-subtle text-info" id="pam_doctor_name"><i className="fa-solid fa-user-doctor me-1"></i>Dr. Assigned</span>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div className="d-flex align-items-center gap-2">
+                                            <span className="badge bg-primary px-3 py-2 rounded-pill fw-semibold" id="pam_target_time">Target: 20 mins/day</span>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                {/* 4 Summary Stat Cards */}
+                                <div className="row g-3 mb-4">
+                                    <div className="col-6 col-md-3">
+                                        <div className="p-3 rounded-4 shadow-sm h-100" style={{ backgroundColor: 'var(--bg-card)', border: '1px solid var(--border-color)' }}>
+                                            <div className="small text-sub text-uppercase fw-bold">Total Sessions</div>
+                                            <h3 className="fw-bold text-main mt-1 mb-0" id="pam_total_sessions">0</h3>
+                                            <small className="text-muted">Therapy plays logged</small>
+                                        </div>
+                                    </div>
+                                    <div className="col-6 col-md-3">
+                                        <div className="p-3 rounded-4 shadow-sm h-100" style={{ backgroundColor: 'var(--bg-card)', border: '1px solid var(--border-color)' }}>
+                                            <div className="small text-sub text-uppercase fw-bold">Therapy Time</div>
+                                            <h3 className="fw-bold text-primary mt-1 mb-0" id="pam_total_minutes">0 mins</h3>
+                                            <small className="text-muted">Cumulative binocular work</small>
+                                        </div>
+                                    </div>
+                                    <div className="col-6 col-md-3">
+                                        <div className="p-3 rounded-4 shadow-sm h-100" style={{ backgroundColor: 'var(--bg-card)', border: '1px solid var(--border-color)' }}>
+                                            <div className="small text-sub text-uppercase fw-bold">Compliance Rate</div>
+                                            <h3 className="fw-bold text-success mt-1 mb-0" id="pam_compliance_rate">0%</h3>
+                                            <small className="text-muted">Daily target met ratio</small>
+                                        </div>
+                                    </div>
+                                    <div className="col-6 col-md-3">
+                                        <div className="p-3 rounded-4 shadow-sm h-100" style={{ backgroundColor: 'var(--bg-card)', border: '1px solid var(--border-color)' }}>
+                                            <div className="small text-sub text-uppercase fw-bold">Active Days</div>
+                                            <h3 className="fw-bold text-warning mt-1 mb-0" id="pam_active_days">0</h3>
+                                            <small className="text-muted">Distinct therapy days</small>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                {/* Therapy Heatmap Card */}
+                                <div className="card border-0 shadow-sm p-4 mb-4" style={{ backgroundColor: 'var(--bg-card)', borderRadius: '1rem', border: '1px solid var(--border-color)' }}>
+                                    <div className="d-flex align-items-center justify-content-between mb-3 flex-wrap gap-2">
+                                        <div>
+                                            <h5 className="fw-bold mb-1 text-main">
+                                                <i className="fa-solid fa-calendar-days text-primary me-2"></i>Therapy Activity Heatmap Calendar
+                                            </h5>
+                                            <small className="text-sub">Daily therapy intensity and session frequency over the past 90 days. Click any date block to inspect sessions.</small>
+                                        </div>
+                                        <div className="d-flex align-items-center gap-1 small text-sub">
+                                            <span>Less</span>
+                                            <span className="d-inline-block rounded-1" style={{ width: 12, height: 12, background: 'var(--border-color)' }}></span>
+                                            <span className="d-inline-block rounded-1" style={{ width: 12, height: 12, background: '#9be9a8' }}></span>
+                                            <span className="d-inline-block rounded-1" style={{ width: 12, height: 12, background: '#40c463' }}></span>
+                                            <span className="d-inline-block rounded-1" style={{ width: 12, height: 12, background: '#216e39' }}></span>
+                                            <span>More</span>
+                                        </div>
+                                    </div>
+
+                                    {/* Heatmap Grid Container rendered dynamically by adminScript */}
+                                    <div className="overflow-auto pb-2" id="pam_heatmap_wrapper" style={{ minHeight: '120px' }}>
+                                        <div className="d-flex align-items-center justify-content-center py-4 text-sub">
+                                            <i className="fa-solid fa-spinner fa-spin me-2"></i> Loading therapy activity heatmap...
+                                        </div>
+                                    </div>
+                                    <div id="pam_selected_date_filter" className="small text-primary fw-semibold mt-2 d-none">
+                                        Showing sessions for selected date: <span id="pam_filter_date_label"></span>
+                                        <button type="button" className="btn btn-sm btn-link text-decoration-none ms-2" id="pam_clear_date_filter">Clear Filter</button>
+                                    </div>
+                                </div>
+
+                                {/* Tabs for Recent Sessions & Consultations */}
+                                <ul className="nav nav-pills mb-3 gap-2" id="pamTabs" role="tablist">
+                                    <li className="nav-item" role="presentation">
+                                        <button className="nav-link active rounded-pill px-3 py-1 fw-semibold small" id="pam-sessions-tab" data-bs-toggle="tab" data-bs-target="#pam-sessions" type="button" role="tab">
+                                            <i className="fa-solid fa-gamepad me-1"></i> Recent Game Sessions (<span id="pam_session_count">0</span>)
+                                        </button>
+                                    </li>
+                                    <li className="nav-item" role="presentation">
+                                        <button className="nav-link rounded-pill px-3 py-1 fw-semibold small" id="pam-consultations-tab" data-bs-toggle="tab" data-bs-target="#pam-consultations" type="button" role="tab">
+                                            <i className="fa-solid fa-stethoscope me-1"></i> Doctor Reviews (<span id="pam_consultation_count">0</span>)
+                                        </button>
+                                    </li>
+                                </ul>
+
+                                <div className="tab-content" id="pamTabContent">
+                                    <div className="tab-pane fade show active" id="pam-sessions" role="tabpanel">
+                                        <div className="table-responsive rounded-3 border" style={{ borderColor: 'var(--border-color)', maxHeight: '280px' }}>
+                                            <table className="table table-hover table-striped mb-0 small" id="pam_sessions_table">
+                                                <thead className="table-light sticky-top">
+                                                    <tr>
+                                                        <th>Game</th>
+                                                        <th>Score</th>
+                                                        <th>Duration</th>
+                                                        <th>Played Date &amp; Time</th>
+                                                    </tr>
+                                                </thead>
+                                                <tbody>
+                                                    <tr><td colSpan="4" className="text-center py-3 text-muted">No session records found.</td></tr>
+                                                </tbody>
+                                            </table>
+                                        </div>
+                                    </div>
+                                    <div className="tab-pane fade" id="pam-consultations" role="tabpanel">
+                                        <div className="table-responsive rounded-3 border" style={{ borderColor: 'var(--border-color)', maxHeight: '280px' }}>
+                                            <table className="table table-hover table-striped mb-0 small" id="pam_consultations_table">
+                                                <thead className="table-light sticky-top">
+                                                    <tr>
+                                                        <th>Date</th>
+                                                        <th>Doctor</th>
+                                                        <th>Compliance</th>
+                                                        <th>Prescription</th>
+                                                        <th>Clinical Observations &amp; Notes</th>
+                                                    </tr>
+                                                </thead>
+                                                <tbody>
+                                                    <tr><td colSpan="5" className="text-center py-3 text-muted">No clinical reviews logged.</td></tr>
+                                                </tbody>
+                                            </table>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div className="modal-footer border-top py-2" style={{ borderColor: 'var(--border-color)' }}>
+                                <button type="button" className="btn btn-secondary rounded-pill px-4" data-bs-dismiss="modal">Close</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
                 <UserDetailsModal data={this.state.data} />
                 <ImageUploadModal data={this.state.data} />
             </>

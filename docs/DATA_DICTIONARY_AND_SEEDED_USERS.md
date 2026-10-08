@@ -108,6 +108,7 @@ When the application boots for the first time (or when `/seedDemoData` is reques
 
 | Role | Full Name | Username | Password | Email | Daily Goal | Initial Doctor ID |
 | :--- | :--- | :--- | :--- | :--- | :--- | :--- |
+| **`root`** | Master Root Administrator | `root` | `root123` | `root@lazyeye.org` | 20 min | — |
 | **`admin`** | Clinical Administrator | `admin` | `admin123` | `admin@lazyeye.org` | 20 min | — |
 | **`admin`** | Pranjal Agarwal | `pranjal` | `4567` | `pranjalagarwal@gmail.com` | 20 min | — |
 | **`doctor`** | Dr. Sarah Mitchell, OD | `dr_sarah` | `doctor123` | `sarah.mitchell@lazyeye-clinic.org` | 20 min | — |
@@ -173,3 +174,21 @@ If you ever wish to re-seed demo data:
 1. **Via Browser / API**: Visit **[https://lazyeye.onrender.com/seedDemoData](https://lazyeye.onrender.com/seedDemoData)**.
 2. **Via Admin Dashboard**: Log in as `admin` and click the blue **`[⚡ Seed Demo Data]`** button in the header.
 3. The platform will automatically rebuild all missing tables, repopulate default staff, create the patient cohort, and generate 42 fresh therapy records.
+
+---
+
+## 6. Role-Based Scoping & Permission Matrix
+
+| Capability / Resource | Doctor (`doctor`) | Clinic Admin (`admin`) | Superadmin (`root`) | Patient (`user`) |
+| :--- | :---: | :---: | :---: | :---: |
+| **Landing View** | Doctor Clinical Workspace | Clinic Administrative Hub | Platform Superadmin Control | Dichoptic Gaming Portal |
+| **View Patients** | Assigned Patients Only | All Clinic Patients | All Platform Patients | Own Profile Only |
+| **View Doctors** | Self Only | All Clinic Doctors | All Platform Doctors | Assigned Doctor Only |
+| **View Admins** | ❌ Forbidden (Hidden) | ❌ Forbidden (Hidden) | ✅ Full Access | ❌ Forbidden |
+| **Create/Invite Staff**| Assigned Patients Only | Patients & Doctors | Admins, Doctors & Patients | ❌ Forbidden |
+| **Assign Doctors** | ❌ Restricted | ✅ Full Access | ✅ Full Access | ❌ Forbidden |
+| **Delete / Edit Staff**| Self profile only | Doctors & Patients | All Accounts | Own profile |
+| **Clinical Consultation Logs** | Conducted by Self | Clinic-wide | Platform-wide | Own evaluations |
+| **Patient Therapy Heatmap** | ✅ 84-Day Activity Modal | ✅ 84-Day Activity Modal | ✅ 84-Day Activity Modal | Weekly Progress View |
+
+

@@ -11,9 +11,9 @@ use App\Models\User;
 class AuthController extends Controller
 {   
     public function admin(Request $request){
-        // $value = $request->session()->get('loggedInUserName');
-         $user_id = $request->session()->get('loggedInUser');
-        return view('adminPanel')->with('user_id',$user_id);
+        $user_id = $request->session()->get('loggedInUser');
+        $user_type = $request->session()->get('loggedInUserType', 'admin');
+        return view('adminPanel')->with('user_id',$user_id)->with('user_type',$user_type);
     }
     public function user_view(Request $request){
         $user_id = $request->session()->get('loggedInUser');
@@ -64,7 +64,10 @@ class AuthController extends Controller
                         }
                         return response()->json([
                             'status' => 200,
-                            'messages' => $message
+                            'messages' => $message,
+                            'role' => $user->accounttype,
+                            'user_id' => $user->id,
+                            'username' => $user->username
                         ]);
                     }else{
                         return response()->json([
@@ -94,19 +97,25 @@ class AuthController extends Controller
         ]);
     }
     
-    public function login_view(){
+    public function login_view(Request $request){
         if(session()->has('loggedInUser')){
-            return redirect()->route('admin');
-            // return view('adminPanel');
+            $type = session('loggedInUserType');
+            if(in_array($type, ['admin', 'root', 'doctor'])){
+                return redirect()->route('admin');
+            }
+            return redirect()->route('user');
         }else{
             return view('welcome');
         }
 
     }
-    public function register_view(){
+    public function register_view(Request $request){
         if(session()->has('loggedInUser')){
-            return redirect()->route('admin');
-            // return view('adminPanel');
+            $type = session('loggedInUserType');
+            if(in_array($type, ['admin', 'root', 'doctor'])){
+                return redirect()->route('admin');
+            }
+            return redirect()->route('user');
         }else{
             return view('welcome');
         }

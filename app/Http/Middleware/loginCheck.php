@@ -23,19 +23,21 @@ class loginCheck
         // echo "<h3>Request Path : ".$request_path." | Current Path : ".$current_path."</h3>";
         // echo "<h3>loggedInUserType : ".$type." | name : ".$name."</h3>";
         
-        // Restrict Admin to redirect to other Guest pages
-        if(session()->has('loggedInUser')&& $type==='admin' && ($request_path === '/' || $request_path === 'Register_view' || $request_path === 'Login_view' )){
+        // Role groupings
+        $isStaff = in_array($type, ['admin', 'root', 'doctor']);
+
+        // Restrict Staff to redirect away from Guest pages to Admin portal
+        if(session()->has('loggedInUser') && $isStaff && ($request_path === '/' || $request_path === 'Register_view' || $request_path === 'Login_view' )){
             return redirect()->route('admin');
         }
-        if(session()->has('loggedInUser')&& $type!='admin' && ($request_path === '/' || $request_path === 'Register_view' || $request_path === 'Login_view'||$request_path === 'admin')){
+
+        // Restrict Patients (regular users) from accessing Admin portal and guest pages
+        if(session()->has('loggedInUser') && !$isStaff && ($request_path === '/' || $request_path === 'Register_view' || $request_path === 'Login_view' || $request_path === 'admin')){
             return redirect()->route('user');
         }
 
-        // Restrict Guest to redirect to ADMIN Dashboard
-        if(!session()->has('loggedInUser')&& ($request_path === 'admin')){
-            return redirect()->route('login');
-        }
-        if(!session()->has('loggedInUser')&& ($request_path === 'user')){
+        // Restrict Unauthenticated Guests from accessing Dashboard pages
+        if(!session()->has('loggedInUser') && ($request_path === 'admin' || $request_path === 'user')){
             return redirect()->route('login');
         }       
         return $next($request);
