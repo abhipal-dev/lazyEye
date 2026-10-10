@@ -8,6 +8,9 @@ use Illuminate\Support\Facades\DB;
 use Illuminate\Http\Request;
 use App\Models\Register;
 use App\Models\User;
+use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\Session;
+
 class AuthController extends Controller
 {   
     public function admin(Request $request){
@@ -82,7 +85,7 @@ class AuthController extends Controller
                     ]);
                 }
             } catch (\Throwable $e) {
-                \Log::error('Login database error: ' . $e->getMessage());
+                Log::error('Login database error: ' . $e->getMessage());
                 return response()->json([
                     'status' => 500,
                     'messages' => 'Database Error: ' . $e->getMessage()
@@ -90,8 +93,8 @@ class AuthController extends Controller
             }
     }
     public function logout(){
-        \Session::flush();
-        \Auth::logout();
+        Session::flush();
+        Auth::logout();
         return response()->json([
             'messages'=>'success'
         ]);
