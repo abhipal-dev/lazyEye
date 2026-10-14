@@ -15,8 +15,8 @@ export default class Footer extends React.Component {
                                 An advanced web-based dichoptic vision therapy platform engineered for amblyopia (lazy eye) rehabilitation. Utilizing interactive binocular stimulation to rebuild neural visual pathways.
                             </p>
                             <div className="d-flex align-items-center gap-3 text-muted mt-3">
-                                <span className="small"><i className="fa-solid fa-shield-halved text-primary me-1"></i> Clinical Protocol</span>
-                                <span className="small"><i className="fa-solid fa-glasses text-info me-1"></i> Red/Blue Dichoptic</span>
+                                <span className="small"><i className="fa-solid fa-shield-halved text-primary me-1"></i> Research Protocol</span>
+                                <span className="small"><i className="fa-solid fa-glasses text-info me-1"></i> Red/Cyan Dichoptic</span>
                             </div>
                         </div>
 
@@ -31,12 +31,12 @@ export default class Footer extends React.Component {
                         </div>
 
                         <div className="col-6 col-md-3">
-                            <h6 className="fw-bold mb-3 text-main"><i className="fa-solid fa-user-doctor text-primary me-2"></i>Patient Portal</h6>
+                            <h6 className="fw-bold mb-3 text-main"><i className="fa-solid fa-user-doctor text-primary me-2"></i>Portals</h6>
                             <ul className="list-unstyled small d-flex flex-column gap-2 mb-0">
                                 <li><a href="/Login_view" className="text-muted text-decoration-none">Patient Login</a></li>
                                 <li><a href="/Register_view" className="text-muted text-decoration-none">New Registration</a></li>
                                 <li><a href="/user" className="text-muted text-decoration-none">Games Panel</a></li>
-                                <li><a href="/admin" className="text-muted text-decoration-none">Doctor Admin Portal</a></li>
+                                <li><a href="/Login_view?role=doctor" className="text-muted text-decoration-none">Doctor &amp; Admin Portal</a></li>
                             </ul>
                         </div>
                     </div>

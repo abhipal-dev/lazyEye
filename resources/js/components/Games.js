@@ -15,7 +15,7 @@ export default class Games extends React.Component {
             {
                 tag: 'Binocular Fusion',
                 tagIcon: 'fa-eye',
-                title: 'Snake Macular Fixation',
+                title: 'Dichoptic Snake',
                 desc: 'Guide the snake to hunt moving targets. Red and cyan filtering splits the snake and food between eyes, stimulating binocular cortical fusion and reducing amblyopic suppression.',
                 mascot: '/images/snake-mascot.svg',
                 route: '/game1snake',
@@ -24,9 +24,20 @@ export default class Games extends React.Component {
                 gameKey: 'Snake'
             },
             {
+                tag: 'Visual Timing',
+                tagIcon: 'fa-plane-departure',
+                title: 'Altitude Flight',
+                desc: 'Navigate altitude obstacles requiring rapid saccadic eye movements. Color separation ensures both eyes coordinate in real time to judge clearances.',
+                mascot: '/images/flappy-mascot.svg',
+                route: '/game2flappybird',
+                bg: 'linear-gradient(135deg, #0369a1 0%, #0284c7 50%, #0284c7 100%)',
+                time: '15 mins',
+                gameKey: 'Flappy Bird'
+            },
+            {
                 tag: 'Visual Reflexes',
                 tagIcon: 'fa-bolt',
-                title: 'Menja 3D Geometric Slicing',
+                title: '3D Spatial Slicer',
                 desc: 'Slice dynamic 3D blocks in rapid succession as they fly toward you. Sharpens reaction velocity, stereoscopic depth judgment, and contrast sensitivity.',
                 mascot: '/images/menja-mascot.svg',
                 route: '/game12menja',
@@ -35,21 +46,10 @@ export default class Games extends React.Component {
                 gameKey: 'Menja'
             },
             {
-                tag: 'Depth & Saccades',
-                tagIcon: 'fa-plane-departure',
-                title: 'Flappy Bird Dual-Eye Flight',
-                desc: 'Navigate altitude obstacles requiring rapid saccadic eye movements. Color separation ensures both eyes must communicate in real time to judge clearances.',
-                mascot: '/images/flappy-mascot.svg',
-                route: '/game2flappybird',
-                bg: 'linear-gradient(135deg, #0369a1 0%, #0284c7 50%, #0284c7 100%)',
-                time: '15 mins',
-                gameKey: 'Flappy Bird'
-            },
-            {
                 tag: 'Pattern Synthesis',
                 tagIcon: 'fa-cubes',
-                title: 'Tetris Fusion Alignment',
-                desc: 'Rotate and place color-filtered falling tetrominoes. Playing board boundaries and falling shapes are split between eyes, demanding simultaneous cortical vision.',
+                title: 'Block Fusion',
+                desc: 'Rotate and place color-filtered falling tetrominoes. Board boundaries and falling shapes are split between eyes, demanding simultaneous cortical vision.',
                 mascot: '/images/tetris-mascot.svg',
                 route: '/game8tetris',
                 bg: 'linear-gradient(135deg, #581c87 0%, #7e22ce 50%, #9333ea 100%)',
@@ -59,8 +59,8 @@ export default class Games extends React.Component {
             {
                 tag: 'Spatial Targeting',
                 tagIcon: 'fa-bullseye',
-                title: 'Bubble Shooter Precision Aim',
-                desc: 'Aim and pop matching bubble clusters to stimulate foveal fixation, peripheral vision, and active engagement in the non-dominant eye.',
+                title: 'Bubble Target Aim',
+                desc: 'Aim and pop matching bubble clusters to stimulate foveal fixation, peripheral vision, and active engagement in the amblyopic eye.',
                 mascot: '/images/bubbles-mascot.svg',
                 route: '/game9bubbleshooter',
                 bg: 'linear-gradient(135deg, #9a3412 0%, #c2410c 50%, #ea580c 100%)',
@@ -70,20 +70,64 @@ export default class Games extends React.Component {
             {
                 tag: 'Speed Tracking',
                 tagIcon: 'fa-table-tennis-paddle-ball',
-                title: 'Ping-Pong 3D Dynamic Rally',
+                title: 'Table Rally 3D',
                 desc: 'Defend your table with rapid paddle tracking. High-velocity returns challenge binocular alignment and dynamic stereoscopic motion tracking.',
                 mascot: '/images/pingpong-mascot.svg',
                 route: '/game10pingpong',
                 bg: 'linear-gradient(135deg, #115e59 0%, #0f766e 50%, #059669 100%)',
                 time: '15 mins',
                 gameKey: 'Ping Pong'
+            },
+            {
+                tag: 'Agility Fixation',
+                tagIcon: 'fa-mountain',
+                title: 'Climber Holds',
+                desc: 'Agility challenge demanding sustained visual fixation, depth processing, and bilateral coordination to navigate to the top hold.',
+                mascot: '/images/stickyholds-mascot.svg',
+                route: '/game11stickyholds',
+                bg: 'linear-gradient(135deg, #334155 0%, #475569 50%, #64748b 100%)',
+                time: '15 mins',
+                gameKey: 'Sticky Holds'
+            },
+            {
+                tag: 'Spatial Search',
+                tagIcon: 'fa-route',
+                title: 'Labyrinth Search',
+                desc: 'Solve intricate labyrinths with split visual cues, boosting visual search efficiency, spatial mapping, and neuro-visual pathway activation.',
+                mascot: '/images/maze.png',
+                route: '/game5maze',
+                bg: 'linear-gradient(135deg, #854d0e 0%, #a16207 50%, #ca8a04 100%)',
+                time: '15 mins',
+                gameKey: 'Maze'
+            },
+            {
+                tag: 'Hand-Eye Sync',
+                tagIcon: 'fa-bullseye',
+                title: 'Target Catcher',
+                desc: 'Track and catch falling targets across visual fields to improve saccadic eye movements and visual-motor integration.',
+                mascot: '/images/ballcatcher-mascot.svg',
+                route: '/game3ballcatcher',
+                bg: 'linear-gradient(135deg, #9f1239 0%, #be123c 50%, #e11d48 100%)',
+                time: '15 mins',
+                gameKey: 'Ball Catcher'
+            },
+            {
+                tag: 'Trajectory Tracking',
+                tagIcon: 'fa-arrows-spin',
+                title: 'Rebound Ball',
+                desc: 'Anticipate dynamic rebounds and speed variations under dichoptic viewing to enhance depth perception and tracking agility.',
+                mascot: '/images/bouncingball-mascot.svg',
+                route: '/game7test',
+                bg: 'linear-gradient(135deg, #1e40af 0%, #1d4ed8 50%, #2563eb 100%)',
+                time: '15 mins',
+                gameKey: 'Bouncing Ball'
             }
         ];
 
         this.allGames = [
             {
                 id: 'Snake',
-                name: 'Snake Game',
+                name: 'Dichoptic Snake',
                 route: '/game1snake',
                 badge: 'Binocular Focus',
                 badgeClass: 'badge-emerald',
@@ -94,7 +138,7 @@ export default class Games extends React.Component {
             },
             {
                 id: 'FlappyBird',
-                name: 'Flappy Bird',
+                name: 'Altitude Flight',
                 route: '/game2flappybird',
                 badge: 'Depth Perception',
                 badgeClass: 'badge-sky',
@@ -105,7 +149,7 @@ export default class Games extends React.Component {
             },
             {
                 id: 'Menja',
-                name: 'Menja 3D',
+                name: '3D Spatial Slicer',
                 route: '/game12menja',
                 badge: 'Spatial Reflex',
                 badgeClass: 'badge-indigo',
@@ -116,7 +160,7 @@ export default class Games extends React.Component {
             },
             {
                 id: 'Tetris',
-                name: 'Tetris Fusion',
+                name: 'Block Fusion',
                 route: '/game8tetris',
                 badge: 'Pattern Synthesis',
                 badgeClass: 'badge-purple',
@@ -127,18 +171,18 @@ export default class Games extends React.Component {
             },
             {
                 id: 'BubbleShooter',
-                name: 'Bubble Shooter',
+                name: 'Bubble Target Aim',
                 route: '/game9bubbleshooter',
                 badge: 'Foveal Targeting',
                 badgeClass: 'badge-amber',
                 art: '/images/bubbles-mascot.svg',
                 bannerBg: 'linear-gradient(135deg, rgba(245, 158, 11, 0.14) 0%, rgba(217, 119, 6, 0.25) 100%)',
-                desc: 'Aim and match color-separated bubbles to stimulate peripheral stereoscopic vision and promote active visual processing in the non-dominant eye.',
+                desc: 'Aim and match color-separated bubbles to stimulate peripheral stereoscopic vision and promote active visual processing in the amblyopic eye.',
                 time: '15 mins'
             },
             {
                 id: 'PingPong',
-                name: 'Ping-Pong 3D',
+                name: 'Table Rally 3D',
                 route: '/game10pingpong',
                 badge: 'Speed Tracking',
                 badgeClass: 'badge-teal',
@@ -149,7 +193,7 @@ export default class Games extends React.Component {
             },
             {
                 id: 'StickyHolds',
-                name: 'Sticky Holds',
+                name: 'Climber Holds',
                 route: '/game11stickyholds',
                 badge: 'Agility Fixation',
                 badgeClass: 'badge-slate',
@@ -160,7 +204,7 @@ export default class Games extends React.Component {
             },
             {
                 id: 'Maze',
-                name: 'Maze Labyrinth',
+                name: 'Labyrinth Search',
                 route: '/game5maze',
                 badge: 'Spatial Search',
                 badgeClass: 'badge-yellow',
@@ -171,7 +215,7 @@ export default class Games extends React.Component {
             },
             {
                 id: 'BallCatcher',
-                name: 'Ball Catcher',
+                name: 'Target Catcher',
                 route: '/game3ballcatcher',
                 badge: 'Hand-Eye Sync',
                 badgeClass: 'badge-rose',
@@ -182,7 +226,7 @@ export default class Games extends React.Component {
             },
             {
                 id: 'BouncingBall',
-                name: 'Bouncing Ball',
+                name: 'Rebound Ball',
                 route: '/game7test',
                 badge: 'Trajectory Tracking',
                 badgeClass: 'badge-blue',

@@ -110,9 +110,31 @@ export default class Dashboard extends React.Component {
         const pointsString = points.map(p => `${p.x},${p.y}`).join(' ');
         const areaPath = `M ${points[0].x},${padding + innerHeight} L ${points.map(p => `${p.x},${p.y}`).join(' L ')} L ${points[points.length - 1].x},${padding + innerHeight} Z`;
 
-        // Game distribution list
-        const gameEntries = Object.entries(stats.game_distribution || {}).slice(0, 5);
+        // Game standardized name mapping
+        const GAME_DISPLAY_NAMES = {
+            'Snake': 'Dichoptic Snake',
+            'Flappy Bird': 'Altitude Flight',
+            'Sticky Holds': 'Climber Holds',
+            'Menja': '3D Spatial Slicer',
+            'Tetris': 'Block Fusion',
+            'Bubble Shooter': 'Bubble Target Aim',
+            'Ping Pong': 'Table Rally 3D',
+            'Maze': 'Labyrinth Search',
+            'Ball Catcher': 'Target Catcher',
+            'Bouncing Ball': 'Rebound Ball'
+        };
+
+        // Game distribution list - strictly sorted descending by plays
+        const gameEntries = Object.entries(stats.game_distribution || {})
+            .sort((a, b) => b[1] - a[1])
+            .slice(0, 5);
         const maxGamePlays = Math.max(...gameEntries.map(e => e[1]), 1);
+
+        // Dynamic Peak Day calculation from actual weekly data
+        const maxDayIdx = weeklyData.indexOf(Math.max(...weeklyData));
+        const dayLabels = stats.weekly_sessions?.labels || ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'];
+        const peakDayName = dayLabels[maxDayIdx] || 'Saturday';
+        const peakDayVolume = weeklyData[maxDayIdx] || 0;
 
         return (
             <div className="mb-4">
@@ -157,22 +179,13 @@ export default class Dashboard extends React.Component {
                                 </button>
                             </>
                         ) : (
-                            <>
-                                <button 
-                                    className="btn btn-sm btn-outline-success rounded-pill px-3 shadow-sm d-flex align-items-center gap-1 fw-bold"
-                                    onClick={this.handleSeedDemoData}
-                                    title="Generate realistic clinical patients, doctors, and game sessions"
-                                >
-                                    <i className="fa-solid fa-wand-magic-sparkles"></i> Seed Demo Data
-                                </button>
-                                <button 
-                                    className="btn btn-sm btn-primary rounded-pill px-3 shadow-sm d-flex align-items-center gap-1 fw-bold"
-                                    data-bs-toggle="modal" 
-                                    data-bs-target="#createStaffModal"
-                                >
-                                    <i className="fa-solid fa-user-plus"></i> {isRoot ? 'Add User / Staff / Admin' : 'Add User / Doctor'}
-                                </button>
-                            </>
+                            <button 
+                                className="btn btn-sm btn-primary rounded-pill px-3 shadow-sm d-flex align-items-center gap-1 fw-bold"
+                                data-bs-toggle="modal" 
+                                data-bs-target="#createStaffModal"
+                            >
+                                <i className="fa-solid fa-user-plus"></i> {isRoot ? 'Add User / Staff / Admin' : 'Add User / Doctor'}
+                            </button>
                         )}
                         <a 
                             href="/user" 
@@ -183,79 +196,79 @@ export default class Dashboard extends React.Component {
                     </div>
                 </div>
 
-                {/* 4 Primary KPI Cards */}
+                {/* 4 Primary KPI Cards - Unified Surface Design */}
                 <div className="row g-3 mb-4">
                     {/* Card 1: Patients */}
                     <div className="col-12 col-sm-6 col-xl-3">
                         <div 
                             className="card border-0 shadow-sm h-100 p-3 cursor-pointer fetchUsers"
                             style={{ 
-                                background: 'linear-gradient(135deg, #2563eb, #1d4ed8)', 
+                                backgroundColor: 'var(--bg-card)', 
+                                border: '1px solid var(--border-color)',
                                 borderRadius: '1rem', 
-                                color: '#fff',
-                                transition: 'transform 0.2s ease'
+                                transition: 'all 0.2s ease'
                             }}
                         >
                             <div className="d-flex align-items-center justify-content-between mb-2">
-                                <span className="small text-white-50 fw-bold text-uppercase tracking-wider">
-                                    {isDoctor ? 'My Assigned Patients' : 'Active Patients'}
+                                <span className="small fw-bold text-uppercase tracking-wider" style={{ color: 'var(--text-sub)' }}>
+                                    {isDoctor ? 'Assigned Patients' : 'Active Patients'}
                                 </span>
-                                <div className="rounded-circle p-2 bg-white bg-opacity-25 d-flex align-items-center justify-content-center" style={{ width: 38, height: 38 }}>
-                                    <i className="fa-solid fa-users text-white"></i>
+                                <div className="rounded-3 p-2 bg-primary-subtle text-primary d-flex align-items-center justify-content-center" style={{ width: 38, height: 38 }}>
+                                    <i className="fa-solid fa-users"></i>
                                 </div>
                             </div>
-                            <h2 className="fw-bold mb-1 text-white">{stats.total_patients}</h2>
-                            <div className="d-flex align-items-center justify-content-between small text-white-50 mt-1">
-                                <span>{isDoctor ? 'Assigned to Your Care' : 'Prescribed Therapy'}</span>
-                                <span className="text-white fw-bold">View Patients <i className="fa-solid fa-arrow-right ms-1"></i></span>
+                            <h2 className="fw-bold mb-1 text-main">{stats.total_patients}</h2>
+                            <div className="d-flex align-items-center justify-content-between small mt-2 pt-2 border-top" style={{ borderColor: 'var(--border-color)' }}>
+                                <span style={{ color: 'var(--text-muted)' }}>{isDoctor ? 'Under Direct Care' : 'Prescribed Cohort'}</span>
+                                <span className="text-primary fw-semibold">View List &rarr;</span>
                             </div>
                         </div>
                     </div>
 
-                    {/* Card 2: Doctors or Doctor Consultations */}
+                    {/* Card 2: Doctors / Clinical Staff */}
                     <div className="col-12 col-sm-6 col-xl-3">
                         {isDoctor ? (
                             <div 
                                 className="card border-0 shadow-sm h-100 p-3 cursor-pointer fetchConsultations"
                                 style={{ 
-                                    background: 'linear-gradient(135deg, #ef4444, #b91c1c)', 
+                                    backgroundColor: 'var(--bg-card)', 
+                                    border: '1px solid var(--border-color)',
                                     borderRadius: '1rem', 
-                                    color: '#fff',
-                                    transition: 'transform 0.2s ease'
+                                    transition: 'all 0.2s ease'
                                 }}
                             >
                                 <div className="d-flex align-items-center justify-content-between mb-2">
-                                    <span className="small text-white-50 fw-bold text-uppercase tracking-wider">My Clinical Reviews</span>
-                                    <div className="rounded-circle p-2 bg-white bg-opacity-25 d-flex align-items-center justify-content-center" style={{ width: 38, height: 38 }}>
-                                        <i className="fa-solid fa-stethoscope text-white"></i>
+                                    <span className="small fw-bold text-uppercase tracking-wider" style={{ color: 'var(--text-sub)' }}>Clinical Reviews</span>
+                                    <div className="rounded-3 p-2 bg-info-subtle text-info d-flex align-items-center justify-content-center" style={{ width: 38, height: 38 }}>
+                                        <i className="fa-solid fa-stethoscope"></i>
                                     </div>
                                 </div>
-                                <h2 className="fw-bold mb-1 text-white">{stats.total_consultations}</h2>
-                                <div className="d-flex align-items-center justify-content-between small text-white-50 mt-1">
-                                    <span>Recorded Consultations</span>
-                                    <span className="text-white fw-bold">View Reviews <i className="fa-solid fa-arrow-right ms-1"></i></span>
+                                <h2 className="fw-bold mb-1 text-main">{stats.total_consultations || 0}</h2>
+                                <div className="d-flex align-items-center justify-content-between small mt-2 pt-2 border-top" style={{ borderColor: 'var(--border-color)' }}>
+                                    <span style={{ color: 'var(--text-muted)' }}>Logged Sessions</span>
+                                    <span className="text-primary fw-semibold">View Reviews &rarr;</span>
                                 </div>
                             </div>
                         ) : (
                             <div 
                                 className="card border-0 shadow-sm h-100 p-3 cursor-pointer fetchDoctors"
                                 style={{ 
-                                    background: 'linear-gradient(135deg, #0284c7, #0369a1)', 
+                                    backgroundColor: 'var(--bg-card)', 
+                                    border: '1px solid var(--border-color)',
                                     borderRadius: '1rem', 
-                                    color: '#fff',
-                                    transition: 'transform 0.2s ease'
+                                    transition: 'all 0.2s ease'
                                 }}
                             >
                                 <div className="d-flex align-items-center justify-content-between mb-2">
-                                    <span className="small text-white-50 fw-bold text-uppercase tracking-wider">Doctors &amp; Staff</span>
-                                    <div className="rounded-circle p-2 bg-white bg-opacity-25 d-flex align-items-center justify-content-center" style={{ width: 38, height: 38 }}>
-                                        <i className="fa-solid fa-user-doctor text-white"></i>
+                                    <span className="small fw-bold text-uppercase tracking-wider" style={{ color: 'var(--text-sub)' }}>Doctors &amp; Staff</span>
+                                    <div className="rounded-3 p-2 bg-info-subtle text-info d-flex align-items-center justify-content-center" style={{ width: 38, height: 38 }}>
+                                        <i className="fa-solid fa-user-doctor"></i>
                                     </div>
                                 </div>
-                                <h2 className="fw-bold mb-1 text-white">{stats.total_doctors}</h2>
-                                <div className="d-flex align-items-center justify-content-between small text-white-50 mt-1">
-                                    <span>Certified Clinical Staff</span>
-                                    <span className="text-white fw-bold">View Doctors <i className="fa-solid fa-arrow-right ms-1"></i></span>
+                                <h2 className="fw-bold mb-1 text-main">{stats.total_doctors}</h2>
+                                <div className="d-flex align-items-center justify-content-between small mt-2 pt-2 border-top" style={{ borderColor: 'var(--border-color)' }}>
+                                    <span style={{ color: 'var(--text-muted)' }}>Certified Practitioners</span>
+                                    <span className="text-primary fw-semibold">View Staff &rarr;</span>
                                 </div>
                             </div>
                         )}
@@ -267,113 +280,115 @@ export default class Dashboard extends React.Component {
                             <div 
                                 className="card border-0 shadow-sm h-100 p-3"
                                 style={{ 
-                                    background: 'linear-gradient(135deg, #10b981, #059669)', 
-                                    borderRadius: '1rem', 
-                                    color: '#fff' 
+                                    backgroundColor: 'var(--bg-card)', 
+                                    border: '1px solid var(--border-color)',
+                                    borderRadius: '1rem' 
                                 }}
                             >
                                 <div className="d-flex align-items-center justify-content-between mb-2">
-                                    <span className="small text-white-50 fw-bold text-uppercase tracking-wider">Cohort Adherence</span>
-                                    <div className="rounded-circle p-2 bg-white bg-opacity-25 d-flex align-items-center justify-content-center" style={{ width: 38, height: 38 }}>
-                                        <i className="fa-solid fa-chart-pie text-white"></i>
+                                    <span className="small fw-bold text-uppercase tracking-wider" style={{ color: 'var(--text-sub)' }}>Cohort Adherence</span>
+                                    <div className="rounded-3 p-2 bg-success-subtle text-success d-flex align-items-center justify-content-center" style={{ width: 38, height: 38 }}>
+                                        <i className="fa-solid fa-chart-pie"></i>
                                     </div>
                                 </div>
-                                <h2 className="fw-bold mb-1 text-white">{stats.compliance_rate}%</h2>
-                                <div className="d-flex align-items-center justify-content-between small text-white-50 mt-1">
-                                    <span>Target Adherence</span>
-                                    <span className="badge bg-white text-success fw-bold py-1 px-2">High Adherence</span>
+                                <h2 className="fw-bold mb-1 text-main">{stats.compliance_rate}%</h2>
+                                <div className="d-flex align-items-center justify-content-between small mt-2 pt-2 border-top" style={{ borderColor: 'var(--border-color)' }}>
+                                    <span style={{ color: 'var(--text-muted)' }}>Target Protocol</span>
+                                    <span className="badge bg-success-subtle text-success fw-semibold py-1 px-2">High Adherence</span>
                                 </div>
                             </div>
                         ) : isRoot ? (
                             <div 
                                 className="card border-0 shadow-sm h-100 p-3 cursor-pointer fetchAdmins"
                                 style={{ 
-                                    background: 'linear-gradient(135deg, #10b981, #059669)', 
+                                    backgroundColor: 'var(--bg-card)', 
+                                    border: '1px solid var(--border-color)',
                                     borderRadius: '1rem', 
-                                    color: '#fff',
-                                    transition: 'transform 0.2s ease'
+                                    transition: 'all 0.2s ease'
                                 }}
                             >
                                 <div className="d-flex align-items-center justify-content-between mb-2">
-                                    <span className="small text-white-50 fw-bold text-uppercase tracking-wider">System Administrators</span>
-                                    <div className="rounded-circle p-2 bg-white bg-opacity-25 d-flex align-items-center justify-content-center" style={{ width: 38, height: 38 }}>
-                                        <i className="fa-solid fa-user-shield text-white"></i>
+                                    <span className="small fw-bold text-uppercase tracking-wider" style={{ color: 'var(--text-sub)' }}>System Admins</span>
+                                    <div className="rounded-3 p-2 bg-dark-subtle text-dark d-flex align-items-center justify-content-center" style={{ width: 38, height: 38 }}>
+                                        <i className="fa-solid fa-user-shield"></i>
                                     </div>
                                 </div>
-                                <h2 className="fw-bold mb-1 text-white">{stats.total_admins}</h2>
-                                <div className="d-flex align-items-center justify-content-between small text-white-50 mt-1">
-                                    <span>Root &amp; Clinic Admins</span>
-                                    <span className="text-white fw-bold">Manage Admins <i className="fa-solid fa-arrow-right ms-1"></i></span>
+                                <h2 className="fw-bold mb-1 text-main">{stats.total_admins}</h2>
+                                <div className="d-flex align-items-center justify-content-between small mt-2 pt-2 border-top" style={{ borderColor: 'var(--border-color)' }}>
+                                    <span style={{ color: 'var(--text-muted)' }}>Root &amp; Clinic Admins</span>
+                                    <span className="text-primary fw-semibold">Manage Admins &rarr;</span>
                                 </div>
                             </div>
                         ) : (
                             <div 
                                 className="card border-0 shadow-sm h-100 p-3 cursor-pointer fetchConsultations"
                                 style={{ 
-                                    background: 'linear-gradient(135deg, #8b5cf6, #7c3aed)', 
+                                    backgroundColor: 'var(--bg-card)', 
+                                    border: '1px solid var(--border-color)',
                                     borderRadius: '1rem', 
-                                    color: '#fff',
-                                    transition: 'transform 0.2s ease'
+                                    transition: 'all 0.2s ease'
                                 }}
                             >
                                 <div className="d-flex align-items-center justify-content-between mb-2">
-                                    <span className="small text-white-50 fw-bold text-uppercase tracking-wider">Clinical Reviews</span>
-                                    <div className="rounded-circle p-2 bg-white bg-opacity-25 d-flex align-items-center justify-content-center" style={{ width: 38, height: 38 }}>
-                                        <i className="fa-solid fa-stethoscope text-white"></i>
+                                    <span className="small fw-bold text-uppercase tracking-wider" style={{ color: 'var(--text-sub)' }}>Clinical Reviews</span>
+                                    <div className="rounded-3 p-2 bg-success-subtle text-success d-flex align-items-center justify-content-center" style={{ width: 38, height: 38 }}>
+                                        <i className="fa-solid fa-notes-medical"></i>
                                     </div>
                                 </div>
-                                <h2 className="fw-bold mb-1 text-white">{stats.total_consultations}</h2>
-                                <div className="d-flex align-items-center justify-content-between small text-white-50 mt-1">
-                                    <span>Logged Consultations</span>
-                                    <span className="text-white fw-bold">View Reviews <i className="fa-solid fa-arrow-right ms-1"></i></span>
+                                <h2 className="fw-bold mb-1 text-main">{stats.total_consultations || 0}</h2>
+                                <div className="d-flex align-items-center justify-content-between small mt-2 pt-2 border-top" style={{ borderColor: 'var(--border-color)' }}>
+                                    <span style={{ color: 'var(--text-muted)' }}>Doctor Assessments</span>
+                                    <span className="text-primary fw-semibold">View Reviews &rarr;</span>
                                 </div>
                             </div>
                         )}
                     </div>
 
-                    {/* Card 4: Avg Time for Doctor / Pending Intake for Admin & Root */}
+                    {/* Card 4: Avg Time for Doctor / Pending Intake for Admin & Root (Attention Highlight) */}
                     <div className="col-12 col-sm-6 col-xl-3">
                         {isDoctor ? (
                             <div 
                                 className="card border-0 shadow-sm h-100 p-3"
                                 style={{ 
-                                    background: 'linear-gradient(135deg, #0284c7, #0369a1)', 
-                                    borderRadius: '1rem', 
-                                    color: '#fff' 
+                                    backgroundColor: 'var(--bg-card)', 
+                                    border: '1px solid var(--border-color)',
+                                    borderRadius: '1rem' 
                                 }}
                             >
                                 <div className="d-flex align-items-center justify-content-between mb-2">
-                                    <span className="small text-white-50 fw-bold text-uppercase tracking-wider">Avg Daily Prescribed</span>
-                                    <div className="rounded-circle p-2 bg-white bg-opacity-25 d-flex align-items-center justify-content-center" style={{ width: 38, height: 38 }}>
-                                        <i className="fa-solid fa-stopwatch text-white"></i>
+                                    <span className="small fw-bold text-uppercase tracking-wider" style={{ color: 'var(--text-sub)' }}>Avg Daily Prescribed</span>
+                                    <div className="rounded-3 p-2 bg-primary-subtle text-primary d-flex align-items-center justify-content-center" style={{ width: 38, height: 38 }}>
+                                        <i className="fa-solid fa-stopwatch"></i>
                                     </div>
                                 </div>
-                                <h2 className="fw-bold mb-1 text-white">{stats.avg_training_time} <span className="fs-6 fw-normal text-white-50">min</span></h2>
-                                <div className="d-flex align-items-center justify-content-between small text-white-50 mt-1">
-                                    <span>Prescribed Therapy Plan</span>
-                                    <span className="badge bg-white text-info fw-bold py-1 px-2">Standard</span>
+                                <h2 className="fw-bold mb-1 text-main">{stats.avg_training_time} <span className="fs-6 fw-normal" style={{ color: 'var(--text-sub)' }}>min</span></h2>
+                                <div className="d-flex align-items-center justify-content-between small mt-2 pt-2 border-top" style={{ borderColor: 'var(--border-color)' }}>
+                                    <span style={{ color: 'var(--text-muted)' }}>Daily Standard</span>
+                                    <span className="badge bg-primary-subtle text-primary fw-semibold py-1 px-2">20 min plan</span>
                                 </div>
                             </div>
                         ) : (
                             <div 
                                 className="card border-0 shadow-sm h-100 p-3 cursor-pointer fetchRegisters"
                                 style={{ 
-                                    background: 'linear-gradient(135deg, #f59e0b, #d97706)', 
+                                    backgroundColor: 'var(--bg-card)', 
+                                    border: stats.pending_registers > 0 ? '1px solid var(--warning)' : '1px solid var(--border-color)',
                                     borderRadius: '1rem', 
-                                    color: '#fff',
-                                    transition: 'transform 0.2s ease'
+                                    transition: 'all 0.2s ease'
                                 }}
                             >
                                 <div className="d-flex align-items-center justify-content-between mb-2">
-                                    <span className="small text-white-50 fw-bold text-uppercase tracking-wider">Pending Registrations</span>
-                                    <div className="rounded-circle p-2 bg-white bg-opacity-25 d-flex align-items-center justify-content-center" style={{ width: 38, height: 38 }}>
-                                        <i className="fa-solid fa-user-clock text-white"></i>
+                                    <span className="small fw-bold text-uppercase tracking-wider" style={{ color: 'var(--text-sub)' }}>Pending Registrations</span>
+                                    <div className={`rounded-3 p-2 ${stats.pending_registers > 0 ? 'bg-warning-subtle text-warning' : 'bg-secondary-subtle text-secondary'} d-flex align-items-center justify-content-center`} style={{ width: 38, height: 38 }}>
+                                        <i className="fa-solid fa-user-clock"></i>
                                     </div>
                                 </div>
-                                <h2 className="fw-bold mb-1 text-white">{stats.pending_registers}</h2>
-                                <div className="d-flex align-items-center justify-content-between small text-white-50 mt-1">
-                                    <span className="badge bg-white text-dark py-1 px-2">{stats.pending_registers > 0 ? 'Requires Action' : 'All Clear'}</span>
-                                    <span className="text-white fw-bold">Review <i className="fa-solid fa-arrow-right ms-1"></i></span>
+                                <h2 className="fw-bold mb-1 text-main">{stats.pending_registers}</h2>
+                                <div className="d-flex align-items-center justify-content-between small mt-2 pt-2 border-top" style={{ borderColor: 'var(--border-color)' }}>
+                                    <span className={`badge ${stats.pending_registers > 0 ? 'bg-warning-subtle text-warning border border-warning-subtle' : 'bg-success-subtle text-success border border-success-subtle'} py-1 px-2 fw-semibold`}>
+                                        {stats.pending_registers > 0 ? 'Requires Action' : 'All Clear'}
+                                    </span>
+                                    <span className="text-primary fw-semibold">Review &rarr;</span>
                                 </div>
                             </div>
                         )}
@@ -493,7 +508,7 @@ export default class Dashboard extends React.Component {
 
                             <div className="d-flex align-items-center justify-content-between small mt-2 pt-2 border-top" style={{ borderColor: 'var(--border-color)', color: 'var(--text-sub)' }}>
                                 <span><i className="fa-solid fa-circle text-primary me-1" style={{ fontSize: 8 }}></i> Completed Sessions</span>
-                                <span>Peak Day: <strong style={{ color: 'var(--text-main)' }}>Saturday (62 sessions)</strong></span>
+                                <span>Peak Day: <strong style={{ color: 'var(--text-main)' }}>{peakDayName} ({peakDayVolume} sessions)</strong></span>
                             </div>
                         </div>
                     </div>
@@ -520,7 +535,7 @@ export default class Dashboard extends React.Component {
                                     return (
                                         <div key={idx}>
                                             <div className="d-flex align-items-center justify-content-between small mb-1">
-                                                <span className="fw-semibold text-main">{name}</span>
+                                                <span className="fw-semibold text-main">{GAME_DISPLAY_NAMES[name] || name}</span>
                                                 <span className="fw-bold" style={{ color: 'var(--text-sub)' }}>{count} plays</span>
                                             </div>
                                             <div className="progress" style={{ height: 8, borderRadius: 4, backgroundColor: 'var(--bg-surface-secondary)' }}>

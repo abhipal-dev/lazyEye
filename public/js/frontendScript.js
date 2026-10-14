@@ -94,8 +94,7 @@ $(document).on('submit', 'form#register_form', function (e) {
                     })
                 }
                 else {
-                    console.log("Passed");
-                    sweetAlert('Sended', 'Your Request is Sended.');
+                    sweetAlert('Submitted', 'Your registration request has been submitted for review.', 'success');
                     emptyForm();
                 }
 

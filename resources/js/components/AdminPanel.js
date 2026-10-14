@@ -90,11 +90,16 @@ export default class AdminDashboard extends React.Component {
                         <ul className="navbar-nav">
                             <li className="nav-item dropdown">
                                 <a className="nav-link dropdown-toggle d-flex align-items-center gap-2 text-main px-2 py-1" id="navbarDropdown" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">
-                                    <div className="rounded-circle d-flex align-items-center justify-content-center text-white fw-bold shadow-sm" style={{ width: 34, height: 34, minWidth: 34, background: isDoctor ? 'linear-gradient(135deg, #0284c7, #0369a1)' : isRoot ? 'linear-gradient(135deg, #334155, #0f172a)' : 'linear-gradient(135deg, #2563eb, #1d4ed8)', fontSize: '0.85rem' }}>
-                                        {this.state.userProfileImage && !this.state.userProfileImage.includes('default') ? (
-                                            <img src={`/${this.state.userProfileImage}`} alt="Avatar" className="rounded-circle w-100 h-100" style={{ objectFit: 'cover' }} />
-                                        ) : (
-                                            (this.state.fullname ? this.state.fullname.charAt(0) : (isDoctor ? 'D' : 'A')).toUpperCase()
+                                    <div className="rounded-circle d-flex align-items-center justify-content-center text-white fw-bold shadow-sm position-relative overflow-hidden" style={{ width: 34, height: 34, minWidth: 34, background: isDoctor ? 'linear-gradient(135deg, #0284c7, #0369a1)' : isRoot ? 'linear-gradient(135deg, #334155, #0f172a)' : 'linear-gradient(135deg, #2563eb, #1d4ed8)', fontSize: '0.85rem' }}>
+                                        <span>{(this.state.fullname ? this.state.fullname.charAt(0) : (isDoctor ? 'D' : 'A')).toUpperCase()}</span>
+                                        {this.state.userProfileImage && !this.state.userProfileImage.includes('default') && (
+                                            <img 
+                                                src={`/${this.state.userProfileImage}`} 
+                                                alt="" 
+                                                className="position-absolute top-0 start-0 w-100 h-100 rounded-circle" 
+                                                style={{ objectFit: 'cover' }} 
+                                                onError={(e) => { e.currentTarget.style.display = 'none'; }}
+                                            />
                                         )}
                                     </div>
                                     <div className="d-none d-md-flex flex-column text-start lh-sm me-1">

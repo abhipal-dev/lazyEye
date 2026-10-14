@@ -14,17 +14,17 @@ export default class Home extends React.Component {
                         <div className="row align-items-center g-5">
                             <div className="col-12 col-lg-7 order-1 order-lg-0" data-aos="fade-up">
                                 <span className="badge bg-primary-subtle text-primary px-3 py-2 rounded-pill fw-bold mb-3">
-                                    <i className="fa-solid fa-eye me-1"></i> Medical Dichoptic Vision Therapy
+                                    <i className="fa-solid fa-eye me-1"></i> Digital Therapeutics Research Prototype
                                 </span>
                                 <h1 className="hero-title">
-                                    Restoring Binocular Vision with <span className="gradient-text">Smart Therapy Games</span>
+                                    Restoring Binocular Vision with <span className="gradient-text">Dichoptic Therapy Games</span>
                                 </h1>
                                 <p className="hero-desc">
-                                    Empowering children and adults with Amblyopia (Lazy Eye). Our scientifically designed dichoptic visual exercises train both eyes to work in synchrony through engaging gameplay.
+                                    A specialized amblyopia rehabilitation system. Play for 15 to 20 minutes a day wearing red/cyan glasses while calibrated games train both eyes to overcome visual cortex suppression.
                                 </p>
                                 <div className="d-flex flex-wrap gap-3">
                                     <a href="/Register_view" className="btn-modern-primary py-3 px-4">
-                                        <i className="fa-solid fa-play me-2"></i> Start Therapy Free
+                                        <i className="fa-solid fa-play me-2"></i> Start Therapy
                                     </a>
                                     <a href="/Login_view" className="btn-modern-outline py-3 px-4">
                                         <i className="fa-solid fa-user me-2"></i> Patient Login
@@ -42,10 +42,10 @@ export default class Home extends React.Component {
                                         className="hero-photo-img"
                                     />
                                     <div className="hero-photo-badge hero-badge-top">
-                                        <i className="fa-solid fa-circle-check text-success me-1"></i> Clinically Tested
+                                        <i className="fa-solid fa-code-branch text-primary me-1"></i> Research Prototype
                                     </div>
                                     <div className="hero-photo-badge hero-badge-bottom">
-                                        <i className="fa-solid fa-glasses text-primary me-1"></i> Red/Cyan Glasses
+                                        <i className="fa-solid fa-glasses text-info me-1"></i> Red/Cyan Anaglyph
                                     </div>
                                 </div>
                             </div>
@@ -53,29 +53,29 @@ export default class Home extends React.Component {
                     </div>
                 </section>
 
-                {/* Stats Section */}
+                {/* Technical Protocol & Platform Specifications (Honest Specs Strip) */}
                 <section className="py-4">
                     <div className="container">
                         <div className="stats-container">
                             <div className="stat-card" data-aos="fade-up" data-aos-delay="100">
-                                <div className="stat-number">100+</div>
-                                <div className="stat-label">Active Patients</div>
-                                <small className="text-muted">Recovering visual acuity</small>
+                                <div className="stat-number">10</div>
+                                <div className="stat-label">Dichoptic Engines</div>
+                                <small className="text-muted">Canvas &amp; WebGL gamification</small>
                             </div>
                             <div className="stat-card" data-aos="fade-up" data-aos-delay="200">
-                                <div className="stat-number">12+</div>
-                                <div className="stat-label">Therapy Games</div>
-                                <small className="text-muted">Targeted suppression breaking</small>
+                                <div className="stat-number">20m</div>
+                                <div className="stat-label">Daily Standard Session</div>
+                                <small className="text-muted">Optometrist recommended protocol</small>
                             </div>
                             <div className="stat-card" data-aos="fade-up" data-aos-delay="300">
-                                <div className="stat-number">94%</div>
-                                <div className="stat-label">Compliance Rate</div>
-                                <small className="text-muted">High engagement gamification</small>
+                                <div className="stat-number">Dual</div>
+                                <div className="stat-label">Red/Cyan Sliders</div>
+                                <small className="text-muted">Independent contrast balancing</small>
                             </div>
                             <div className="stat-card" data-aos="fade-up" data-aos-delay="400">
-                                <div className="stat-number">24/7</div>
-                                <div className="stat-label">Home Access</div>
-                                <small className="text-muted">Daily progress tracking</small>
+                                <div className="stat-number">Live</div>
+                                <div className="stat-label">Adherence Logs</div>
+                                <small className="text-muted">Clinical dashboard telemetry</small>
                             </div>
                         </div>
                     </div>
@@ -85,10 +85,10 @@ export default class Home extends React.Component {
                 <section id="INS" className="py-5">
                     <div className="container">
                         <div className="text-center mb-5" data-aos="fade-up">
-                            <span className="badge bg-primary-subtle text-primary px-3 py-2 rounded-pill fw-bold mb-2">Instructions</span>
+                            <span className="badge bg-primary-subtle text-primary px-3 py-2 rounded-pill fw-bold mb-2">Protocol</span>
                             <h2 className="fw-bold">How Dichoptic Therapy Works</h2>
                             <p className="text-muted mx-auto" style={{ maxWidth: '600px' }}>
-                                Dichoptic stimulation presents different visual stimuli to each eye simultaneously to eliminate brain suppression.
+                                Dichoptic stimulation presents complementary visual stimuli to each eye simultaneously to actively break cortical suppression.
                             </p>
                         </div>
 
@@ -98,9 +98,9 @@ export default class Home extends React.Component {
                                     <div className="d-flex align-items-center justify-content-center bg-primary-subtle rounded-3 p-3 mb-3 text-primary" style={{ width: '56px', height: '56px' }}>
                                         <i className="fa-solid fa-glasses fa-xl"></i>
                                     </div>
-                                    <h5 className="fw-bold mb-2">1. Put On Anaglyph Glasses</h5>
-                                    <p className="text-muted small mb-0">
-                                        Wear standard Red/Blue or Red/Cyan glasses. The red filter covers one eye and the blue/cyan covers the other eye.
+                                    <h5 className="fw-bold mb-2 text-main">1. Put On Red/Cyan Glasses</h5>
+                                    <p className="text-sub small mb-0">
+                                        Wear standard Red/Cyan anaglyph glasses. The red filter covers the amblyopic eye, and the cyan filter covers the dominant eye.
                                     </p>
                                 </div>
                             </div>
@@ -109,9 +109,9 @@ export default class Home extends React.Component {
                                     <div className="d-flex align-items-center justify-content-center bg-primary-subtle rounded-3 p-3 mb-3 text-primary" style={{ width: '56px', height: '56px' }}>
                                         <i className="fa-solid fa-sliders fa-xl"></i>
                                     </div>
-                                    <h5 className="fw-bold mb-2">2. Calibrate Contrast</h5>
-                                    <p className="text-muted small mb-0">
-                                        Use our in-app calibration slider to match lens filters. You will adjust contrast so the weaker eye receives higher stimulus.
+                                    <h5 className="fw-bold mb-2 text-main">2. Calibrate Contrast</h5>
+                                    <p className="text-sub small mb-0">
+                                        Use our in-app calibration slider to match lens filters. You will adjust contrast so the weaker eye receives higher stimulus than the dominant eye.
                                     </p>
                                 </div>
                             </div>
@@ -120,9 +120,9 @@ export default class Home extends React.Component {
                                     <div className="d-flex align-items-center justify-content-center bg-primary-subtle rounded-3 p-3 mb-3 text-primary" style={{ width: '56px', height: '56px' }}>
                                         <i className="fa-solid fa-trophy fa-xl"></i>
                                     </div>
-                                    <h5 className="fw-bold mb-2">3. Play Daily & Track</h5>
-                                    <p className="text-muted small mb-0">
-                                        Play your prescribed 15-20 minute session. Elements are split between both eyes, forcing binocular fusion to score.
+                                    <h5 className="fw-bold mb-2 text-main">3. Play Daily &amp; Track</h5>
+                                    <p className="text-sub small mb-0">
+                                        Play your prescribed 15 to 20 minute session. Essential game elements are split between eyes, requiring binocular combination to score.
                                     </p>
                                 </div>
                             </div>
@@ -135,10 +135,10 @@ export default class Home extends React.Component {
                     <div className="container">
                         <div className="row align-items-center g-5">
                             <div className="col-12 col-lg-6" data-aos="fade-right">
-                                <span className="badge bg-primary-subtle text-primary px-3 py-2 rounded-pill fw-bold mb-2">Neuro-Optometric Science</span>
-                                <h2 className="fw-bold mb-3">Why Dichoptic Therapy Works Better Than Patching</h2>
+                                <span className="badge bg-primary-subtle text-primary px-3 py-2 rounded-pill fw-bold mb-2">Neuro-Optometric Principles</span>
+                                <h2 className="fw-bold mb-3 text-main">Active Dichoptic Stimulation &amp; Suppression Relief</h2>
                                 <p className="text-sub">
-                                    Traditional eye-patching isolates the amblyopic eye passively, which often causes frustration and high relapse rates. In contrast, our <strong>dichoptic system</strong> presents complementary high-frequency targets to the lazy eye and low-contrast obstacles to the dominant eye simultaneously.
+                                    Traditional patching occludes the dominant eye passively, which often causes low adherence and does not directly train binocular cooperation. In contrast, <strong>dichoptic therapy</strong> presents complementary high-contrast targets to the amblyopic eye and lower-contrast obstacles to the fellow eye.
                                 </p>
                                 <div className="d-flex flex-column gap-3 mb-4">
                                     <div className="d-flex align-items-start gap-3 p-3 rounded-3" style={{ background: 'var(--bg-card)', border: '1px solid var(--border-color)' }}>
@@ -146,8 +146,8 @@ export default class Home extends React.Component {
                                             <i className="fa-solid fa-eye-low-vision fa-lg"></i>
                                         </div>
                                         <div>
-                                            <h6 className="fw-bold mb-1 text-main">Suppression Elimination</h6>
-                                            <p className="small text-sub mb-0">Gradually retrains cortical neurons in visual cortex area V1 to process input from both eyes simultaneously.</p>
+                                            <h6 className="fw-bold mb-1 text-main">Suppression Reduction</h6>
+                                            <p className="small text-sub mb-0">Encourages cortical neurons in the visual cortex (V1) to process visual input simultaneously from both eyes.</p>
                                         </div>
                                     </div>
                                     <div className="d-flex align-items-start gap-3 p-3 rounded-3" style={{ background: 'var(--bg-card)', border: '1px solid var(--border-color)' }}>
@@ -155,8 +155,8 @@ export default class Home extends React.Component {
                                             <i className="fa-solid fa-cube fa-lg"></i>
                                         </div>
                                         <div>
-                                            <h6 className="fw-bold mb-1 text-main">Stereopsis & Depth Perception</h6>
-                                            <p className="small text-sub mb-0">Restores true 3D spatial awareness, coordination, and binocular fusion that patching cannot achieve.</p>
+                                            <h6 className="fw-bold mb-1 text-main">Stereopsis &amp; Depth Awareness</h6>
+                                            <p className="small text-sub mb-0">Trains spatial tracking, saccadic timing, and 3D depth perception through real-time feedback loops.</p>
                                         </div>
                                     </div>
                                 </div>
@@ -173,8 +173,8 @@ export default class Home extends React.Component {
                                         style={{ maxHeight: '360px', width: '100%', objectFit: 'contain' }}
                                     />
                                     <div className="d-flex align-items-center justify-content-center gap-3 mt-3 text-sub small">
-                                        <span className="d-flex align-items-center gap-1"><i className="fa-solid fa-circle text-danger"></i> Red Filter (Weaker Eye)</span>
-                                        <span className="d-flex align-items-center gap-1"><i className="fa-solid fa-circle text-info"></i> Cyan Filter (Dominant Eye)</span>
+                                        <span className="d-flex align-items-center gap-1"><i className="fa-solid fa-circle text-danger"></i> Red Channel (Amblyopic Eye)</span>
+                                        <span className="d-flex align-items-center gap-1"><i className="fa-solid fa-circle text-info"></i> Cyan Channel (Dominant Eye)</span>
                                     </div>
                                 </div>
                             </div>
@@ -187,19 +187,19 @@ export default class Home extends React.Component {
                     <div className="container">
                         <div className="text-center mb-5" data-aos="fade-up">
                             <span className="badge bg-primary-subtle text-primary px-3 py-2 rounded-pill fw-bold mb-2">Therapeutic Curriculum</span>
-                            <h2 className="fw-bold">12 Clinically Calibrated Games</h2>
+                            <h2 className="fw-bold">10 Dichoptic Therapy Engines</h2>
                             <p className="text-sub mx-auto" style={{ maxWidth: '650px' }}>
                                 Interactive gameplay designed to stimulate saccadic eye movements, visual tracking, and binocular coordination.
                             </p>
                         </div>
                         <div className="row g-4">
                             {[
-                                { name: 'Snake Rescue', icon: '/images/snake-mascot.svg', tag: 'Hand-Eye Tracking', desc: 'Control the snake while elements split across red and blue channels.' },
-                                { name: 'Flappy Bird', icon: '/images/flappy-mascot.svg', tag: 'Visual Timing', desc: 'Fly through obstacles requiring simultaneous dual-eye recognition.' },
-                                { name: 'Menja Slice', icon: '/images/menja-mascot.svg', tag: 'Spatial Perception', desc: 'Precision slicing that exercises rapid cortical processing.' },
-                                { name: 'Tetris Fusion', icon: '/images/tetris-mascot.svg', tag: 'Spatial Orientation', desc: 'Falling blocks requiring depth perception and color filter alignment.' },
-                                { name: 'Bubble Shooter', icon: '/images/bubbles-mascot.svg', tag: 'Foveal Fixation', desc: 'Aim at high-contrast bubbles to train amblyopic central vision.' },
-                                { name: 'Ping Pong 3D', icon: '/images/pingpong-mascot.svg', tag: 'Binocular Tracking', desc: 'Classic paddle game with dynamic speed matching patient visual acuity.' }
+                                { name: 'Dichoptic Snake', icon: '/images/snake-mascot.svg', tag: 'Hand-Eye Tracking', desc: 'Control the snake while target food and boundaries are split across red and cyan channels.' },
+                                { name: 'Altitude Flight', icon: '/images/flappy-mascot.svg', tag: 'Visual Timing', desc: 'Navigate flight obstacles requiring simultaneous dual-eye recognition to judge gaps.' },
+                                { name: '3D Spatial Slicer', icon: '/images/menja-mascot.svg', tag: 'Spatial Perception', desc: 'Precision slicing that exercises rapid cortical processing and stereoscopic tracking.' },
+                                { name: 'Block Fusion', icon: '/images/tetris-mascot.svg', tag: 'Spatial Orientation', desc: 'Falling blocks requiring depth perception and color filter alignment to clear rows.' },
+                                { name: 'Bubble Target Aim', icon: '/images/bubbles-mascot.svg', tag: 'Foveal Fixation', desc: 'Aim at high-contrast bubbles to train amblyopic central vision and fixation.' },
+                                { name: 'Table Rally 3D', icon: '/images/pingpong-mascot.svg', tag: 'Binocular Tracking', desc: 'Dynamic paddle rally with speed adjustment matching patient visual acuity.' }
                             ].map((game, i) => (
                                 <div key={i} className="col-12 col-md-6 col-lg-4" data-aos="fade-up" data-aos-delay={i * 80}>
                                     <div className="modern-card h-100 d-flex flex-column justify-content-between p-4">
@@ -214,24 +214,52 @@ export default class Home extends React.Component {
                                             <p className="text-sub small mb-3">{game.desc}</p>
                                         </div>
                                         <a href="/Login_view" className="btn btn-sm btn-outline-primary rounded-pill w-100 fw-semibold">
-                                            Play in Therapy <i className="fa-solid fa-arrow-right ms-1"></i>
+                                            Launch in Therapy <i className="fa-solid fa-arrow-right ms-1"></i>
                                         </a>
                                     </div>
                                 </div>
                             ))}
                         </div>
+
+                        <div className="text-center mt-5">
+                            <a href="/user" className="btn btn-outline-primary px-4 py-2 rounded-pill fw-semibold">
+                                <i className="fa-solid fa-gamepad me-2"></i> View All 10 Games in Patient Panel &rarr;
+                            </a>
+                        </div>
+                    </div>
+                </section>
+
+                {/* Provenance & Engineering Context Section */}
+                <section className="py-4" style={{ backgroundColor: 'var(--bg-surface-secondary)' }}>
+                    <div className="container">
+                        <div className="card border-0 shadow-sm p-4" style={{ backgroundColor: 'var(--bg-card)', border: '1px solid var(--border-color)', borderRadius: '1rem' }}>
+                            <div className="row align-items-center g-4">
+                                <div className="col-12 col-md-8">
+                                    <span className="badge bg-info-subtle text-info px-3 py-1 rounded-pill fw-bold mb-2">Project Provenance</span>
+                                    <h4 className="fw-bold text-main mb-2">Engineered by Abhishek Pal at Softcruise Technologies</h4>
+                                    <p className="text-sub small mb-0">
+                                        Originally developed (Jan–Jun 2023) as a digital therapeutics research prototype for amblyopia gamification. Modernized on React &amp; Laravel with 10 custom Canvas/WebGL engines, postMessage bridges for mobile WebViews, and clinical adherence tracking.
+                                    </p>
+                                </div>
+                                <div className="col-12 col-md-4 text-md-end">
+                                    <a href="/Login_view?role=doctor" className="btn btn-primary rounded-pill px-4 py-2 fw-semibold">
+                                        <i className="fa-solid fa-user-doctor me-2"></i> Clinical Portal Demo
+                                    </a>
+                                </div>
+                            </div>
+                        </div>
                     </div>
                 </section>
 
                 {/* Contact Section */}
-                <section id="contact" className="py-5" style={{ backgroundColor: 'var(--bg-surface-secondary)' }}>
+                <section id="contact" className="py-5">
                     <div className="container">
                         <div className="row g-5 align-items-center">
                             <div className="col-12 col-lg-6" data-aos="fade-up">
                                 <span className="badge bg-primary-subtle text-primary px-3 py-2 rounded-pill fw-bold mb-2">Get In Touch</span>
                                 <h2 className="fw-bold mb-3">Have Questions About Vision Therapy?</h2>
                                 <p className="text-sub mb-4">
-                                    Our clinical team and support staff are here to assist patients, parents, and eye care professionals with equipment setup and session guidelines.
+                                    Contact us for questions regarding equipment setup, red/cyan glasses calibration, or session guidelines.
                                 </p>
                                 <div className="d-flex flex-column gap-3 mb-4">
                                     <div className="d-flex align-items-center gap-3 modern-card p-3">
@@ -239,7 +267,7 @@ export default class Home extends React.Component {
                                             <i className="fa-solid fa-phone"></i>
                                         </div>
                                         <div>
-                                            <small className="text-muted d-block">Optometry Helpline</small>
+                                            <small className="text-muted d-block">Helpline</small>
                                             <a href="tel:+919890376644" className="fw-bold text-main">+91 9890376644</a>
                                         </div>
                                     </div>
@@ -248,7 +276,7 @@ export default class Home extends React.Component {
                                             <i className="fa-solid fa-envelope"></i>
                                         </div>
                                         <div>
-                                            <small className="text-muted d-block">Clinical Inquiries</small>
+                                            <small className="text-muted d-block">Inquiries</small>
                                             <a href="mailto:info@lazyeye.com" className="fw-bold text-main">info@lazyeye.com</a>
                                         </div>
                                     </div>
@@ -256,8 +284,8 @@ export default class Home extends React.Component {
                             </div>
                             <div className="col-12 col-lg-6" data-aos="zoom-in">
                                 <div className="modern-card p-4 shadow-lg">
-                                    <h4 className="fw-bold mb-3 text-main">Quick Consultation Request</h4>
-                                    <form onSubmit={(e) => { e.preventDefault(); alert('Thank you! Our vision therapy specialist will contact you shortly.'); }}>
+                                    <h4 className="fw-bold mb-3 text-main">Consultation Request</h4>
+                                    <form onSubmit={(e) => { e.preventDefault(); alert('Thank you! Your therapy inquiry has been received.'); }}>
                                         <div className="mb-3">
                                             <label className="form-label text-sub small fw-semibold">Patient Name</label>
                                             <input type="text" className="form-control" placeholder="Full name of patient" required />
@@ -267,7 +295,7 @@ export default class Home extends React.Component {
                                             <input type="text" className="form-control" placeholder="Email address or phone number" required />
                                         </div>
                                         <div className="mb-3">
-                                            <label className="form-label text-sub small fw-semibold">Patient Age & Diagnosis</label>
+                                            <label className="form-label text-sub small fw-semibold">Patient Age &amp; Diagnosis</label>
                                             <input type="text" className="form-control" placeholder="e.g. 10 years old, Left eye Amblyopia" />
                                         </div>
                                         <button type="submit" className="btn-modern-primary w-100 py-3 justify-content-center fw-bold">

@@ -2,8 +2,7 @@ import React, { useState, useEffect } from 'react';
 
 export default function ThemeToggle({ className = '' }) {
     const [theme, setTheme] = useState(() => {
-        return localStorage.getItem('lazyeye-theme') || 
-            (window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light');
+        return localStorage.getItem('lazyeye-theme') || 'light';
     });
 
     useEffect(() => {

@@ -11,9 +11,9 @@
   --bg-header: rgba(255, 255, 255, 0.92);
   --bg-input: #ffffff;
   
-  --text-main: #0f172a;
-  --text-sub: #334155;
-  --text-muted: #64748b;
+  --text-main: #090d16;
+  --text-sub: #1e293b;
+  --text-muted: #475569;
   --text-inverse: #ffffff;
   
   --border-color: #e2e8f0;
@@ -47,9 +47,9 @@
   --bg-header: rgba(19, 28, 49, 0.92);
   --bg-input: #1a253c;
   
-  --text-main: #f8fafc;
-  --text-sub: #cbd5e1;
-  --text-muted: #94a3b8;
+  --text-main: #ffffff;
+  --text-sub: #e2e8f0;
+  --text-muted: #cbd5e1;
   --text-inverse: #0f172a;
   
   --border-color: #243049;
@@ -492,14 +492,26 @@ a:hover {
   margin-bottom: 1.25rem;
 }
 
-.modern-input-group i {
+.modern-input-group .input-wrapper {
+  position: relative;
+  width: 100%;
+}
+
+.modern-input-group i,
+.modern-input-group .input-wrapper i {
   position: absolute;
-  left: 1rem;
+  left: 1.1rem;
   top: 50%;
   transform: translateY(-50%);
   color: var(--text-muted);
   font-size: 1rem;
   pointer-events: none;
+  z-index: 2;
+  transition: color 0.2s ease;
+}
+
+.modern-input-group .input-wrapper:focus-within i {
+  color: var(--primary);
 }
 
 .modern-input {
