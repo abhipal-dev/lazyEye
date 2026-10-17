@@ -17,13 +17,21 @@ export default class AdminDashboard extends React.Component {
             fullname: '',
             username: '',
             data: {},
-            userProfileImage: ''
-        }
+            userProfileImage: '',
+            activeView: 'dashboard', // 'dashboard' or 'table'
+            activeTableCategory: 'fetchUsers'
+        };
     }
+
     componentDidMount() {
-        // console.log(this.props.id)
-        // console.log(this.state.username)
-        // console.log(this.state.data)
+        // Expose view switcher methods globally for adminScript and buttons
+        window.switchToAdminDashboard = () => {
+            this.switchToDashboard();
+        };
+        window.switchToAdminTable = (categoryFn) => {
+            this.switchToTable(categoryFn);
+        };
+
         let token = $('meta[name="csrf-token"]').attr('content');
         $.ajax({
             url: "/fetchLoginUser",
@@ -31,27 +39,36 @@ export default class AdminDashboard extends React.Component {
             headers: { 'X-CSRF-TOKEN': token },
             data: { id: this.props.id },
             success: (data) => {
-                console.log(data)
-                this.setState({
-                    id: data[0].id,
-                    fullname: data[0].fullname,
-                    username: data[0].username,
-                    data: data[0],
-                    userProfileImage: `storage/images/${data[0].image_address}`
-                })
-                // document.querySelector('#leftColorTestDiv').style.backgroundColor=data[0].left_eye_contrast_color
-                // document.querySelector('#rightColorTestDiv').style.backgroundColor=data[0].right_eye_contrast_color
-                // document.querySelector('#leftColorTestDiv').innerHTML=data[0].left_eye_contrast_color
-                // document.querySelector('#rightColorTestDiv').innerHTML=data[0].right_eye_contrast_color
-                // document.getElementById('leftEyeColor').value=data[0].left_eye_color
-                // document.getElementById('rightEyeColor').value=data[0].right_eye_color
-                // document.querySelector('#leftColorContrastSlider').defaultValue = data[0].left_eye_contrastvalue
-                // document.querySelector('#rightColorContrastSlider').defaultValue = data[0].right_eye_contrastvalue
-                // console.log("Saved data")
-                console.log(this.state.data)
+                if (data && data[0]) {
+                    this.setState({
+                        id: data[0].id,
+                        fullname: data[0].fullname,
+                        username: data[0].username,
+                        data: data[0],
+                        userProfileImage: `storage/images/${data[0].image_address}`
+                    });
+                }
             }
         });
     }
+
+    switchToDashboard = () => {
+        this.setState({ activeView: 'dashboard' });
+        $('#layoutSidenav_nav .nav-link').removeClass('active');
+        $('#layoutSidenav_nav .nav-link.dashboardButton').addClass('active');
+        $('.table-filter-btn').removeClass('active');
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+    };
+
+    switchToTable = (categoryFn) => {
+        const cat = categoryFn || 'fetchUsers';
+        this.setState({ activeView: 'table', activeTableCategory: cat }, () => {
+            if (typeof window[cat] === 'function') {
+                window[cat]();
+            }
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        });
+    };
     render() {
         const role = this.state.data?.accounttype || this.props.role || 'admin';
         const isDoctor = (role === 'doctor');
@@ -160,7 +177,7 @@ export default class AdminDashboard extends React.Component {
                                     <div className="sb-sidenav-menu-heading">
                                         {isDoctor ? 'Clinical Practice' : isRoot ? 'Superadmin Jurisdiction' : 'Clinic Operations'}
                                     </div>
-                                    <a className="nav-link dashboardButton cursor-pointer">
+                                    <a className={`nav-link dashboardButton cursor-pointer ${this.state.activeView === 'dashboard' ? 'active' : ''}`} onClick={() => this.switchToDashboard()}>
                                         <div className="sb-nav-link-icon"><i className="fa-solid fa-gauge-high"></i></div>
                                         {isDoctor ? 'Clinical Overview' : 'Overview Dashboard'}
                                     </a>
@@ -168,32 +185,32 @@ export default class AdminDashboard extends React.Component {
                                     <div className="sb-sidenav-menu-heading">
                                         {isDoctor ? 'Assigned Patients' : 'User & Patient Records'}
                                     </div>
-                                    <a className="nav-link fetchUsers cursor-pointer">
+                                    <a className={`nav-link fetchUsers cursor-pointer ${this.state.activeView === 'table' && this.state.activeTableCategory === 'fetchUsers' ? 'active' : ''}`} onClick={() => this.switchToTable('fetchUsers')}>
                                         <div className="sb-nav-link-icon"><i className="fa-solid fa-users text-primary"></i></div>
                                         {isDoctor ? 'My Assigned Patients' : 'Active Patients'}
                                     </a>
 
                                     {!isDoctor && (
-                                        <a className="nav-link fetchDoctors cursor-pointer">
+                                        <a className={`nav-link fetchDoctors cursor-pointer ${this.state.activeView === 'table' && this.state.activeTableCategory === 'fetchDoctors' ? 'active' : ''}`} onClick={() => this.switchToTable('fetchDoctors')}>
                                             <div className="sb-nav-link-icon"><i className="fa-solid fa-user-doctor text-info"></i></div>
                                             Doctors &amp; Staff
                                         </a>
                                     )}
 
-                                    <a className="nav-link fetchConsultations cursor-pointer">
+                                    <a className={`nav-link fetchConsultations cursor-pointer ${this.state.activeView === 'table' && this.state.activeTableCategory === 'fetchConsultations' ? 'active' : ''}`} onClick={() => this.switchToTable('fetchConsultations')}>
                                         <div className="sb-nav-link-icon"><i className="fa-solid fa-stethoscope text-danger"></i></div>
                                         {isDoctor ? 'My Clinical Reviews' : 'Clinical Reviews'}
                                     </a>
 
                                     {!isDoctor && (
-                                        <a className="nav-link fetchRegisters cursor-pointer">
+                                        <a className={`nav-link fetchRegisters cursor-pointer ${this.state.activeView === 'table' && this.state.activeTableCategory === 'fetchRegisters' ? 'active' : ''}`} onClick={() => this.switchToTable('fetchRegisters')}>
                                             <div className="sb-nav-link-icon"><i className="fa-solid fa-user-plus text-warning"></i></div>
                                             Pending Registrations
                                         </a>
                                     )}
 
                                     {isRoot && (
-                                        <a className="nav-link fetchAdmins cursor-pointer">
+                                        <a className={`nav-link fetchAdmins cursor-pointer ${this.state.activeView === 'table' && this.state.activeTableCategory === 'fetchAdmins' ? 'active' : ''}`} onClick={() => this.switchToTable('fetchAdmins')}>
                                             <div className="sb-nav-link-icon"><i className="fa-solid fa-user-shield text-success"></i></div>
                                             Administrators
                                         </a>
@@ -238,9 +255,18 @@ export default class AdminDashboard extends React.Component {
                     >
                         <main>
                             <div className="container-fluid px-2 px-sm-3 px-md-4">
-                                <Dashboard currentUser={this.state.data} />
-                                <div id="table-section">
-                                    <Table currentUser={this.state.data} />
+                                <div id="dashboard-section" className={this.state.activeView === 'dashboard' ? '' : 'd-none'}>
+                                    <Dashboard 
+                                        currentUser={this.state.data} 
+                                        onNavigateToTable={(category) => this.switchToTable(category)} 
+                                    />
+                                </div>
+                                <div id="table-section" className={this.state.activeView === 'table' ? '' : 'd-none'}>
+                                    <Table 
+                                        currentUser={this.state.data} 
+                                        activeCategory={this.state.activeTableCategory}
+                                        onBackToDashboard={() => this.switchToDashboard()} 
+                                    />
                                 </div>
                             </div>
                         </main>
@@ -667,6 +693,37 @@ export default class AdminDashboard extends React.Component {
                             </div>
                             <div className="modal-footer border-top py-2" style={{ borderColor: 'var(--border-color)' }}>
                                 <button type="button" className="btn btn-secondary rounded-pill px-4" data-bs-dismiss="modal">Close</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                {/* Clinical Record & Dossier Inspection Modal (Recruiter & Doctor Friendly) */}
+                <div className="modal fade" id="recordDetailsModal" tabIndex={-1} aria-labelledby="recordDetailsModalLabel" aria-hidden="true">
+                    <div className="modal-dialog modal-dialog-centered modal-lg modal-dialog-scrollable">
+                        <div className="modal-content" style={{ backgroundColor: 'var(--bg-card)', borderColor: 'var(--border-color)', borderRadius: '1rem' }}>
+                            <div className="modal-header border-bottom py-3" style={{ borderColor: 'var(--border-color)' }}>
+                                <div className="d-flex align-items-center gap-2">
+                                    <div id="rdm_icon_container" className="rounded-circle bg-primary-subtle text-primary d-flex align-items-center justify-content-center" style={{ width: 42, height: 42 }}>
+                                        <i id="rdm_header_icon" className="fa-solid fa-file-medical fa-lg"></i>
+                                    </div>
+                                    <div>
+                                        <h5 className="modal-title fw-bold text-main mb-0" id="rdm_title">Patient Clinical Dossier</h5>
+                                        <small className="text-sub" id="rdm_subtitle">Comprehensive clinical profile &amp; therapy parameters</small>
+                                    </div>
+                                </div>
+                                <button type="button" className="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                            </div>
+                            <div className="modal-body p-4" id="rdm_body">
+                                {/* Dynamically populated by adminScript.js */}
+                            </div>
+                            <div className="modal-footer border-top py-2 d-flex justify-content-between align-items-center" style={{ borderColor: 'var(--border-color)' }}>
+                                <span className="small text-muted d-none d-sm-inline">
+                                    <i className="fa-solid fa-shield-halved text-success me-1"></i> Verified Clinical Record &bull; LazyEye Systems
+                                </span>
+                                <div className="d-flex gap-2" id="rdm_action_buttons">
+                                    <button type="button" className="btn btn-secondary rounded-pill px-4" data-bs-dismiss="modal">Close</button>
+                                </div>
                             </div>
                         </div>
                     </div>

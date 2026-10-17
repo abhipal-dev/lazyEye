@@ -130,167 +130,25 @@ export default class Home extends React.Component {
                                 </div>
                             </div>
 
-                            {/* Right Column: High-Fidelity Interactive App Preview Window */}
+                            {/* Right Column: Authentic Clinical Patient Photography */}
                             <div className="col-12 col-lg-6 order-0 order-lg-1">
-                                <div className="saas-app-window">
-                                    {/* macOS Window Title Bar */}
-                                    <div className="saas-window-bar">
-                                        <div className="saas-window-dots">
-                                            <span className="saas-dot saas-dot-red"></span>
-                                            <span className="saas-dot saas-dot-yellow"></span>
-                                            <span className="saas-dot saas-dot-green"></span>
-                                        </div>
-                                        <span className="saas-window-title">lazyeye.app &bull; Dichoptic Therapy Console</span>
-                                        <span className="saas-window-status">
-                                            <i className="fa-solid fa-circle text-success" style={{ fontSize: 6 }}></i> Active Session
-                                        </span>
-                                    </div>
-
-                                    {/* Session Sub-Telemetry Bar */}
-                                    <div className="saas-window-telemetry">
-                                        <div>
-                                            <strong className="text-main d-block" style={{ fontSize: '0.8rem' }}>Block Fusion (Tetris Dichoptic)</strong>
-                                            <span className="text-muted" style={{ fontSize: '0.72rem' }}>Patient: Active Training &bull; Session Dosage: 20 min</span>
-                                        </div>
-                                        <div className="text-end">
-                                            <span className="badge bg-primary-subtle text-primary fw-semibold" style={{ fontSize: '0.74rem' }}>
-                                                14:22 / 20:00
+                                <div className="p-3 rounded-4 shadow-sm" style={{ background: 'var(--bg-card)', border: '1px solid var(--border-color)' }}>
+                                    <img 
+                                        src="/images/LazyEyeGirl.jpg" 
+                                        alt="Young girl undergoing dichoptic therapy with red/cyan 3D glasses" 
+                                        className="img-fluid rounded-3" 
+                                        style={{ width: '100%', maxHeight: '410px', objectFit: 'cover' }}
+                                    />
+                                    <div className="mt-3 p-3 rounded-3 text-start" style={{ background: 'var(--bg-surface-secondary)', border: '1px solid var(--border-color)' }}>
+                                        <div className="d-flex align-items-center justify-content-between mb-1">
+                                            <span className="fw-bold text-main small">
+                                                <i className="fa-solid fa-glasses text-primary me-2"></i>Dichoptic Vision Training
                                             </span>
+                                            <span className="badge bg-success-subtle text-success small">15–20 min / day</span>
                                         </div>
-                                    </div>
-
-                                    {/* Interactive Game Viewport */}
-                                    <div className="saas-viewport-canvas position-relative">
-                                        <div className="saas-viewport-grid"></div>
-
-                                        {/* Chromatic Stimulus Viewport */}
-                                        <div className="d-flex align-items-center justify-content-center w-100" style={{ height: 180, position: 'relative' }}>
-                                            {/* Red Channel (Left Eye Stimulus) */}
-                                            {(previewChannel === 'both' || previewChannel === 'red') && (
-                                                <div 
-                                                    style={{ 
-                                                        position: 'absolute', 
-                                                        opacity: leftContrast / 100,
-                                                        transition: 'opacity 0.2s ease',
-                                                        color: '#ef4444',
-                                                        filter: 'drop-shadow(0 0 6px rgba(239, 68, 68, 0.4))',
-                                                        transform: 'translateX(-40px)'
-                                                    }}
-                                                >
-                                                    <div className="p-3 border border-danger rounded-3 text-center" style={{ background: 'rgba(239, 68, 68, 0.08)', minWidth: 130 }}>
-                                                        <i className="fa-solid fa-cubes fa-2x mb-1 text-danger"></i>
-                                                        <div className="fw-bold small">Falling Blocks</div>
-                                                        <span className="badge bg-danger-subtle text-danger" style={{ fontSize: '0.65rem' }}>Left Eye (Red 630nm)</span>
-                                                    </div>
-                                                </div>
-                                            )}
-
-                                            {/* Binocular Fusion Link Icon */}
-                                            {previewChannel === 'both' && (
-                                                <div className="position-absolute d-flex flex-column align-items-center justify-content-center text-center" style={{ zIndex: 3 }}>
-                                                    <div className="rounded-circle bg-white text-dark shadow-sm d-flex align-items-center justify-content-center fw-bold" style={{ width: 32, height: 32, fontSize: '0.8rem' }}>
-                                                        <i className="fa-solid fa-link text-primary"></i>
-                                                    </div>
-                                                    <span className="small fw-bold text-white mt-1" style={{ fontSize: '0.68rem', textShadow: '0 1px 2px #000' }}>Fusion Lock</span>
-                                                </div>
-                                            )}
-
-                                            {/* Cyan Channel (Right Eye Stimulus) */}
-                                            {(previewChannel === 'both' || previewChannel === 'cyan') && (
-                                                <div 
-                                                    style={{ 
-                                                        position: 'absolute', 
-                                                        opacity: rightContrast / 100,
-                                                        transition: 'opacity 0.2s ease',
-                                                        color: '#0284c7',
-                                                        filter: 'drop-shadow(0 0 6px rgba(2, 132, 199, 0.4))',
-                                                        transform: 'translateX(40px)'
-                                                    }}
-                                                >
-                                                    <div className="p-3 border border-info rounded-3 text-center" style={{ background: 'rgba(2, 132, 199, 0.08)', minWidth: 130 }}>
-                                                        <i className="fa-solid fa-border-all fa-2x mb-1 text-info"></i>
-                                                        <div className="fw-bold small">Target Base Grid</div>
-                                                        <span className="badge bg-info-subtle text-info" style={{ fontSize: '0.65rem' }}>Right Eye (Cyan 490nm)</span>
-                                                    </div>
-                                                </div>
-                                            )}
-                                        </div>
-
-                                        {/* Telemetry Overlay Badges */}
-                                        <div className="position-absolute bottom-0 start-0 w-100 p-2 d-flex justify-content-between align-items-center" style={{ background: 'rgba(9, 13, 22, 0.75)', backdropFilter: 'blur(4px)', borderTop: '1px solid rgba(255,255,255,0.06)' }}>
-                                            <span className="text-white small" style={{ fontSize: '0.72rem' }}>
-                                                <i className="fa-solid fa-gamepad text-primary me-1"></i> Score: <strong>1,480 pts</strong>
-                                            </span>
-                                            <span className="text-white small" style={{ fontSize: '0.72rem' }}>
-                                                Adherence: <strong className="text-success">94% Target</strong>
-                                            </span>
-                                        </div>
-                                    </div>
-
-                                    {/* Real-time Interactive Controls */}
-                                    <div className="saas-slider-strip">
-                                        <div className="d-flex align-items-center justify-content-between mb-2">
-                                            <span className="small fw-bold text-main" style={{ fontSize: '0.75rem' }}>
-                                                <i className="fa-solid fa-sliders text-primary me-1"></i> Interactive Lens Simulation:
-                                            </span>
-                                            <div className="d-flex gap-1">
-                                                <button 
-                                                    type="button" 
-                                                    className={`saas-tab-btn ${previewChannel === 'both' ? 'active' : ''}`}
-                                                    onClick={() => this.setState({ previewChannel: 'both' })}
-                                                >
-                                                    Binocular
-                                                </button>
-                                                <button 
-                                                    type="button" 
-                                                    className={`saas-tab-btn ${previewChannel === 'red' ? 'active' : ''}`}
-                                                    onClick={() => this.setState({ previewChannel: 'red' })}
-                                                >
-                                                    Left (Red)
-                                                </button>
-                                                <button 
-                                                    type="button" 
-                                                    className={`saas-tab-btn ${previewChannel === 'cyan' ? 'active' : ''}`}
-                                                    onClick={() => this.setState({ previewChannel: 'cyan' })}
-                                                >
-                                                    Right (Cyan)
-                                                </button>
-                                            </div>
-                                        </div>
-
-                                        {/* Dual Contrast Balance Range Sliders */}
-                                        <div className="row g-2 pt-1">
-                                            <div className="col-6">
-                                                <div className="d-flex justify-content-between small text-muted" style={{ fontSize: '0.7rem' }}>
-                                                    <span>Amblyopic Eye (Red)</span>
-                                                    <strong>{leftContrast}%</strong>
-                                                </div>
-                                                <input 
-                                                    type="range" 
-                                                    className="form-range" 
-                                                    min="30" 
-                                                    max="100" 
-                                                    value={leftContrast}
-                                                    onChange={(e) => this.setState({ leftContrast: parseInt(e.target.value) })}
-                                                    style={{ height: 4 }}
-                                                />
-                                            </div>
-                                            <div className="col-6">
-                                                <div className="d-flex justify-content-between small text-muted" style={{ fontSize: '0.7rem' }}>
-                                                    <span>Fellow Eye Attenuation</span>
-                                                    <strong>{rightContrast}%</strong>
-                                                </div>
-                                                <input 
-                                                    type="range" 
-                                                    className="form-range" 
-                                                    min="10" 
-                                                    max="100" 
-                                                    value={rightContrast}
-                                                    onChange={(e) => this.setState({ rightContrast: parseInt(e.target.value) })}
-                                                    style={{ height: 4 }}
-                                                />
-                                            </div>
-                                        </div>
+                                        <p className="text-muted small mb-0" style={{ fontSize: '0.82rem', lineHeight: '1.6' }}>
+                                            Standard anaglyph glasses separate game stimuli between both eyes, actively retraining binocular cortical pathways through daily home video games.
+                                        </p>
                                     </div>
                                 </div>
                             </div>

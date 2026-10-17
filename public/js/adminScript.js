@@ -100,9 +100,15 @@ function approveRegisters(id, type) {
 }
 
 function scrollToTable() {
-    const el = document.getElementById('table-section');
-    if (el) {
-        el.scrollIntoView({ behavior: 'smooth' });
+    if (window.switchToAdminTable) {
+        window.switchToAdminTable(activeTableContentType ? ('fetch' + activeTableContentType) : 'fetchUsers');
+    } else {
+        $('#dashboard-section').addClass('d-none');
+        $('#table-section').removeClass('d-none');
+        const el = document.getElementById('table-section');
+        if (el) {
+            el.scrollIntoView({ behavior: 'smooth' });
+        }
     }
 }
 
@@ -133,6 +139,7 @@ function fetchRegisters() {
         url: "/fetchRegisters",
         type: "get",
         success: function (data) {
+            window.currentTableData = data;
             activeTableContentType = 'Registers';
             updateFilterActive('fetchRegisters');
             $('tbody').html('');
@@ -154,10 +161,10 @@ function fetchRegisters() {
                 $('tbody').append(`<tr><td colspan="9" class="text-center text-muted py-4"><i class="fa-solid fa-circle-check text-success me-1"></i> No pending registrations at this time.</td></tr>`);
                 return;
             }
-            data.forEach((e) => {
+            data.forEach((e, idx) => {
                 let localSubmitted = formatUtcToLocal(e.created_at, 'DD/MM/YYYY, hh:mm A');
                 $('tbody').append(`
-                    <tr>
+                    <tr class="patient-record-row cursor-pointer" data-index="` + idx + `" title="Click row to inspect registration dossier">
                     <td>`+ e.reg_id + `</td>
                     <td><strong>`+ e.fullname + `</strong></td>
                     <td><span class="badge bg-secondary-subtle text-secondary">`+ e.username + `</span></td>
@@ -179,6 +186,7 @@ function fetchDoctors() {
         url: "/fetchDoctors",
         type: "get",
         success: function (data) {
+            window.currentTableData = data;
             activeTableContentType = "Doctors";
             updateFilterActive('fetchDoctors');
             $('tbody').html('');
@@ -201,10 +209,10 @@ function fetchDoctors() {
                 $('tbody').append(`<tr><td colspan="10" class="text-center text-muted py-4">No doctors registered yet. Click "Add User / Doctor" to onboard staff.</td></tr>`);
                 return;
             }
-            data.forEach((e) => {
+            data.forEach((e, idx) => {
                 let localJoined = formatUtcToLocal(e.created_at, 'DD/MM/YYYY');
                 $('tbody').append(`
-                    <tr>
+                    <tr class="patient-record-row cursor-pointer" data-index="` + idx + `" title="Click row to inspect clinical practitioner dossier">
                     <td>`+ e.id + `</td>
                     <td><strong>`+ e.fullname + `</strong></td>
                     <td><span class="badge bg-secondary-subtle text-secondary">`+ e.username + `</span></td>
@@ -227,6 +235,7 @@ function fetchAdmins() {
         url: "/fetchAdmins",
         type: "get",
         success: function (data) {
+            window.currentTableData = data;
             activeTableContentType = "Admins";
             updateFilterActive('fetchAdmins');
             $('tbody').html('');
@@ -249,14 +258,14 @@ function fetchAdmins() {
                 $('tbody').append(`<tr><td colspan="10" class="text-center text-muted py-4"><i class="fa-solid fa-lock text-warning me-2"></i>Restricted Access: Only Root Superadmin can view and manage system administrators.</td></tr>`);
                 return;
             }
-            data.forEach((e) => {
+            data.forEach((e, idx) => {
                 let badge = (e.accounttype === 'root')
                     ? '<span class="badge bg-dark-subtle text-dark border"><i class="fa-solid fa-crown me-1 text-warning"></i>Root Superadmin</span>'
                     : '<span class="badge bg-danger-subtle text-danger"><i class="fa-solid fa-user-shield me-1"></i>Clinic Admin</span>';
 
                 let localJoined = formatUtcToLocal(e.created_at, 'DD/MM/YYYY');
                 $('tbody').append(`
-                    <tr>
+                    <tr class="patient-record-row cursor-pointer" data-index="` + idx + `" title="Click row to inspect administrator credentials">
                     <td>`+ e.id + `</td>
                     <td><strong>`+ e.fullname + `</strong></td>
                     <td><span class="badge bg-secondary-subtle text-secondary">`+ e.username + `</span></td>
@@ -279,6 +288,7 @@ function fetchUsers() {
         url: "/fetchUsers",
         type: "get",
         success: function (data) {
+            window.currentTableData = data;
             activeTableContentType = "Users";
             updateFilterActive('fetchUsers');
             $('tbody').html('');
@@ -311,7 +321,7 @@ function fetchUsers() {
                 });
             }
 
-            data.forEach((e) => {
+            data.forEach((e, idx) => {
                 let badge = (e.accounttype === 'Unpaid User')
                     ? '<span class="badge bg-warning-subtle text-warning">Pending Payment</span>'
                     : '<span class="badge bg-primary-subtle text-primary"><i class="fa-solid fa-circle-check me-1"></i>Active Patient</span>';
@@ -334,7 +344,7 @@ function fetchUsers() {
                 let localEnrolled = formatUtcToLocal(e.created_at, 'DD/MM/YYYY');
 
                 $('tbody').append(`
-                    <tr>
+                    <tr class="patient-record-row cursor-pointer" data-index="` + idx + `" title="Click row to inspect clinical patient dossier & calibration">
                     <td>`+ e.id + `</td>
                     <td><strong>`+ e.fullname + `</strong></td>
                     <td><span class="badge bg-secondary-subtle text-secondary">`+ e.username + `</span></td>
@@ -359,6 +369,7 @@ function fetchConsultations() {
         url: "/fetchConsultations",
         type: "get",
         success: function (data) {
+            window.currentTableData = data;
             activeTableContentType = "Consultations";
             updateFilterActive('fetchConsultations');
             $('tbody').html('');
@@ -380,7 +391,7 @@ function fetchConsultations() {
                 $('tbody').append(`<tr><td colspan="8" class="text-center text-muted py-4"><i class="fa-solid fa-stethoscope me-1 text-primary"></i> No doctor consultations recorded yet. Click "Review" on any patient row to log an assessment.</td></tr>`);
                 return;
             }
-            data.forEach((e) => {
+            data.forEach((e, idx) => {
                 let statusBadge = (e.status === 'Reviewed')
                     ? '<span class="badge bg-success-subtle text-success"><i class="fa-solid fa-circle-check me-1"></i>Reviewed</span>'
                     : `<span class="badge bg-info-subtle text-info">${e.status}</span>`;
@@ -392,7 +403,7 @@ function fetchConsultations() {
                 let localTime = formatUtcToLocal(e.created_at, 'DD MMM YYYY, hh:mm A');
 
                 $('tbody').append(`
-                    <tr>
+                    <tr class="patient-record-row cursor-pointer" data-index="` + idx + `" title="Click row to inspect clinical review dossier">
                     <td><strong>#`+ e.id + `</strong></td>
                     <td>
                         <span class="fw-bold text-main d-block"><i class="fa-solid fa-user-doctor me-1 text-info"></i>`+ e.doctor_name + `</span>
@@ -448,8 +459,395 @@ $(document).on('click', '#sidebarToggle', function (event) {
     localStorage.setItem('sb|sidebar-toggle', document.body.classList.contains('sb-sidenav-toggled'));
 });
 function showDashboard() {
+    if (window.switchToAdminDashboard) {
+        window.switchToAdminDashboard();
+    } else {
+        $('#dashboard-section').removeClass('d-none');
+        $('#table-section').addClass('d-none');
+    }
     window.scrollTo({ top: 0, behavior: 'smooth' });
 }
+
+function showRecordDetailsModal(record, type) {
+    if (!record) return;
+
+    let modal = $('#recordDetailsModal');
+    let titleEl = $('#rdm_title');
+    let subtitleEl = $('#rdm_subtitle');
+    let bodyEl = $('#rdm_body');
+    let headerIcon = $('#rdm_header_icon');
+    let actionButtons = $('#rdm_action_buttons');
+
+    if (type === 'Users' || type === 'user') {
+        titleEl.text('Patient Clinical Dossier');
+        subtitleEl.text('Dichoptic Therapy Parameters & Demographic Profile');
+        headerIcon.attr('class', 'fa-solid fa-file-medical fa-lg text-primary');
+
+        let enrolledDate = formatUtcToLocal(record.created_at, 'DD MMMM YYYY, hh:mm A');
+        let statusBadge = (record.accounttype === 'Unpaid User')
+            ? '<span class="badge bg-warning-subtle text-warning">Pending Payment</span>'
+            : '<span class="badge bg-success-subtle text-success"><i class="fa-solid fa-circle-check me-1"></i>Active Therapy Cohort</span>';
+
+        let leftColor = record.left_eye_contrast_color || '#ff0000';
+        let rightColor = record.right_eye_contrast_color || '#0000ff';
+        let leftContrast = record.left_eye_contrastvalue || 255;
+        let rightContrast = record.right_eye_contrastvalue || 255;
+        let leftPct = Math.round((leftContrast / 255) * 100);
+        let rightPct = Math.round((rightContrast / 255) * 100);
+
+        let doctorInfo = record.doctor_name
+            ? '<span class="badge bg-info-subtle text-info fw-semibold"><i class="fa-solid fa-user-doctor me-1"></i>' + record.doctor_name + '</span>'
+            : '<span class="badge bg-warning-subtle text-warning">No Doctor Assigned</span>';
+
+        let html = `
+            <!-- Patient Identification Banner -->
+            <div class="card border-0 p-3 mb-3 shadow-sm" style="background-color: var(--bg-surface-secondary); border-radius: 0.85rem; border: 1px solid var(--border-color);">
+                <div class="d-flex align-items-center justify-content-between flex-wrap gap-2">
+                    <div class="d-flex align-items-center gap-3">
+                        <div class="rounded-circle text-white fw-bold d-flex align-items-center justify-content-center shadow-sm" style="width: 48px; height: 48px; background: linear-gradient(135deg, #2563eb, #1d4ed8); font-size: 1.1rem;">
+                            ` + ((record.fullname ? record.fullname.charAt(0) : 'P').toUpperCase()) + `
+                        </div>
+                        <div>
+                            <h4 class="fw-bold mb-0 text-main">` + (record.fullname || 'Patient') + `</h4>
+                            <div class="d-flex align-items-center gap-2 small mt-1 flex-wrap">
+                                <span class="badge bg-secondary-subtle text-secondary">@` + record.username + `</span>
+                                <span class="text-sub">&bull;</span>
+                                <span class="text-sub">` + (record.email || '') + `</span>
+                                <span class="text-sub">&bull;</span>
+                                <span>` + statusBadge + `</span>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="text-end">
+                        <span class="badge bg-primary px-3 py-2 rounded-pill fw-semibold">Target: ` + (record.user_playing_time || 20) + ` mins/day</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Demographics & Clinical Assignment Grid -->
+            <div class="row g-3 mb-3">
+                <div class="col-12 col-md-4">
+                    <div class="p-3 rounded-3 h-100" style="background: var(--bg-card); border: 1px solid var(--border-color);">
+                        <small class="text-sub text-uppercase fw-bold d-block mb-1">Attending Optometrist</small>
+                        <div class="mt-1">` + doctorInfo + `</div>
+                    </div>
+                </div>
+                <div class="col-12 col-md-4">
+                    <div class="p-3 rounded-3 h-100" style="background: var(--bg-card); border: 1px solid var(--border-color);">
+                        <small class="text-sub text-uppercase fw-bold d-block mb-1">Gender / Demographics</small>
+                        <div class="fw-semibold text-main mt-1"><i class="fa-solid fa-venus-mars text-primary me-1"></i>` + (record.gender || 'Not specified') + `</div>
+                    </div>
+                </div>
+                <div class="col-12 col-md-4">
+                    <div class="p-3 rounded-3 h-100" style="background: var(--bg-card); border: 1px solid var(--border-color);">
+                        <small class="text-sub text-uppercase fw-bold d-block mb-1">Enrollment Date</small>
+                        <div class="small fw-semibold text-main mt-1"><i class="fa-regular fa-calendar-check text-success me-1"></i>` + enrolledDate + `</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Clinical Dichoptic Suppression Calibration -->
+            <div class="card border-0 p-3 mb-3 shadow-sm" style="background-color: var(--bg-card); border-radius: 0.85rem; border: 1px solid var(--border-color);">
+                <div class="d-flex align-items-center justify-content-between mb-2">
+                    <h6 class="fw-bold text-main mb-0">
+                        <i class="fa-solid fa-glasses text-primary me-2"></i>Dichoptic Suppression Calibration (Anaglyph Dual-Eye)
+                    </h6>
+                    <span class="badge bg-primary-subtle text-primary small">Anti-Amblyopia</span>
+                </div>
+                <p class="small text-sub mb-3">Calibrated optical wavelength channels and luminance contrast balance ocular dominance to overcome active binocular cortical suppression.</p>
+                <div class="row g-3">
+                    <div class="col-6">
+                        <div class="p-3 rounded-3" style="background: var(--bg-surface-secondary); border: 1px solid var(--border-color);">
+                            <div class="d-flex align-items-center justify-content-between mb-2">
+                                <span class="fw-bold small text-danger"><i class="fa-regular fa-eye me-1"></i>Left Eye (OS)</span>
+                                <span class="contrast-swatch-box" style="background-color: ` + leftColor + `;"></span>
+                            </div>
+                            <div class="small text-sub mb-1">Filter Color: <strong class="text-main">` + (record.left_eye_color || 'Red') + `</strong> (` + leftColor + `)</div>
+                            <div class="small text-sub">Contrast: <strong class="text-main">` + leftContrast + `/255 (` + leftPct + `%)</strong></div>
+                            <div class="progress mt-2" style="height: 6px;">
+                                <div class="progress-bar bg-danger" style="width: ` + leftPct + `%;"></div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-6">
+                        <div class="p-3 rounded-3" style="background: var(--bg-surface-secondary); border: 1px solid var(--border-color);">
+                            <div class="d-flex align-items-center justify-content-between mb-2">
+                                <span class="fw-bold small text-info"><i class="fa-regular fa-eye me-1"></i>Right Eye (OD)</span>
+                                <span class="contrast-swatch-box" style="background-color: ` + rightColor + `;"></span>
+                            </div>
+                            <div class="small text-sub mb-1">Filter Color: <strong class="text-main">` + (record.right_eye_color || 'Cyan/Blue') + `</strong> (` + rightColor + `)</div>
+                            <div class="small text-sub">Contrast: <strong class="text-main">` + rightContrast + `/255 (` + rightPct + `%)</strong></div>
+                            <div class="progress mt-2" style="height: 6px;">
+                                <div class="progress-bar bg-info" style="width: ` + rightPct + `%;"></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        `;
+        bodyEl.html(html);
+
+        actionButtons.html(`
+            <button type="button" class="btn btn-outline-success btn-sm rounded-pill px-3 rdm-trigger-activity" data-patient-id="` + record.id + `" data-patient-name="` + (record.fullname || '') + `">
+                <i class="fa-solid fa-fire text-danger me-1"></i>Activity & Heatmap
+            </button>
+            <button type="button" class="btn btn-outline-danger btn-sm rounded-pill px-3 rdm-trigger-review" data-patient-id="` + record.id + `" data-patient-name="` + (record.fullname || '') + `" data-doctor-id="` + (record.doctor_id || 23) + `">
+                <i class="fa-solid fa-stethoscope me-1"></i>Log Clinical Review
+            </button>
+            <button type="button" class="btn btn-primary btn-sm rounded-pill px-3" data-bs-dismiss="modal">
+                Done
+            </button>
+        `);
+
+    } else if (type === 'Doctors') {
+        titleEl.text('Clinical Practitioner Dossier');
+        subtitleEl.text('Optometrist Credentials & Cohort Supervisory Profile');
+        headerIcon.attr('class', 'fa-solid fa-user-doctor fa-lg text-info');
+
+        let joinedDate = formatUtcToLocal(record.created_at, 'DD MMMM YYYY');
+        let html = `
+            <div class="card border-0 p-3 mb-3 shadow-sm" style="background-color: var(--bg-surface-secondary); border-radius: 0.85rem; border: 1px solid var(--border-color);">
+                <div class="d-flex align-items-center gap-3">
+                    <div class="rounded-circle text-white fw-bold d-flex align-items-center justify-content-center shadow-sm" style="width: 52px; height: 52px; background: linear-gradient(135deg, #0284c7, #0369a1); font-size: 1.2rem;">
+                        ` + ((record.fullname ? record.fullname.charAt(0) : 'D').toUpperCase()) + `
+                    </div>
+                    <div>
+                        <h4 class="fw-bold mb-0 text-main">` + record.fullname + `</h4>
+                        <div class="d-flex align-items-center gap-2 small mt-1 flex-wrap">
+                            <span class="badge bg-secondary-subtle text-secondary">@` + record.username + `</span>
+                            <span class="text-sub">&bull;</span>
+                            <span class="text-sub">` + (record.email || '') + `</span>
+                            <span class="text-sub">&bull;</span>
+                            <span class="badge bg-info-subtle text-info"><i class="fa-solid fa-user-doctor me-1"></i>Clinical Optometrist</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="row g-3 mb-3">
+                <div class="col-12 col-md-6">
+                    <div class="p-3 rounded-3 h-100" style="background: var(--bg-card); border: 1px solid var(--border-color);">
+                        <small class="text-sub text-uppercase fw-bold d-block mb-1">Standard Patient Target Prescribed</small>
+                        <div class="fw-bold text-primary fs-5 mt-1">` + (record.user_playing_time || 20) + ` mins / day</div>
+                        <small class="text-muted">Standard protocol duration for assigned cohort</small>
+                    </div>
+                </div>
+                <div class="col-12 col-md-6">
+                    <div class="p-3 rounded-3 h-100" style="background: var(--bg-card); border: 1px solid var(--border-color);">
+                        <small class="text-sub text-uppercase fw-bold d-block mb-1">Staff Member Since</small>
+                        <div class="fw-bold text-main fs-5 mt-1">` + joinedDate + `</div>
+                        <small class="text-muted">Credentialed Vision Therapist</small>
+                    </div>
+                </div>
+            </div>
+
+            <div class="p-3 rounded-3" style="background: var(--bg-surface-secondary); border: 1px solid var(--border-color);">
+                <div class="fw-semibold text-main mb-1"><i class="fa-solid fa-certificate text-warning me-2"></i>Specialty Qualifications</div>
+                <p class="small text-sub mb-0">Authorized to prescribe dichoptic stimulus protocols, adjust eye contrast thresholds, and evaluate stereopsis visual recovery.</p>
+            </div>
+        `;
+        bodyEl.html(html);
+        actionButtons.html(`
+            <button type="button" class="btn btn-secondary rounded-pill px-4" data-bs-dismiss="modal">Close</button>
+        `);
+
+    } else if (type === 'Consultations') {
+        titleEl.text('Clinical Review Session');
+        subtitleEl.text(`Consultation Record #` + record.id);
+        headerIcon.attr('class', 'fa-solid fa-stethoscope fa-lg text-danger');
+
+        let reviewDate = formatUtcToLocal(record.created_at, 'DD MMMM YYYY, hh:mm A');
+        let complianceColor = 'text-success bg-success-subtle';
+        if (record.compliance_assessment === 'Moderate') complianceColor = 'text-warning bg-warning-subtle';
+        if (record.compliance_assessment === 'Low') complianceColor = 'text-danger bg-danger-subtle';
+
+        let html = `
+            <div class="row g-3 mb-3">
+                <div class="col-12 col-md-6">
+                    <div class="p-3 rounded-3 h-100" style="background: var(--bg-surface-secondary); border: 1px solid var(--border-color);">
+                        <small class="text-sub text-uppercase fw-bold d-block mb-1">Evaluating Optometrist</small>
+                        <div class="fw-bold text-main"><i class="fa-solid fa-user-doctor text-info me-1"></i>` + record.doctor_name + `</div>
+                        <small class="text-muted">@` + record.doctor_username + `</small>
+                    </div>
+                </div>
+                <div class="col-12 col-md-6">
+                    <div class="p-3 rounded-3 h-100" style="background: var(--bg-surface-secondary); border: 1px solid var(--border-color);">
+                        <small class="text-sub text-uppercase fw-bold d-block mb-1">Patient Evaluated</small>
+                        <div class="fw-bold text-main">` + record.patient_name + `</div>
+                        <small class="text-muted">@` + record.patient_username + `</small>
+                    </div>
+                </div>
+            </div>
+
+            <div class="row g-3 mb-3">
+                <div class="col-6">
+                    <div class="p-3 rounded-3" style="background: var(--bg-card); border: 1px solid var(--border-color);">
+                        <small class="text-sub text-uppercase fw-bold d-block mb-1">Therapy Compliance</small>
+                        <span class="badge ` + complianceColor + ` py-1 px-3 fw-semibold mt-1">` + record.compliance_assessment + `</span>
+                    </div>
+                </div>
+                <div class="col-6">
+                    <div class="p-3 rounded-3" style="background: var(--bg-card); border: 1px solid var(--border-color);">
+                        <small class="text-sub text-uppercase fw-bold d-block mb-1">Prescribed Daily Target</small>
+                        <div class="fw-bold text-primary mt-1">` + record.prescribed_minutes + ` mins / day</div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="card border-0 p-3 mb-3" style="background: var(--bg-card); border-radius: 0.85rem; border: 1px solid var(--border-color);">
+                <div class="fw-bold text-main mb-2"><i class="fa-solid fa-notes-medical text-danger me-2"></i>Doctor Clinical Observations & Notes</div>
+                <div class="p-3 rounded-2" style="background: var(--bg-surface-secondary); font-size: 0.92rem; line-height: 1.6; color: var(--text-main);">
+                    ` + (record.notes || 'Routine follow-up consultation completed. Amblyopia suppression therapy proceeding according to clinical schedule.') + `
+                </div>
+                <div class="small text-muted mt-2 text-end">
+                    <i class="fa-regular fa-clock me-1"></i>Logged at ` + reviewDate + `
+                </div>
+            </div>
+        `;
+        bodyEl.html(html);
+        actionButtons.html(`
+            <button type="button" class="btn btn-secondary rounded-pill px-4" data-bs-dismiss="modal">Close</button>
+        `);
+
+    } else if (type === 'Registers') {
+        titleEl.text('Pending Patient Registration');
+        subtitleEl.text(`Application ID #` + record.reg_id);
+        headerIcon.attr('class', 'fa-solid fa-user-clock fa-lg text-warning');
+
+        let submittedDate = formatUtcToLocal(record.created_at, 'DD MMMM YYYY, hh:mm A');
+        let html = `
+            <div class="card border-0 p-3 mb-3 shadow-sm" style="background-color: var(--bg-surface-secondary); border-radius: 0.85rem; border: 1px solid var(--border-color);">
+                <div class="d-flex align-items-center gap-3">
+                    <div class="rounded-circle text-white fw-bold d-flex align-items-center justify-content-center shadow-sm" style="width: 48px; height: 48px; background: linear-gradient(135deg, #f59e0b, #d97706); font-size: 1.1rem;">
+                        ` + ((record.fullname ? record.fullname.charAt(0) : 'R').toUpperCase()) + `
+                    </div>
+                    <div>
+                        <h4 class="fw-bold mb-0 text-main">` + record.fullname + `</h4>
+                        <div class="d-flex align-items-center gap-2 small mt-1 flex-wrap">
+                            <span class="badge bg-secondary-subtle text-secondary">@` + record.username + `</span>
+                            <span class="text-sub">&bull;</span>
+                            <span class="text-sub">` + (record.email || '') + `</span>
+                            <span class="text-sub">&bull;</span>
+                            <span class="badge bg-warning-subtle text-warning"><i class="fa-solid fa-clock me-1"></i>Awaiting Clinical Approval</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="row g-3 mb-3">
+                <div class="col-6">
+                    <div class="p-3 rounded-3" style="background: var(--bg-card); border: 1px solid var(--border-color);">
+                        <small class="text-sub text-uppercase fw-bold d-block mb-1">Gender</small>
+                        <div class="fw-semibold text-main mt-1">` + (record.gender || 'Not specified') + `</div>
+                    </div>
+                </div>
+                <div class="col-6">
+                    <div class="p-3 rounded-3" style="background: var(--bg-card); border: 1px solid var(--border-color);">
+                        <small class="text-sub text-uppercase fw-bold d-block mb-1">Registration Submitted</small>
+                        <div class="small fw-semibold text-main mt-1">` + submittedDate + `</div>
+                    </div>
+                </div>
+            </div>
+            <div class="alert alert-info py-2 px-3 small mb-0">
+                <i class="fa-solid fa-circle-info me-1"></i> Approving this applicant automatically provisions an active patient therapy profile with standard dichoptic red/cyan filter calibration.
+            </div>
+        `;
+        bodyEl.html(html);
+        actionButtons.html(`
+            <button type="button" class="btn btn-outline-danger btn-sm rounded-pill px-3" onclick="deleteData(` + record.reg_id + `, 'registers'); $('#recordDetailsModal').modal('hide');">
+                <i class="fa-solid fa-trash me-1"></i>Decline
+            </button>
+            <button type="button" class="btn btn-success btn-sm rounded-pill px-4" onclick="approveRegisters(` + record.reg_id + `, 'registers'); $('#recordDetailsModal').modal('hide');">
+                <i class="fa-solid fa-check me-1"></i>Approve & Enroll
+            </button>
+        `);
+
+    } else if (type === 'Admins') {
+        titleEl.text('System Administrator Dossier');
+        subtitleEl.text(`Administrator Record #` + record.id);
+        headerIcon.attr('class', 'fa-solid fa-user-shield fa-lg text-success');
+
+        let isRootSuper = (record.accounttype === 'root');
+        let joinedDate = formatUtcToLocal(record.created_at, 'DD MMMM YYYY');
+        let roleBadge = isRootSuper
+            ? '<span class="badge bg-dark text-white"><i class="fa-solid fa-crown text-warning me-1"></i>Master Root Superadmin</span>'
+            : '<span class="badge bg-danger-subtle text-danger"><i class="fa-solid fa-user-shield me-1"></i>Clinic Operations Admin</span>';
+
+        let html = `
+            <div class="card border-0 p-3 mb-3 shadow-sm" style="background-color: var(--bg-surface-secondary); border-radius: 0.85rem; border: 1px solid var(--border-color);">
+                <div class="d-flex align-items-center gap-3">
+                    <div class="rounded-circle text-white fw-bold d-flex align-items-center justify-content-center shadow-sm" style="width: 48px; height: 48px; background: ` + (isRootSuper ? 'linear-gradient(135deg, #1e293b, #0f172a)' : 'linear-gradient(135deg, #2563eb, #1d4ed8)') + `; font-size: 1.1rem;">
+                        ` + ((record.fullname ? record.fullname.charAt(0) : 'A').toUpperCase()) + `
+                    </div>
+                    <div>
+                        <h4 class="fw-bold mb-0 text-main">` + record.fullname + `</h4>
+                        <div class="d-flex align-items-center gap-2 small mt-1 flex-wrap">
+                            <span class="badge bg-secondary-subtle text-secondary">@` + record.username + `</span>
+                            <span class="text-sub">&bull;</span>
+                            <span class="text-sub">` + (record.email || '') + `</span>
+                            <span class="text-sub">&bull;</span>
+                            ` + roleBadge + `
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="row g-3 mb-3">
+                <div class="col-6">
+                    <div class="p-3 rounded-3" style="background: var(--bg-card); border: 1px solid var(--border-color);">
+                        <small class="text-sub text-uppercase fw-bold d-block mb-1">Access Jurisdiction</small>
+                        <div class="fw-semibold text-main mt-1">` + (isRootSuper ? 'Full System Jurisdiction & Master Superadmin' : 'Clinic Operations & Medical Staff Oversight') + `</div>
+                    </div>
+                </div>
+                <div class="col-6">
+                    <div class="p-3 rounded-3" style="background: var(--bg-card); border: 1px solid var(--border-color);">
+                        <small class="text-sub text-uppercase fw-bold d-block mb-1">Account Active Since</small>
+                        <div class="small fw-semibold text-main mt-1">` + joinedDate + `</div>
+                    </div>
+                </div>
+            </div>
+        `;
+        bodyEl.html(html);
+        actionButtons.html(`
+            <button type="button" class="btn btn-secondary rounded-pill px-4" data-bs-dismiss="modal">Close</button>
+        `);
+    }
+
+    modal.modal('show');
+}
+
+// Row click listener to open dossier modal (ignoring clicks on buttons, links, inputs)
+$(document).on('click', '#datatablesSimple tbody tr.patient-record-row', function (e) {
+    if ($(e.target).closest('button, a, input, select, .btn, .assign-doc-btn').length) {
+        return;
+    }
+    let idx = $(this).attr('data-index');
+    if (window.currentTableData && window.currentTableData[idx]) {
+        showRecordDetailsModal(window.currentTableData[idx], activeTableContentType);
+    }
+});
+
+// Modal triggers delegation for patient actions
+$(document).on('click', '.rdm-trigger-activity', function () {
+    let patientId = $(this).attr('data-patient-id');
+    $('#recordDetailsModal').modal('hide');
+    setTimeout(() => {
+        if (typeof openPatientActivity === 'function') {
+            openPatientActivity(patientId);
+        }
+    }, 350);
+});
+
+$(document).on('click', '.rdm-trigger-review', function () {
+    let patientId = $(this).attr('data-patient-id');
+    let doctorId = $(this).attr('data-doctor-id') || '23';
+    $('#recordDetailsModal').modal('hide');
+    setTimeout(() => {
+        $('#consultation_patient_select').val(patientId);
+        $('#consultation_doctor_select').val(doctorId);
+        $('#logConsultationModal').modal('show');
+    }, 350);
+});
 
 window.fetchUsers = fetchUsers;
 window.fetchDoctors = fetchDoctors;
@@ -458,6 +856,7 @@ window.fetchRegisters = fetchRegisters;
 window.fetchConsultations = fetchConsultations;
 window.scrollToTable = scrollToTable;
 window.showDashboard = showDashboard;
+window.showRecordDetailsModal = showRecordDetailsModal;
 
 $(document).on('click', '.fetchRegisters', function () {
     fetchRegisters();

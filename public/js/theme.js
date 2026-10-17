@@ -1,7 +1,6 @@
 (function() {
     try {
-        var savedTheme = localStorage.getItem('lazyeye-theme') || 
-            (window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light');
+        var savedTheme = localStorage.getItem('lazyeye-theme') || 'light';
         document.documentElement.setAttribute('data-theme', savedTheme);
         document.documentElement.setAttribute('data-bs-theme', savedTheme);
         if (document.body) {

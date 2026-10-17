@@ -9,46 +9,80 @@ export default class Table extends React.Component{
         const isRoot = (role === 'root');
 
         return(
-            <div className="card border-0 shadow-sm mb-4" style={{ backgroundColor: 'var(--bg-card)', borderRadius: '1rem', border: '1px solid var(--border-color)' }}>
-                <div className="card-header bg-transparent d-flex align-items-center justify-content-between py-3 flex-wrap gap-2" style={{ borderColor: 'var(--border-color)' }}>
-                    <div className="d-flex align-items-center gap-2">
-                        <i className="fas fa-table text-primary"></i>
-                        <span className="fw-semibold text-main">{isDoctor ? 'Assigned Clinical Records' : 'Data Records'}</span>
-                    </div>
-                    <div className="d-flex align-items-center gap-2 flex-wrap">
-                        <div className="table-filter-group">
-                            <button className="table-filter-btn fetchUsers active" type="button" onClick={() => window.fetchUsers && window.fetchUsers()}>
-                                <i className="fa-solid fa-users me-1 text-primary"></i>{isDoctor ? 'My Patients' : 'Patients'}
-                            </button>
-                            {!isDoctor && (
-                                <button className="table-filter-btn fetchDoctors" type="button" onClick={() => window.fetchDoctors && window.fetchDoctors()}>
-                                    <i className="fa-solid fa-user-doctor me-1 text-info"></i>Doctors
-                                </button>
-                            )}
-                            <button className="table-filter-btn fetchConsultations" type="button" onClick={() => window.fetchConsultations && window.fetchConsultations()}>
-                                <i className="fa-solid fa-stethoscope me-1 text-danger"></i>{isDoctor ? 'My Reviews' : 'Clinical Reviews'}
-                            </button>
-                            {isRoot && (
-                                <button className="table-filter-btn fetchAdmins" type="button" onClick={() => window.fetchAdmins && window.fetchAdmins()}>
-                                    <i className="fa-solid fa-user-shield me-1 text-success"></i>Admins
-                                </button>
-                            )}
-                            {!isDoctor && (
-                                <button className="table-filter-btn fetchRegisters" type="button" onClick={() => window.fetchRegisters && window.fetchRegisters()}>
-                                    <i className="fa-solid fa-user-plus me-1 text-warning"></i>Pending
-                                </button>
-                            )}
-                        </div>
+            <div className="mb-4">
+                {/* Back to Overview & Title Header */}
+                <div className="d-flex align-items-center justify-content-between flex-wrap gap-2 mt-4 mb-3">
+                    <div className="d-flex align-items-center gap-3">
                         <button 
-                            className="btn btn-primary btn-sm rounded-pill px-3 shadow-sm d-flex align-items-center gap-1 fw-semibold text-nowrap"
-                            data-bs-toggle="modal" 
-                            data-bs-target="#createStaffModal"
+                            type="button" 
+                            className="btn btn-outline-secondary btn-sm rounded-pill px-3 py-1 d-flex align-items-center gap-2 fw-semibold"
+                            onClick={() => {
+                                if (this.props.onBackToDashboard) {
+                                    this.props.onBackToDashboard();
+                                } else if (window.switchToAdminDashboard) {
+                                    window.switchToAdminDashboard();
+                                } else if (window.showDashboard) {
+                                    window.showDashboard();
+                                }
+                            }}
                         >
-                            <i className="fa-solid fa-user-plus"></i>
-                            <span>{isDoctor ? 'Enroll Patient' : isRoot ? 'Add User / Staff / Admin' : 'Add User / Doctor'}</span>
+                            <i className="fa-solid fa-arrow-left"></i>
+                            <span>Back to Overview</span>
                         </button>
+                        <div>
+                            <h3 className="fw-bold mb-0 text-main" style={{ fontSize: '1.35rem' }}>
+                                {isDoctor ? 'Assigned Clinical Cohort' : 'Database Records & Management'}
+                            </h3>
+                            <small className="text-sub">Manage patients, clinical staff, and therapy records</small>
+                        </div>
+                    </div>
+                    <div className="d-flex align-items-center gap-2">
+                        <span className="badge bg-primary-subtle text-primary border border-primary-subtle px-3 py-2 rounded-pill small">
+                            <i className="fa-solid fa-circle-info me-1"></i> Tip: Click any row to inspect complete clinical dossier
+                        </span>
                     </div>
                 </div>
+
+                <div className="card border-0 shadow-sm mb-4" style={{ backgroundColor: 'var(--bg-card)', borderRadius: '1rem', border: '1px solid var(--border-color)' }}>
+                    <div className="card-header bg-transparent d-flex align-items-center justify-content-between py-3 flex-wrap gap-2" style={{ borderColor: 'var(--border-color)' }}>
+                        <div className="d-flex align-items-center gap-2">
+                            <i className="fas fa-table text-primary"></i>
+                            <span className="fw-semibold text-main">{isDoctor ? 'Assigned Clinical Records' : 'Data Records'}</span>
+                        </div>
+                        <div className="d-flex align-items-center gap-2 flex-wrap">
+                            <div className="table-filter-group">
+                                <button className="table-filter-btn fetchUsers active" type="button" onClick={() => window.fetchUsers && window.fetchUsers()}>
+                                    <i className="fa-solid fa-users me-1 text-primary"></i>{isDoctor ? 'My Patients' : 'Patients'}
+                                </button>
+                                {!isDoctor && (
+                                    <button className="table-filter-btn fetchDoctors" type="button" onClick={() => window.fetchDoctors && window.fetchDoctors()}>
+                                        <i className="fa-solid fa-user-doctor me-1 text-info"></i>Doctors
+                                    </button>
+                                )}
+                                <button className="table-filter-btn fetchConsultations" type="button" onClick={() => window.fetchConsultations && window.fetchConsultations()}>
+                                    <i className="fa-solid fa-stethoscope me-1 text-danger"></i>{isDoctor ? 'My Reviews' : 'Clinical Reviews'}
+                                </button>
+                                {isRoot && (
+                                    <button className="table-filter-btn fetchAdmins" type="button" onClick={() => window.fetchAdmins && window.fetchAdmins()}>
+                                        <i className="fa-solid fa-user-shield me-1 text-success"></i>Admins
+                                    </button>
+                                )}
+                                {!isDoctor && (
+                                    <button className="table-filter-btn fetchRegisters" type="button" onClick={() => window.fetchRegisters && window.fetchRegisters()}>
+                                        <i className="fa-solid fa-user-plus me-1 text-warning"></i>Pending
+                                    </button>
+                                )}
+                            </div>
+                            <button 
+                                className="btn btn-primary btn-sm rounded-pill px-3 shadow-sm d-flex align-items-center gap-1 fw-semibold text-nowrap"
+                                data-bs-toggle="modal" 
+                                data-bs-target="#createStaffModal"
+                            >
+                                <i className="fa-solid fa-user-plus"></i>
+                                <span>{isDoctor ? 'Enroll Patient' : isRoot ? 'Add User / Staff / Admin' : 'Add User / Doctor'}</span>
+                            </button>
+                        </div>
+                    </div>
                 <div className="table-scroll-hint d-none">
                     <i className="fa-solid fa-arrows-left-right me-1"></i> Swipe horizontally to see all columns
                 </div>
@@ -62,6 +96,7 @@ export default class Table extends React.Component{
                         </tbody>
                     </table>
                 </div>
+            </div>
             </div>
         );
     }
