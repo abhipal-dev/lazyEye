@@ -34,10 +34,13 @@ export default class Navbar extends React.Component {
                                 <a className="nav-link" href="/">Home</a>
                             </li>
                             <li className="nav-item">
-                                <a className="nav-link" href="/#ABT">About</a>
+                                <a className="nav-link" href="/#science">Research</a>
                             </li>
                             <li className="nav-item">
-                                <a className="nav-link" href="/#INS">Instructions</a>
+                                <a className="nav-link" href="/#protocol">Protocol</a>
+                            </li>
+                            <li className="nav-item">
+                                <a className="nav-link" href="/#curriculum">Engines</a>
                             </li>
                             <li className="nav-item">
                                 <a className="nav-link" href="/#contact">Contact</a>

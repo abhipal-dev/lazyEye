@@ -318,138 +318,275 @@ a:hover {
 }
 
 .btn-modern-primary {
-  background: var(--primary-gradient);
+  background: var(--primary);
   color: #ffffff !important;
-  border: none;
-  font-weight: 700;
-  padding: 0.6rem 1.4rem;
-  border-radius: 9999px;
-  box-shadow: 0 4px 14px rgba(37, 99, 235, 0.3);
-  transition: all 0.25s ease;
+  border: 1px solid rgba(0, 0, 0, 0.1);
+  font-weight: 600;
+  padding: 0.65rem 1.4rem;
+  border-radius: 8px;
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05), inset 0 1px 0 rgba(255, 255, 255, 0.18);
+  transition: all 0.2s ease;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-size: 0.95rem;
+}
+
+.btn-modern-primary:hover {
+  background: var(--primary-hover);
+  box-shadow: 0 4px 12px rgba(37, 99, 235, 0.25);
+  transform: translateY(-1px);
+  color: #ffffff !important;
+}
+
+.btn-modern-outline {
+  background: var(--bg-card);
+  color: var(--text-main) !important;
+  border: 1px solid var(--border-color);
+  font-weight: 600;
+  padding: 0.65rem 1.3rem;
+  border-radius: 8px;
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.04);
+  transition: all 0.2s ease;
+  font-size: 0.95rem;
   display: inline-flex;
   align-items: center;
   gap: 0.5rem;
 }
 
-.btn-modern-primary:hover {
-  box-shadow: 0 6px 20px rgba(37, 99, 235, 0.45);
-  transform: translateY(-2px);
-  color: #ffffff !important;
-}
-
-.btn-modern-outline {
-  background: transparent;
-  color: var(--text-main) !important;
-  border: 1.5px solid var(--border-color);
-  font-weight: 600;
-  padding: 0.55rem 1.3rem;
-  border-radius: 9999px;
-  transition: all 0.25s ease;
-}
-
 .btn-modern-outline:hover {
   border-color: var(--primary);
-  background: var(--primary-light);
+  background: var(--bg-surface-secondary);
   color: var(--primary) !important;
+  transform: translateY(-1px);
 }
 
 /* ========================================================
-   HERO & SECTIONS (Home)
+   HERO & EDITORIAL SECTIONS (Home)
    ======================================================== */
 .hero-section {
-  padding: 4rem 1.5rem;
+  padding: 4.5rem 1.5rem 3.5rem;
   position: relative;
   overflow: hidden;
 }
 
 .hero-title {
-  font-size: clamp(2.2rem, 5vw, 3.6rem);
+  font-size: clamp(2.2rem, 4.5vw, 3.4rem);
   font-weight: 800;
   line-height: 1.15;
   color: var(--text-main);
+  letter-spacing: -0.03em;
   margin-bottom: 1.25rem;
 }
 
-.hero-title .gradient-text {
-  background: var(--primary-gradient);
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
+.hero-title .accent-text {
+  color: var(--primary);
+  display: inline;
 }
 
 .hero-desc {
-  font-size: clamp(1rem, 2vw, 1.2rem);
-  color: var(--text-muted);
-  line-height: 1.6;
-  max-width: 580px;
+  font-size: 1.08rem;
+  color: var(--text-sub);
+  line-height: 1.65;
+  max-width: 600px;
   margin-bottom: 2rem;
 }
 
-.hero-card-img {
-  max-width: 100%;
-  height: auto;
-  border-radius: 1.5rem;
-  box-shadow: var(--card-shadow-hover);
-  border: 1px solid var(--border-color);
-  transition: transform 0.4s ease;
-}
-
-.hero-card-img:hover {
-  transform: translateY(-6px) scale(1.01);
-}
-
-/* Stats Cards */
-.stats-container {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
-  gap: 1.5rem;
-  margin: 3rem 0;
-}
-
-.stat-card {
+/* Integrated Clinical Telemetry Bar (Replaces 4 Floating Cards) */
+.clinical-telemetry-bar {
   background: var(--bg-card);
   border: 1px solid var(--border-color);
-  border-radius: 1.25rem;
-  padding: 2rem 1.5rem;
-  text-align: center;
-  box-shadow: var(--card-shadow);
-  transition: all 0.3s ease;
+  border-radius: 12px;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.04);
+  padding: 1.25rem 1.5rem;
 }
 
-.stat-card:hover {
-  transform: translateY(-5px);
-  box-shadow: var(--card-shadow-hover);
+.telemetry-item {
+  padding: 0.75rem 1.25rem;
+  border-right: 1px solid var(--border-color);
+}
+
+.telemetry-item:last-child {
+  border-right: none;
+}
+
+.telemetry-mono-val {
+  font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
+  font-size: 1.65rem;
+  font-weight: 800;
+  color: var(--text-main);
+  letter-spacing: -0.02em;
+  line-height: 1.2;
+}
+
+.telemetry-label {
+  font-size: 0.76rem;
+  text-transform: uppercase;
+  font-weight: 700;
+  letter-spacing: 0.05em;
+  color: var(--text-muted);
+  margin-top: 0.25rem;
+}
+
+/* Interactive Optics Calibration Simulator (Hero Right Column) */
+.optics-lab-card {
+  background: var(--bg-card);
+  border: 1px solid var(--border-color);
+  border-radius: 14px;
+  box-shadow: 0 8px 30px rgba(0, 0, 0, 0.08);
+  overflow: hidden;
+  text-align: left;
+}
+
+.optics-lab-header {
+  background: var(--bg-surface-secondary);
+  border-bottom: 1px solid var(--border-color);
+  padding: 0.75rem 1.25rem;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  font-size: 0.78rem;
+  font-family: ui-monospace, monospace;
+}
+
+.optics-viewport {
+  background: #0b1120;
+  height: 220px;
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+}
+
+.optics-grid-overlay {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-image: 
+    linear-gradient(rgba(255, 255, 255, 0.05) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(255, 255, 255, 0.05) 1px, transparent 1px);
+  background-size: 20px 20px;
+  pointer-events: none;
+}
+
+.optics-crosshair-center {
+  position: absolute;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.optics-crosshair-center::before {
+  content: '';
+  position: absolute;
+  width: 120px;
+  height: 1px;
+  background: rgba(255, 255, 255, 0.15);
+}
+
+.optics-crosshair-center::after {
+  content: '';
+  position: absolute;
+  height: 120px;
+  width: 1px;
+  background: rgba(255, 255, 255, 0.15);
+}
+
+.stimulus-layer {
+  position: absolute;
+  transition: opacity 0.15s ease, transform 0.15s ease;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.stimulus-layer.stimulus-red {
+  color: #ff2a4b;
+  text-shadow: 0 0 10px rgba(255, 42, 75, 0.7);
+  mix-blend-mode: screen;
+}
+
+.stimulus-layer.stimulus-cyan {
+  color: #00e5ff;
+  text-shadow: 0 0 10px rgba(0, 229, 255, 0.7);
+  mix-blend-mode: screen;
+}
+
+.optics-slider-control {
+  padding: 1rem 1.25rem;
+  background: var(--bg-card);
+  border-top: 1px solid var(--border-color);
+}
+
+.filter-mode-btn {
+  font-size: 0.78rem;
+  font-weight: 600;
+  padding: 0.4rem 0.8rem;
+  border-radius: 6px;
+  border: 1px solid var(--border-color);
+  background: var(--bg-surface-secondary);
+  color: var(--text-sub);
+  transition: all 0.15s ease;
+}
+
+.filter-mode-btn.active {
+  background: var(--primary);
+  color: #ffffff;
   border-color: var(--primary);
 }
 
-.stat-card .stat-number {
-  font-size: 2.5rem;
-  font-weight: 800;
-  background: var(--primary-gradient);
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
-  margin-bottom: 0.5rem;
-}
-
-.stat-card .stat-label {
-  font-size: 1rem;
-  font-weight: 600;
-  color: var(--text-muted);
-}
-
-/* Feature & Instruction Cards */
+/* Feature & Clinical Cards (Refined structure, no generic template look) */
 .modern-card {
   background: var(--bg-card);
   border: 1px solid var(--border-color);
-  border-radius: 1.25rem;
-  padding: 2rem;
-  box-shadow: var(--card-shadow);
-  transition: all 0.3s ease;
+  border-radius: 10px;
+  padding: 1.75rem;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.03);
+  transition: border-color 0.2s ease, box-shadow 0.2s ease;
 }
 
 .modern-card:hover {
-  transform: translateY(-4px);
-  box-shadow: var(--card-shadow-hover);
   border-color: var(--primary);
+  box-shadow: 0 6px 18px rgba(0, 0, 0, 0.06);
+}
+
+/* Comparison Matrix Table */
+.clinical-matrix-table {
+  width: 100%;
+  border-collapse: separate;
+  border-spacing: 0;
+  border: 1px solid var(--border-color);
+  border-radius: 10px;
+  overflow: hidden;
+  background: var(--bg-card);
+}
+
+.clinical-matrix-table th {
+  background: var(--bg-surface-secondary);
+  padding: 0.9rem 1.2rem;
+  font-size: 0.82rem;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  font-weight: 700;
+  color: var(--text-main);
+  border-bottom: 1px solid var(--border-color);
+}
+
+.clinical-matrix-table td {
+  padding: 0.95rem 1.2rem;
+  border-bottom: 1px solid var(--border-color);
+  font-size: 0.9rem;
+  color: var(--text-sub);
+}
+
+.clinical-matrix-table tr:last-child td {
+  border-bottom: none;
 }
 
 /* ========================================================
