@@ -98,50 +98,34 @@ export default class Login extends React.Component {
                 <div className="auth-wrapper py-5">
                     <div className="container">
                         <div className="row align-items-center justify-content-center g-5">
-                            {/* Left Side: Portal Context & System Architecture */}
+                            {/* Left Side: Illustration & Vision Therapy Benefits */}
                             <div className="col-12 col-lg-5 text-center d-none d-lg-block">
                                 <div className="p-4 rounded-4 text-start shadow-sm" style={{ background: 'var(--bg-surface-secondary)', border: '1px solid var(--border-color)' }}>
-                                    <div className="d-flex align-items-center gap-2 mb-3">
+                                    <div className="text-center mb-3">
+                                        <img 
+                                            src="/images/auth-therapy-illustration.svg" 
+                                            className="img-fluid" 
+                                            alt="Dichoptic Vision Therapy" 
+                                            style={{ maxHeight: '240px', width: '100%', objectFit: 'contain' }}
+                                        />
+                                    </div>
+                                    <div className="d-flex align-items-center gap-2 mb-2">
                                         <span className="badge bg-primary px-3 py-2 rounded-pill fw-semibold">
-                                            {isDoctor ? 'Clinical Management' : 'Therapy Simulation'}
+                                            {isDoctor ? 'Clinical Management' : 'Vision Therapy'}
                                         </span>
                                         <span className="badge bg-info-subtle text-info px-3 py-2 rounded-pill fw-semibold">
-                                            {isDoctor ? 'Doctor & Admin Portal' : 'Patient Access'}
+                                            {isDoctor ? 'Doctor & Admin' : 'Patient Access'}
                                         </span>
                                     </div>
-                                    <h3 className="fw-bold mb-3 text-main">
-                                        {isDoctor ? 'Optometrist & Clinical Console' : 'Dichoptic Therapy Engine'}
-                                    </h3>
-                                    <p className="text-sub small mb-4" style={{ lineHeight: '1.7' }}>
+                                    <h4 className="fw-bold mb-2 text-main">
+                                        {isDoctor ? 'Optometrist & Clinic Console' : 'Dichoptic Therapy Games'}
+                                    </h4>
+                                    <p className="text-sub small mb-3" style={{ lineHeight: '1.6' }}>
                                         {isDoctor 
-                                            ? 'Access patient cohorts, monitor compliance adherence rates, review therapy session volumes, and record clinical consultation notes.'
-                                            : 'Log in to play your 15–20 minute prescribed sessions, adjust Red/Cyan chromatic contrast balance, and view recovery records.'
+                                            ? 'Manage assigned patient cohorts, review therapy logs, monitor adherence rates, and log clinical assessments.'
+                                            : 'Log in to play your 15–20 minute prescribed sessions with Red/Cyan 3D glasses and track your visual recovery.'
                                         }
                                     </p>
-
-                                    <div className="d-flex flex-column gap-3 mb-4">
-                                        <div className="d-flex align-items-start gap-3 p-3 rounded-3" style={{ background: 'var(--bg-card)', border: '1px solid var(--border-color)' }}>
-                                            <div className="rounded-3 p-2 bg-primary-subtle text-primary d-flex align-items-center justify-content-center" style={{ width: 36, height: 36, minWidth: 36 }}>
-                                                <i className={`fa-solid ${isDoctor ? 'fa-user-doctor' : 'fa-gamepad'}`}></i>
-                                            </div>
-                                            <div>
-                                                <strong className="d-block text-main small">{isDoctor ? 'Multi-Doctor Clinic Roles' : '10 Calibrated Games'}</strong>
-                                                <span className="text-muted" style={{ fontSize: '0.8rem' }}>
-                                                    {isDoctor ? 'Granular RBAC for optometrists, staff, and clinic superadmins.' : 'Canvas and WebGL dichoptic engines designed for suppression relief.'}
-                                                </span>
-                                            </div>
-                                        </div>
-
-                                        <div className="d-flex align-items-start gap-3 p-3 rounded-3" style={{ background: 'var(--bg-card)', border: '1px solid var(--border-color)' }}>
-                                            <div className="rounded-3 p-2 bg-success-subtle text-success d-flex align-items-center justify-content-center" style={{ width: 36, height: 36, minWidth: 36 }}>
-                                                <i className="fa-solid fa-chart-line"></i>
-                                            </div>
-                                            <div>
-                                                <strong className="d-block text-main small">Live Adherence Telemetry</strong>
-                                                <span className="text-muted" style={{ fontSize: '0.8rem' }}>Calculated adherence rates against 20-minute daily standard targets.</span>
-                                            </div>
-                                        </div>
-                                    </div>
 
                                     {/* Quick Test Demo Credentials for Recruiters */}
                                     <div className="p-3 rounded-3" style={{ background: 'var(--bg-card)', border: '1px solid var(--border-color)' }}>

@@ -34,13 +34,13 @@ export default class Navbar extends React.Component {
                                 <a className="nav-link" href="/">Home</a>
                             </li>
                             <li className="nav-item">
-                                <a className="nav-link" href="/#science">Research</a>
+                                <a className="nav-link" href="/#intro">What is Lazy Eye?</a>
                             </li>
                             <li className="nav-item">
-                                <a className="nav-link" href="/#protocol">Protocol</a>
+                                <a className="nav-link" href="/#how-it-works">How It Works</a>
                             </li>
                             <li className="nav-item">
-                                <a className="nav-link" href="/#curriculum">Engines</a>
+                                <a className="nav-link" href="/#games">Therapy Games</a>
                             </li>
                             <li className="nav-item">
                                 <a className="nav-link" href="/#contact">Contact</a>

@@ -3,296 +3,109 @@ import Navbar from './Navbar';
 import Footer from './Footer';
 
 export default class Home extends React.Component {
-    constructor(props) {
-        super(props);
-        this.state = {
-            filterMode: 'both', // 'both' | 'red' | 'cyan'
-            redContrast: 85,
-            cyanContrast: 30,
-            stimulusType: 'crosshair', // 'crosshair' | 'squares' | 'letters'
-            activeTab: 'all' // for game filter
-        };
-    }
-
-    setFilterMode = (mode) => {
-        this.setState({ filterMode: mode });
-    }
-
-    handleRedChange = (e) => {
-        this.setState({ redContrast: parseInt(e.target.value, 10) });
-    }
-
-    handleCyanChange = (e) => {
-        this.setState({ cyanContrast: parseInt(e.target.value, 10) });
-    }
-
-    setStimulusType = (type) => {
-        this.setState({ stimulusType: type });
-    }
-
-    setActiveTab = (tab) => {
-        this.setState({ activeTab: tab });
-    }
-
     render() {
-        const { filterMode, redContrast, cyanContrast, stimulusType, activeTab } = this.state;
-        const ratio = (redContrast / Math.max(cyanContrast, 1)).toFixed(2);
-
-        const gamesList = [
-            { id: 1, name: 'Dichoptic Snake', category: 'tracking', tag: 'Binocular Tracking', disparity: '12px', floor: '15%', focus: 'Macular Fixation', time: '20m', route: '/game1snake' },
-            { id: 2, name: 'Block Fusion', category: 'spatial', tag: 'Pattern Synthesis', disparity: '16px', floor: '20%', focus: 'Spatial Orientation', time: '20m', route: '/game8tetris' },
-            { id: 3, name: 'Altitude Flight', category: 'saccades', tag: 'Visual Timing', disparity: '14px', floor: '15%', focus: 'Saccadic Eye Velocity', time: '15m', route: '/game2flappybird' },
-            { id: 4, name: '3D Spatial Slicer', category: 'spatial', tag: 'Cortical Reflex', disparity: '20px', floor: '25%', focus: 'Stereoscopic Depth', time: '20m', route: '/game12menja' },
-            { id: 5, name: 'Bubble Target Aim', category: 'foveal', tag: 'Foveal Targeting', disparity: '10px', floor: '10%', focus: 'Central Visual Acuity', time: '15m', route: '/game9bubbleshooter' },
-            { id: 6, name: 'Table Rally 3D', category: 'tracking', tag: 'Depth Perception', disparity: '18px', floor: '20%', focus: 'Dynamic Disparity', time: '15m', route: '/game10pingpong' }
+        const games = [
+            { 
+                name: 'Dichoptic Snake', 
+                icon: '/images/snake-mascot.svg', 
+                tag: 'Tracking & Agility', 
+                desc: 'Guide the snake to collect targets split across red and cyan channels, training hand-eye coordination.' 
+            },
+            { 
+                name: 'Block Fusion (Tetris)', 
+                icon: '/images/tetris-mascot.svg', 
+                tag: 'Spatial Fusion', 
+                desc: 'Falling blocks appear to one eye while landed blocks appear to the other, forcing both eyes to work together.' 
+            },
+            { 
+                name: 'Altitude Flight (Flappy Bird)', 
+                icon: '/images/flappy-mascot.svg', 
+                tag: 'Visual Timing', 
+                desc: 'Navigate through obstacle gates that require simultaneous dual-eye recognition to avoid collisions.' 
+            },
+            { 
+                name: '3D Table Tennis (Ping Pong)', 
+                icon: '/images/pingpong-mascot.svg', 
+                tag: 'Depth & Speed', 
+                desc: 'Fast-paced rally game that exercises visual tracking, reaction speed, and depth perception.' 
+            },
+            { 
+                name: 'Bubble Target Aim', 
+                icon: '/images/bubbles-mascot.svg', 
+                tag: 'Foveal Focus', 
+                desc: 'Aim at high-contrast bubbles to train central fixation in the amblyopic eye with precision.' 
+            },
+            { 
+                name: 'Climber Holds', 
+                icon: '/images/stickyholds-mascot.svg', 
+                tag: 'Hand-Eye Precision', 
+                desc: 'Reach for targets on a climbing wall to exercise peripheral awareness and spatial coordination.' 
+            }
         ];
-
-        const filteredGames = activeTab === 'all' 
-            ? gamesList 
-            : gamesList.filter(g => g.category === activeTab);
 
         return (
             <>
                 <Navbar />
 
-                {/* Hero Section with Interactive Clinical Optics Lab */}
+                {/* Hero Section */}
                 <section className="hero-section">
                     <div className="container">
                         <div className="row align-items-center g-5">
-                            {/* Left Column: Authoritative Editorial Copy */}
-                            <div className="col-12 col-lg-6" data-aos="fade-up">
-                                <div className="d-inline-flex align-items-center gap-2 mb-3">
-                                    <span className="badge bg-primary-subtle text-primary border border-primary-subtle px-2 py-1 rounded-1 fw-bold" style={{ fontSize: '0.74rem', letterSpacing: '0.06em', fontFamily: 'ui-monospace, monospace' }}>
-                                        DICHOPTIC AMBLYOPIA PLATFORM
-                                    </span>
-                                    <span className="badge bg-secondary-subtle text-muted px-2 py-1 rounded-1 small" style={{ fontSize: '0.74rem', fontFamily: 'ui-monospace, monospace' }}>
-                                        PROTOTYPE v2.4
-                                    </span>
+                            <div className="col-12 col-lg-7 order-1 order-lg-0">
+                                <div className="d-inline-flex align-items-center gap-2 px-3 py-2 rounded-pill bg-primary-subtle text-primary fw-semibold small mb-3">
+                                    <i className="fa-solid fa-glasses"></i>
+                                    <span>Fun Home Vision Therapy</span>
                                 </div>
-
-                                <h1 className="hero-title mb-3">
-                                    Restoring Binocular Vision through <span className="accent-text">Dichoptic Retraining</span>
+                                <h1 className="hero-title">
+                                    Helping Every Child See the World <span className="accent-text">Clearly &amp; Brightly</span>
                                 </h1>
-
-                                <p className="hero-desc mb-4">
-                                    A clinical digital therapeutics platform engineered for pediatric and adult amblyopia rehabilitation. By presenting contrast-attenuated stimuli to the dominant eye and high-contrast targets to the amblyopic eye, the system actively forces the visual cortex (Area V1) to break neural suppression.
+                                <p className="hero-desc">
+                                    A smart, friendly way to treat <strong>Lazy Eye (Amblyopia)</strong> at home. Wear simple Red/Cyan 3D glasses and play engaging video games for 15–20 minutes a day to train your weaker eye and help both eyes work together as a team.
                                 </p>
-
-                                <div className="d-flex flex-wrap align-items-center gap-3 mb-4">
-                                    <a href="/Register_view" className="btn-modern-primary">
-                                        <i className="fa-solid fa-play"></i> Start Therapy Session
+                                <div className="d-flex flex-wrap gap-3 mb-4">
+                                    <a href="/Register_view" className="btn-modern-primary py-3 px-4">
+                                        <i className="fa-solid fa-play"></i> Start Therapy Free
                                     </a>
-                                    <a href="/Login_view?role=doctor" className="btn-modern-outline">
-                                        <i className="fa-solid fa-stethoscope"></i> Clinical Doctor Portal
+                                    <a href="/Login_view" className="btn-modern-outline py-3 px-4">
+                                        <i className="fa-solid fa-right-to-bracket"></i> Patient &amp; Doctor Login
                                     </a>
-                                    <a href="#protocol" className="btn-modern-outline">
-                                        <i className="fa-solid fa-diagram-project"></i> Protocol
+                                    <a href="#how-it-works" className="btn-modern-outline py-3 px-4">
+                                        <i className="fa-solid fa-circle-info"></i> How It Works
                                     </a>
                                 </div>
-
-                                <div className="d-flex align-items-center gap-4 pt-3 border-top" style={{ borderColor: 'var(--border-color)' }}>
-                                    <div>
-                                        <small className="d-block text-muted" style={{ fontSize: '0.72rem', textTransform: 'uppercase', letterSpacing: '0.05em', fontWeight: 700 }}>Clinical Dosage</small>
-                                        <strong className="text-main" style={{ fontSize: '0.92rem', fontFamily: 'ui-monospace, monospace' }}>20 min / daily session</strong>
+                                <div className="d-flex flex-wrap align-items-center gap-4 pt-3 border-top" style={{ borderColor: 'var(--border-color)' }}>
+                                    <div className="d-flex align-items-center gap-2 text-sub small">
+                                        <i className="fa-solid fa-circle-check text-success"></i>
+                                        <span>No Boring Eye Patches</span>
                                     </div>
-                                    <div className="border-start ps-4" style={{ borderColor: 'var(--border-color)' }}>
-                                        <small className="d-block text-muted" style={{ fontSize: '0.72rem', textTransform: 'uppercase', letterSpacing: '0.05em', fontWeight: 700 }}>Optics Standard</small>
-                                        <strong className="text-main" style={{ fontSize: '0.92rem', fontFamily: 'ui-monospace, monospace' }}>Red 630nm / Cyan 490nm</strong>
+                                    <div className="d-flex align-items-center gap-2 text-sub small">
+                                        <i className="fa-solid fa-circle-check text-success"></i>
+                                        <span>Standard Red/Cyan Glasses</span>
                                     </div>
-                                    <div className="border-start ps-4" style={{ borderColor: 'var(--border-color)' }}>
-                                        <small className="d-block text-muted" style={{ fontSize: '0.72rem', textTransform: 'uppercase', letterSpacing: '0.05em', fontWeight: 700 }}>Cohort Adherence</small>
-                                        <strong className="text-success" style={{ fontSize: '0.92rem', fontFamily: 'ui-monospace, monospace' }}>92.4% Verified</strong>
+                                    <div className="d-flex align-items-center gap-2 text-sub small">
+                                        <i className="fa-solid fa-circle-check text-success"></i>
+                                        <span>Fun for Kids &amp; Adults</span>
                                     </div>
                                 </div>
                             </div>
-
-                            {/* Right Column: Live Interactive Anaglyph Calibration Simulator */}
-                            <div className="col-12 col-lg-6" data-aos="fade-left">
-                                <div className="optics-lab-card">
-                                    {/* Console Top Bar */}
-                                    <div className="optics-lab-header">
-                                        <div className="d-flex align-items-center gap-2">
-                                            <span className="badge bg-success-subtle text-success py-0 px-2 fw-bold" style={{ fontSize: '0.68rem' }}>● LIVE EMULATION</span>
-                                            <span className="text-sub fw-semibold">OPTICS CALIBRATION LAB</span>
-                                        </div>
-                                        <div className="d-flex align-items-center gap-2">
-                                            <span className="text-muted" style={{ fontSize: '0.72rem' }}>RATIO:</span>
-                                            <span className="text-primary fw-bold">{ratio}:1</span>
-                                        </div>
-                                    </div>
-
-                                    {/* Live Stimulus Viewport with Dichoptic Layers */}
-                                    <div className="optics-viewport">
-                                        <div className="optics-grid-overlay"></div>
-                                        <div className="optics-crosshair-center"></div>
-
-                                        {/* Red Channel Layer (Amblyopic Eye) */}
-                                        {(filterMode === 'both' || filterMode === 'red') && (
-                                            <div 
-                                                className="stimulus-layer stimulus-red" 
-                                                style={{ 
-                                                    opacity: redContrast / 100,
-                                                    transform: 'translate(-4px, 0)'
-                                                }}
-                                            >
-                                                {stimulusType === 'crosshair' && (
-                                                    <div style={{ width: 70, height: 70, border: '3px solid #ff2a4b', borderRadius: '50%', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-                                                        <div style={{ width: 14, height: 14, background: '#ff2a4b', borderRadius: '50%' }}></div>
-                                                    </div>
-                                                )}
-                                                {stimulusType === 'squares' && (
-                                                    <div style={{ width: 80, height: 80, border: '3px solid #ff2a4b', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-                                                        <span style={{ fontSize: '1.2rem', fontWeight: 800 }}>LE</span>
-                                                    </div>
-                                                )}
-                                                {stimulusType === 'letters' && (
-                                                    <div style={{ fontSize: '3rem', fontWeight: 900, fontFamily: 'ui-monospace, monospace' }}>
-                                                        E
-                                                    </div>
-                                                )}
-                                            </div>
-                                        )}
-
-                                        {/* Cyan Channel Layer (Dominant Eye) */}
-                                        {(filterMode === 'both' || filterMode === 'cyan') && (
-                                            <div 
-                                                className="stimulus-layer stimulus-cyan" 
-                                                style={{ 
-                                                    opacity: cyanContrast / 100,
-                                                    transform: 'translate(4px, 0)'
-                                                }}
-                                            >
-                                                {stimulusType === 'crosshair' && (
-                                                    <div style={{ width: 70, height: 70, border: '3px solid #00f0ff', borderRadius: '50%', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-                                                        <div style={{ width: 28, height: 2, background: '#00f0ff', position: 'absolute' }}></div>
-                                                        <div style={{ height: 28, width: 2, background: '#00f0ff', position: 'absolute' }}></div>
-                                                    </div>
-                                                )}
-                                                {stimulusType === 'squares' && (
-                                                    <div style={{ width: 80, height: 80, border: '3px dashed #00f0ff', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-                                                        <span style={{ fontSize: '1.2rem', fontWeight: 800 }}>RE</span>
-                                                    </div>
-                                                )}
-                                                {stimulusType === 'letters' && (
-                                                    <div style={{ fontSize: '3rem', fontWeight: 900, fontFamily: 'ui-monospace, monospace' }}>
-                                                        E
-                                                    </div>
-                                                )}
-                                            </div>
-                                        )}
-
-                                        {/* Floating Optical Status HUD */}
-                                        <div className="position-absolute bottom-0 start-0 w-100 p-2 d-flex justify-content-between align-items-center" style={{ background: 'linear-gradient(transparent, rgba(11, 17, 32, 0.9))', fontSize: '0.72rem', fontFamily: 'ui-monospace, monospace' }}>
-                                            <span className="text-white-50">
-                                                MODE: <strong className="text-white">{filterMode.toUpperCase()}</strong>
+                            <div className="col-12 col-lg-5 order-0 order-lg-1 text-center">
+                                <div className="p-3 rounded-4 shadow-sm position-relative overflow-hidden" style={{ background: 'var(--bg-surface-secondary)', border: '1px solid var(--border-color)' }}>
+                                    <img 
+                                        src="/images/hero-vision-therapy.svg" 
+                                        alt="Child playing vision therapy games with 3D glasses" 
+                                        className="img-fluid rounded-3"
+                                        style={{ maxHeight: '360px', width: '100%', objectFit: 'contain' }}
+                                    />
+                                    <div className="mt-3 p-3 rounded-3 text-start" style={{ background: 'var(--bg-card)', border: '1px solid var(--border-color)' }}>
+                                        <div className="d-flex align-items-center justify-content-between mb-1">
+                                            <span className="fw-bold text-main small">
+                                                <i className="fa-solid fa-heart-pulse text-danger me-1"></i> Dual-Eye Brain Training
                                             </span>
-                                            <span className="text-white-50">
-                                                DISPARITY: <strong className="text-info">8px BIFOCAL</strong>
-                                            </span>
-                                            <span className="text-white-50">
-                                                BLEND: <strong className="text-success">{filterMode === 'both' ? 'FUSED' : 'OCCLUDED'}</strong>
-                                            </span>
+                                            <span className="badge bg-success-subtle text-success small">15–20 min / day</span>
                                         </div>
-                                    </div>
-
-                                    {/* Interactive Controls Panel */}
-                                    <div className="optics-slider-control">
-                                        {/* Filter Mode Switcher Tabs */}
-                                        <div className="d-flex align-items-center justify-content-between gap-2 mb-3">
-                                            <span className="small text-muted fw-bold" style={{ fontSize: '0.75rem', textTransform: 'uppercase' }}>Ocular Filter Pass:</span>
-                                            <div className="d-flex gap-1">
-                                                <button 
-                                                    type="button" 
-                                                    className={`filter-mode-btn ${filterMode === 'both' ? 'active' : ''}`}
-                                                    onClick={() => this.setFilterMode('both')}
-                                                >
-                                                    ⚪ Binocular Fusion
-                                                </button>
-                                                <button 
-                                                    type="button" 
-                                                    className={`filter-mode-btn ${filterMode === 'red' ? 'active' : ''}`}
-                                                    onClick={() => this.setFilterMode('red')}
-                                                >
-                                                    🔴 Left Eye (Red)
-                                                </button>
-                                                <button 
-                                                    type="button" 
-                                                    className={`filter-mode-btn ${filterMode === 'cyan' ? 'active' : ''}`}
-                                                    onClick={() => this.setFilterMode('cyan')}
-                                                >
-                                                    🔵 Right Eye (Cyan)
-                                                </button>
-                                            </div>
-                                        </div>
-
-                                        {/* Contrast Sliders */}
-                                        <div className="row g-3">
-                                            <div className="col-6">
-                                                <div className="d-flex justify-content-between align-items-center mb-1">
-                                                    <label className="small fw-bold text-main" style={{ fontSize: '0.74rem' }}>
-                                                        <i className="fa-solid fa-circle text-danger me-1" style={{ fontSize: '0.65rem' }}></i>
-                                                        Amblyopic Eye (Red)
-                                                    </label>
-                                                    <span className="small fw-bold text-danger font-mono" style={{ fontSize: '0.78rem' }}>{redContrast}%</span>
-                                                </div>
-                                                <input 
-                                                    type="range" 
-                                                    className="form-range" 
-                                                    min="20" 
-                                                    max="100" 
-                                                    value={redContrast} 
-                                                    onChange={this.handleRedChange}
-                                                />
-                                            </div>
-                                            <div className="col-6">
-                                                <div className="d-flex justify-content-between align-items-center mb-1">
-                                                    <label className="small fw-bold text-main" style={{ fontSize: '0.74rem' }}>
-                                                        <i className="fa-solid fa-circle text-info me-1" style={{ fontSize: '0.65rem' }}></i>
-                                                        Dominant Eye (Cyan)
-                                                    </label>
-                                                    <span className="small fw-bold text-info font-mono" style={{ fontSize: '0.78rem' }}>{cyanContrast}%</span>
-                                                </div>
-                                                <input 
-                                                    type="range" 
-                                                    className="form-range" 
-                                                    min="10" 
-                                                    max="100" 
-                                                    value={cyanContrast} 
-                                                    onChange={this.handleCyanChange}
-                                                />
-                                            </div>
-                                        </div>
-
-                                        {/* Stimulus Selector Footer */}
-                                        <div className="d-flex align-items-center justify-content-between mt-3 pt-2 border-top" style={{ borderColor: 'var(--border-color)', fontSize: '0.76rem' }}>
-                                            <span className="text-muted">Target Pattern:</span>
-                                            <div className="d-flex gap-2">
-                                                <button 
-                                                    type="button" 
-                                                    className={`btn btn-sm py-0 px-2 ${stimulusType === 'crosshair' ? 'btn-primary' : 'btn-outline-secondary'}`} 
-                                                    style={{ fontSize: '0.72rem' }}
-                                                    onClick={() => this.setStimulusType('crosshair')}
-                                                >
-                                                    Foveal Crosshair
-                                                </button>
-                                                <button 
-                                                    type="button" 
-                                                    className={`btn btn-sm py-0 px-2 ${stimulusType === 'squares' ? 'btn-primary' : 'btn-outline-secondary'}`} 
-                                                    style={{ fontSize: '0.72rem' }}
-                                                    onClick={() => this.setStimulusType('squares')}
-                                                >
-                                                    Fusion Box
-                                                </button>
-                                                <button 
-                                                    type="button" 
-                                                    className={`btn btn-sm py-0 px-2 ${stimulusType === 'letters' ? 'btn-primary' : 'btn-outline-secondary'}`} 
-                                                    style={{ fontSize: '0.72rem' }}
-                                                    onClick={() => this.setStimulusType('letters')}
-                                                >
-                                                    Tumbling E
-                                                </button>
-                                            </div>
-                                        </div>
+                                        <p className="text-muted small mb-0" style={{ fontSize: '0.82rem' }}>
+                                            Both eyes must work simultaneously to score points, gently waking up the lazy eye while playing games.
+                                        </p>
                                     </div>
                                 </div>
                             </div>
@@ -300,329 +113,302 @@ export default class Home extends React.Component {
                     </div>
                 </section>
 
-                {/* Integrated Clinical Telemetry Strip (No generic 4-box cards) */}
-                <section className="py-2">
+                {/* Highlights Bar */}
+                <section className="py-4">
                     <div className="container">
-                        <div className="clinical-telemetry-bar">
-                            <div className="row g-0 align-items-center">
-                                <div className="col-12 col-sm-6 col-lg-3 telemetry-item">
-                                    <div className="telemetry-mono-val text-primary">10</div>
-                                    <div className="telemetry-label">Dichoptic Engines</div>
-                                    <small className="text-muted" style={{ fontSize: '0.78rem' }}>HTML5 Canvas &amp; WebGL shaders</small>
+                        <div className="row g-3">
+                            <div className="col-6 col-lg-3">
+                                <div className="p-3 rounded-3 h-100 text-center" style={{ background: 'var(--bg-card)', border: '1px solid var(--border-color)' }}>
+                                    <div className="rounded-circle bg-primary-subtle text-primary d-inline-flex align-items-center justify-content-center mb-2" style={{ width: 44, height: 44 }}>
+                                        <i className="fa-solid fa-gamepad fa-lg"></i>
+                                    </div>
+                                    <h4 className="fw-bold mb-1 text-main">10+ Fun Games</h4>
+                                    <p className="text-muted small mb-0">Tetris, Snake, Flappy Bird &amp; more</p>
                                 </div>
-                                <div className="col-12 col-sm-6 col-lg-3 telemetry-item">
-                                    <div className="telemetry-mono-val">20<span className="fs-6 fw-normal text-muted">min</span></div>
-                                    <div className="telemetry-label">Daily Target Dosage</div>
-                                    <small className="text-muted" style={{ fontSize: '0.78rem' }}>Standard pediatric protocol</small>
+                            </div>
+                            <div className="col-6 col-lg-3">
+                                <div className="p-3 rounded-3 h-100 text-center" style={{ background: 'var(--bg-card)', border: '1px solid var(--border-color)' }}>
+                                    <div className="rounded-circle bg-success-subtle text-success d-inline-flex align-items-center justify-content-center mb-2" style={{ width: 44, height: 44 }}>
+                                        <i className="fa-solid fa-stopwatch fa-lg"></i>
+                                    </div>
+                                    <h4 className="fw-bold mb-1 text-main">15–20 Mins</h4>
+                                    <p className="text-muted small mb-0">Daily recommended play time</p>
                                 </div>
-                                <div className="col-12 col-sm-6 col-lg-3 telemetry-item">
-                                    <div className="telemetry-mono-val">Dual-Ch</div>
-                                    <div className="telemetry-label">Contrast Attenuation</div>
-                                    <small className="text-muted" style={{ fontSize: '0.78rem' }}>Foveal balance per ocular axis</small>
+                            </div>
+                            <div className="col-6 col-lg-3">
+                                <div className="p-3 rounded-3 h-100 text-center" style={{ background: 'var(--bg-card)', border: '1px solid var(--border-color)' }}>
+                                    <div className="rounded-circle bg-info-subtle text-info d-inline-flex align-items-center justify-content-center mb-2" style={{ width: 44, height: 44 }}>
+                                        <i className="fa-solid fa-glasses fa-lg"></i>
+                                    </div>
+                                    <h4 className="fw-bold mb-1 text-main">Red/Cyan Lenses</h4>
+                                    <p className="text-muted small mb-0">Standard inexpensive 3D glasses</p>
                                 </div>
-                                <div className="col-12 col-sm-6 col-lg-3 telemetry-item">
-                                    <div className="telemetry-mono-val text-success">Live</div>
-                                    <div className="telemetry-label">Clinical Adherence</div>
-                                    <small className="text-muted" style={{ fontSize: '0.78rem' }}>postMessage telemetry sync</small>
+                            </div>
+                            <div className="col-6 col-lg-3">
+                                <div className="p-3 rounded-3 h-100 text-center" style={{ background: 'var(--bg-card)', border: '1px solid var(--border-color)' }}>
+                                    <div className="rounded-circle bg-warning-subtle text-warning d-inline-flex align-items-center justify-content-center mb-2" style={{ width: 44, height: 44 }}>
+                                        <i className="fa-solid fa-chart-line fa-lg"></i>
+                                    </div>
+                                    <h4 className="fw-bold mb-1 text-main">Doctor Tracking</h4>
+                                    <p className="text-muted small mb-0">Optometrist review portal</p>
                                 </div>
                             </div>
                         </div>
                     </div>
                 </section>
 
-                {/* Clinical Comparison Matrix: Traditional Patching vs Active Dichoptic Stimulation */}
-                <section id="science" className="py-5 mt-4" style={{ backgroundColor: 'var(--bg-surface-secondary)' }}>
+                {/* Introduction Section: What is Amblyopia? */}
+                <section id="intro" className="py-5" style={{ background: 'var(--bg-surface-secondary)' }}>
                     <div className="container">
-                        <div className="row align-items-center g-5">
-                            <div className="col-12 col-lg-5" data-aos="fade-right">
-                                <span className="badge bg-primary-subtle text-primary border border-primary-subtle px-2 py-1 rounded-1 fw-bold mb-2" style={{ fontSize: '0.74rem', fontFamily: 'ui-monospace, monospace' }}>
-                                    NEURO-OPTOMETRIC RESEARCH
-                                </span>
-                                <h2 className="fw-bold mb-3 text-main" style={{ letterSpacing: '-0.02em' }}>
-                                    Why Dichoptic Stimulation Overcomes Cortical Suppression
-                                </h2>
-                                <p className="text-sub small mb-3" style={{ lineHeight: '1.7' }}>
-                                    Amblyopia is primarily a neurological dysfunction of the visual cortex (Area V1), not merely a physical eye defect. In conventional patching therapy, the dominant eye is covered, leaving the visual cortex in an artificial monocular state with relapse rates exceeding 25%.
-                                </p>
-                                <p className="text-sub small mb-4" style={{ lineHeight: '1.7' }}>
-                                    LazyEye implements <strong>active binocular stimulation</strong>. By displaying complementary high-contrast game targets to the amblyopic eye and attenuated contrast obstacles to the dominant eye, it retrains the brain to synthesize inputs from both retinas simultaneously.
-                                </p>
-                                <div className="d-flex gap-2">
-                                    <a href="/Register_view" className="btn-modern-primary">
-                                        <i className="fa-solid fa-user-plus"></i> Enroll in Clinical Cohort
-                                    </a>
+                        <div className="text-center mb-5">
+                            <span className="badge bg-primary-subtle text-primary px-3 py-2 rounded-pill fw-bold mb-2">Understanding Amblyopia</span>
+                            <h2 className="fw-bold text-main">What is Lazy Eye &amp; How Does It Work?</h2>
+                            <p className="text-sub mx-auto" style={{ maxWidth: '640px' }}>
+                                A clear, friendly explanation for parents, patients, and families looking for modern vision solutions.
+                            </p>
+                        </div>
+
+                        <div className="row g-4 align-items-stretch">
+                            <div className="col-12 col-md-4">
+                                <div className="modern-card h-100 d-flex flex-column p-4">
+                                    <div className="rounded-3 bg-primary-subtle text-primary d-inline-flex align-items-center justify-content-center p-3 mb-3" style={{ width: 52, height: 52 }}>
+                                        <i className="fa-solid fa-eye-low-vision fa-xl"></i>
+                                    </div>
+                                    <h5 className="fw-bold mb-2 text-main">1. What is Lazy Eye?</h5>
+                                    <p className="text-sub small mb-0" style={{ lineHeight: '1.7' }}>
+                                        Lazy eye (amblyopia) is a common condition where the brain and one eye are not communicating properly. Because one eye produces a slightly weaker picture, the brain begins to favor the stronger eye and ignore input from the weaker one. Over time, visual sharpness in that eye fades.
+                                    </p>
                                 </div>
                             </div>
 
-                            <div className="col-12 col-lg-7" data-aos="fade-left">
-                                <div className="table-responsive">
-                                    <table className="clinical-matrix-table shadow-sm">
-                                        <thead>
-                                            <tr>
-                                                <th>Therapeutic Parameter</th>
-                                                <th>Traditional Eye Patching</th>
-                                                <th className="text-primary">LazyEye Dichoptic Platform</th>
-                                            </tr>
-                                        </thead>
-                                        <tbody>
-                                            <tr>
-                                                <td><strong>Ocular Activation</strong></td>
-                                                <td><span className="badge bg-secondary-subtle text-muted">Monocular Only</span> (Fellow eye blocked)</td>
-                                                <td><span className="badge bg-primary-subtle text-primary">Active Binocular</span> (Both eyes engaged)</td>
-                                            </tr>
-                                            <tr>
-                                                <td><strong>Suppression Retraining</strong></td>
-                                                <td>Indirect; suppression recurs upon patch removal</td>
-                                                <td>Direct; contrast attenuation breaks V1 cortical suppression</td>
-                                            </tr>
-                                            <tr>
-                                                <td><strong>Stereopsis &amp; Depth</strong></td>
-                                                <td><i className="fa-solid fa-xmark text-danger me-1"></i> Not addressed or rehabilitated</td>
-                                                <td><i className="fa-solid fa-check text-success me-1"></i> Trains disparity fusion &amp; 3D depth perception</td>
-                                            </tr>
-                                            <tr>
-                                                <td><strong>Patient Adherence</strong></td>
-                                                <td>Low compliance (~42% pediatric adherence)</td>
-                                                <td>High compliance (&gt;92% through calibrated gamification)</td>
-                                            </tr>
-                                            <tr>
-                                                <td><strong>Clinical Supervision</strong></td>
-                                                <td>Subjective parent recall between checkups</td>
-                                                <td>Real-time daily session duration &amp; score telemetry</td>
-                                            </tr>
-                                        </tbody>
-                                    </table>
+                            <div className="col-12 col-md-4">
+                                <div className="modern-card h-100 d-flex flex-column p-4">
+                                    <div className="rounded-3 bg-danger-subtle text-danger d-inline-flex align-items-center justify-content-center p-3 mb-3" style={{ width: 52, height: 52 }}>
+                                        <i className="fa-solid fa-circle-xmark fa-xl"></i>
+                                    </div>
+                                    <h5 className="fw-bold mb-2 text-main">2. The Problem with Eye Patches</h5>
+                                    <p className="text-sub small mb-0" style={{ lineHeight: '1.7' }}>
+                                        Traditional patching covers the good eye with an adhesive patch for hours. Children hate wearing it at school, causing frustration and tears. More importantly, when the patch is removed, the two eyes still have not learned to work together, resulting in frequent vision relapse.
+                                    </p>
+                                </div>
+                            </div>
+
+                            <div className="col-12 col-md-4">
+                                <div className="modern-card h-100 d-flex flex-column p-4">
+                                    <div className="rounded-3 bg-success-subtle text-success d-inline-flex align-items-center justify-content-center p-3 mb-3" style={{ width: 52, height: 52 }}>
+                                        <i className="fa-solid fa-puzzle-piece fa-xl"></i>
+                                    </div>
+                                    <h5 className="fw-bold mb-2 text-main">3. The Fun Game Solution</h5>
+                                    <p className="text-sub small mb-0" style={{ lineHeight: '1.7' }}>
+                                        Instead of hiding the strong eye, our games show separate, complementary elements to each eye through Red/Cyan glasses. For example, one eye sees the player while the other sees the score targets. Both eyes MUST work together to play, retraining the brain naturally while having fun!
+                                    </p>
                                 </div>
                             </div>
                         </div>
                     </div>
                 </section>
 
-                {/* Horizontal Clinical Protocol Pipeline (Process 01 -> 02 -> 03) */}
-                <section id="protocol" className="py-5">
+                {/* Instructions Section: How To Play */}
+                <section id="how-it-works" className="py-5">
                     <div className="container">
-                        <div className="d-flex align-items-center justify-content-between flex-wrap gap-2 mb-4 pb-2 border-bottom" style={{ borderColor: 'var(--border-color)' }}>
-                            <div>
-                                <span className="badge bg-primary-subtle text-primary border border-primary-subtle px-2 py-1 rounded-1 fw-bold" style={{ fontSize: '0.74rem', fontFamily: 'ui-monospace, monospace' }}>
-                                    STANDARDIZED PROTOCOL
-                                </span>
-                                <h3 className="fw-bold text-main mt-2 mb-0" style={{ letterSpacing: '-0.02em' }}>Three-Phase Therapy Workflow</h3>
+                        <div className="text-center mb-5">
+                            <span className="badge bg-primary-subtle text-primary px-3 py-2 rounded-pill fw-bold mb-2">Step-by-Step Instructions</span>
+                            <h2 className="fw-bold text-main">How to Play &amp; Strengthen Your Vision</h2>
+                            <p className="text-sub mx-auto" style={{ maxWidth: '600px' }}>
+                                Getting started takes less than two minutes. Follow these simple steps for your daily home therapy.
+                            </p>
+                        </div>
+
+                        <div className="row g-4 justify-content-center">
+                            <div className="col-12 col-md-4">
+                                <div className="modern-card h-100 p-4">
+                                    <div className="d-flex align-items-center gap-3 mb-3">
+                                        <div className="rounded-circle bg-primary text-white fw-bold d-flex align-items-center justify-content-center" style={{ width: 42, height: 42, fontSize: '1.1rem' }}>
+                                            1
+                                        </div>
+                                        <h5 className="fw-bold mb-0 text-main">Wear Red/Cyan Glasses</h5>
+                                    </div>
+                                    <p className="text-sub small mb-3" style={{ lineHeight: '1.7' }}>
+                                        Put on standard anaglyph glasses (Red lens on the left eye, Blue/Cyan lens on the right eye). These lenses separate the game images so each eye receives its own visual challenge.
+                                    </p>
+                                    <div className="p-2 rounded-3 bg-body-tertiary small text-muted">
+                                        <i className="fa-solid fa-glasses text-primary me-1"></i> Standard glasses available online or from your optometrist.
+                                    </div>
+                                </div>
                             </div>
-                            <span className="text-muted small font-mono">STANDARDIZED AT 20 MIN / SESSION</span>
+
+                            <div className="col-12 col-md-4">
+                                <div className="modern-card h-100 p-4">
+                                    <div className="d-flex align-items-center gap-3 mb-3">
+                                        <div className="rounded-circle bg-primary text-white fw-bold d-flex align-items-center justify-content-center" style={{ width: 42, height: 42, fontSize: '1.1rem' }}>
+                                            2
+                                        </div>
+                                        <h5 className="fw-bold mb-0 text-main">Adjust Color Contrast</h5>
+                                    </div>
+                                    <p className="text-sub small mb-3" style={{ lineHeight: '1.7' }}>
+                                        Inside each game, easily adjust the color brightness sliders. Set the weaker eye to high contrast and the stronger eye to slightly lower contrast. This gives the lazy eye an extra boost.
+                                    </p>
+                                    <div className="p-2 rounded-3 bg-body-tertiary small text-muted">
+                                        <i className="fa-solid fa-sliders text-primary me-1"></i> Customized in seconds right on your screen.
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div className="col-12 col-md-4">
+                                <div className="modern-card h-100 p-4">
+                                    <div className="d-flex align-items-center gap-3 mb-3">
+                                        <div className="rounded-circle bg-primary text-white fw-bold d-flex align-items-center justify-content-center" style={{ width: 42, height: 42, fontSize: '1.1rem' }}>
+                                            3
+                                        </div>
+                                        <h5 className="fw-bold mb-0 text-main">Play 15–20 Mins Daily</h5>
+                                    </div>
+                                    <p className="text-sub small mb-3" style={{ lineHeight: '1.7' }}>
+                                        Enjoy playing Snake, Tetris, or Flappy Bird for 15 to 20 minutes a day. Your game time is recorded automatically so you and your doctor can track consistency and vision improvements.
+                                    </p>
+                                    <div className="p-2 rounded-3 bg-body-tertiary small text-muted">
+                                        <i className="fa-solid fa-trophy text-warning me-1"></i> Fun, engaging gameplay kids look forward to every day.
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+
+                {/* Games Showcase Section */}
+                <section id="games" className="py-5" style={{ background: 'var(--bg-surface-secondary)' }}>
+                    <div className="container">
+                        <div className="text-center mb-5">
+                            <span className="badge bg-primary-subtle text-primary px-3 py-2 rounded-pill fw-bold mb-2">Our Video Games</span>
+                            <h2 className="fw-bold text-main">10 Engaging Games Designed for Vision Recovery</h2>
+                            <p className="text-sub mx-auto" style={{ maxWidth: '640px' }}>
+                                Every game is carefully adapted with dichoptic color separation to exercise spatial perception, speed, and eye coordination.
+                            </p>
                         </div>
 
                         <div className="row g-4">
-                            <div className="col-12 col-md-4">
-                                <div className="modern-card h-100 p-4">
-                                    <div className="d-flex align-items-center justify-content-between mb-3">
-                                        <span className="font-mono text-primary fw-bold" style={{ fontSize: '1.25rem' }}>PHASE 01</span>
-                                        <i className="fa-solid fa-glasses text-muted fa-lg"></i>
-                                    </div>
-                                    <h5 className="fw-bold mb-2 text-main">Optical Color Separation</h5>
-                                    <p className="text-sub small mb-0" style={{ lineHeight: '1.6' }}>
-                                        Patient wears optical Red/Cyan anaglyph lenses. The red filter (630nm) covers the amblyopic eye; the cyan filter (490nm) covers the dominant eye, isolating each retina's input channel.
-                                    </p>
-                                </div>
-                            </div>
-
-                            <div className="col-12 col-md-4">
-                                <div className="modern-card h-100 p-4">
-                                    <div className="d-flex align-items-center justify-content-between mb-3">
-                                        <span className="font-mono text-primary fw-bold" style={{ fontSize: '1.25rem' }}>PHASE 02</span>
-                                        <i className="fa-solid fa-sliders text-muted fa-lg"></i>
-                                    </div>
-                                    <h5 className="fw-bold mb-2 text-main">Contrast Balancing</h5>
-                                    <p className="text-sub small mb-0" style={{ lineHeight: '1.6' }}>
-                                        Doctor or patient calibrates the contrast threshold. Attenuating dominant eye visibility down to 20%–40% allows the visual cortex to accept signals from the weaker eye without suppression.
-                                    </p>
-                                </div>
-                            </div>
-
-                            <div className="col-12 col-md-4">
-                                <div className="modern-card h-100 p-4">
-                                    <div className="d-flex align-items-center justify-content-between mb-3">
-                                        <span className="font-mono text-primary fw-bold" style={{ fontSize: '1.25rem' }}>PHASE 03</span>
-                                        <i className="fa-solid fa-gamepad text-muted fa-lg"></i>
-                                    </div>
-                                    <h5 className="fw-bold mb-2 text-main">Cortical Fusion Gameplay</h5>
-                                    <p className="text-sub small mb-0" style={{ lineHeight: '1.6' }}>
-                                        Patient plays prescribed 20-minute daily exercises. Target goals are split across both channels—making game progression neurologically impossible without active binocular combination.
-                                    </p>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </section>
-
-                {/* Curriculum & 10 Dichoptic Engines Showcase */}
-                <section id="curriculum" className="py-5" style={{ backgroundColor: 'var(--bg-surface-secondary)' }}>
-                    <div className="container">
-                        <div className="d-flex align-items-center justify-content-between flex-wrap gap-3 mb-4">
-                            <div>
-                                <span className="badge bg-primary-subtle text-primary border border-primary-subtle px-2 py-1 rounded-1 fw-bold" style={{ fontSize: '0.74rem', fontFamily: 'ui-monospace, monospace' }}>
-                                    CLINICAL CURRICULUM
-                                </span>
-                                <h3 className="fw-bold text-main mt-2 mb-0" style={{ letterSpacing: '-0.02em' }}>10 Calibrated Dichoptic Engines</h3>
-                            </div>
-
-                            {/* Categorical Filter Tabs */}
-                            <div className="d-flex gap-1 p-1 rounded-2" style={{ background: 'var(--bg-card)', border: '1px solid var(--border-color)' }}>
-                                <button 
-                                    type="button" 
-                                    className={`btn btn-sm py-1 px-3 ${activeTab === 'all' ? 'btn-primary' : 'btn-light border-0 text-muted'}`}
-                                    style={{ fontSize: '0.8rem', fontWeight: 600 }}
-                                    onClick={() => this.setActiveTab('all')}
-                                >
-                                    All (10)
-                                </button>
-                                <button 
-                                    type="button" 
-                                    className={`btn btn-sm py-1 px-3 ${activeTab === 'tracking' ? 'btn-primary' : 'btn-light border-0 text-muted'}`}
-                                    style={{ fontSize: '0.8rem', fontWeight: 600 }}
-                                    onClick={() => this.setActiveTab('tracking')}
-                                >
-                                    Tracking
-                                </button>
-                                <button 
-                                    type="button" 
-                                    className={`btn btn-sm py-1 px-3 ${activeTab === 'spatial' ? 'btn-primary' : 'btn-light border-0 text-muted'}`}
-                                    style={{ fontSize: '0.8rem', fontWeight: 600 }}
-                                    onClick={() => this.setActiveTab('spatial')}
-                                >
-                                    Spatial Depth
-                                </button>
-                                <button 
-                                    type="button" 
-                                    className={`btn btn-sm py-1 px-3 ${activeTab === 'saccades' ? 'btn-primary' : 'btn-light border-0 text-muted'}`}
-                                    style={{ fontSize: '0.8rem', fontWeight: 600 }}
-                                    onClick={() => this.setActiveTab('saccades')}
-                                >
-                                    Saccades
-                                </button>
-                            </div>
-                        </div>
-
-                        {/* Engine Cards Matrix */}
-                        <div className="row g-3">
-                            {filteredGames.map((game) => (
-                                <div key={game.id} className="col-12 col-md-6 col-lg-4">
-                                    <div className="modern-card h-100 p-3 d-flex flex-column justify-content-between">
+                            {games.map((game, idx) => (
+                                <div key={idx} className="col-12 col-md-6 col-lg-4">
+                                    <div className="modern-card h-100 d-flex flex-column justify-content-between p-4">
                                         <div>
-                                            <div className="d-flex align-items-center justify-content-between mb-2">
-                                                <span className="badge bg-primary-subtle text-primary font-mono" style={{ fontSize: '0.72rem' }}>{game.tag}</span>
-                                                <span className="text-muted font-mono" style={{ fontSize: '0.72rem' }}>{game.time} / session</span>
+                                            <div className="d-flex align-items-center justify-content-between mb-3">
+                                                <div className="p-2 rounded-3 bg-light shadow-sm d-flex align-items-center justify-content-center" style={{ width: 50, height: 50 }}>
+                                                    <img src={game.icon} alt={game.name} style={{ width: 34, height: 34, objectFit: 'contain' }} />
+                                                </div>
+                                                <span className="badge bg-primary-subtle text-primary small px-2 py-1 rounded-pill">
+                                                    {game.tag}
+                                                </span>
                                             </div>
-                                            <h5 className="fw-bold text-main mb-2" style={{ fontSize: '1.05rem' }}>{game.name}</h5>
-                                            
-                                            <div className="p-2 rounded-2 mb-3" style={{ background: 'var(--bg-surface-secondary)', border: '1px solid var(--border-color)', fontSize: '0.78rem', fontFamily: 'ui-monospace, monospace' }}>
-                                                <div className="d-flex justify-content-between text-muted mb-1">
-                                                    <span>Target Focus:</span>
-                                                    <span className="text-main fw-semibold">{game.focus}</span>
-                                                </div>
-                                                <div className="d-flex justify-content-between text-muted mb-1">
-                                                    <span>Min Disparity:</span>
-                                                    <span className="text-main fw-semibold">{game.disparity}</span>
-                                                </div>
-                                                <div className="d-flex justify-content-between text-muted">
-                                                    <span>Contrast Floor:</span>
-                                                    <span className="text-main fw-semibold">{game.floor}</span>
-                                                </div>
-                                            </div>
+                                            <h5 className="fw-bold mb-2 text-main">{game.name}</h5>
+                                            <p className="text-sub small mb-3" style={{ lineHeight: '1.6' }}>{game.desc}</p>
                                         </div>
-
-                                        <a href="/Login_view" className="btn btn-sm btn-outline-primary w-100 fw-semibold" style={{ borderRadius: '6px' }}>
-                                            Launch in Clinical Engine &rarr;
+                                        <a href="/Login_view" className="btn-modern-outline w-100 justify-content-center small fw-semibold">
+                                            Play in Therapy <i className="fa-solid fa-arrow-right ms-1"></i>
                                         </a>
                                     </div>
                                 </div>
                             ))}
                         </div>
 
-                        <div className="mt-4 p-3 rounded-2 text-center" style={{ background: 'var(--bg-card)', border: '1px solid var(--border-color)' }}>
-                            <span className="text-muted small me-3">Need to review all 10 engines in the patient console?</span>
-                            <a href="/user" className="btn-modern-primary py-1 px-3" style={{ fontSize: '0.85rem' }}>
-                                Open Full Patient Games Panel &rarr;
+                        <div className="text-center mt-5">
+                            <a href="/Register_view" className="btn-modern-primary py-3 px-5 fw-bold">
+                                <i className="fa-solid fa-rocket me-2"></i> Create Account to Play All Games
                             </a>
                         </div>
                     </div>
                 </section>
 
-                {/* Architecture & Engineering Provenance Card */}
-                <section className="py-4">
+                {/* FAQ Section */}
+                <section className="py-5">
                     <div className="container">
-                        <div className="card border-0 p-4" style={{ backgroundColor: 'var(--bg-card)', border: '1px solid var(--border-color)', borderRadius: '10px' }}>
-                            <div className="row align-items-center g-4">
-                                <div className="col-12 col-md-8">
-                                    <div className="d-flex align-items-center gap-2 mb-2">
-                                        <span className="badge bg-info-subtle text-info font-mono" style={{ fontSize: '0.72rem' }}>SYSTEM ARCHITECTURE</span>
-                                        <span className="badge bg-secondary-subtle text-muted font-mono" style={{ fontSize: '0.72rem' }}>PROVENANCE</span>
+                        <div className="text-center mb-5">
+                            <span className="badge bg-primary-subtle text-primary px-3 py-2 rounded-pill fw-bold mb-2">Common Questions</span>
+                            <h2 className="fw-bold text-main">Frequently Asked Questions</h2>
+                        </div>
+
+                        <div className="row g-4 justify-content-center">
+                            <div className="col-12 col-lg-8">
+                                <div className="d-flex flex-column gap-3">
+                                    <div className="modern-card p-4">
+                                        <h5 className="fw-bold text-main mb-2">
+                                            <i className="fa-solid fa-circle-question text-primary me-2"></i> Who can benefit from LazyEye?
+                                        </h5>
+                                        <p className="text-sub small mb-0" style={{ lineHeight: '1.7' }}>
+                                            LazyEye is designed for children (ages 4 and up) and adults diagnosed with amblyopia or binocular vision suppression. Many adults who believed their lazy eye could never be improved find that active dichoptic therapy helps stimulate visual pathways.
+                                        </p>
                                     </div>
-                                    <h4 className="fw-bold text-main mb-2">Engineered by Abhishek Pal at Softcruise Technologies</h4>
-                                    <p className="text-sub small mb-0" style={{ lineHeight: '1.65' }}>
-                                        Originally developed (Jan–Jun 2023) as an optometric digital therapeutics research prototype for pediatric amblyopia gamification. Modernized on React &amp; Laravel with 10 custom Canvas/WebGL dichoptic shaders, bidirectional postMessage bridges for mobile WebViews, and clinical adherence tracking.
-                                    </p>
-                                </div>
-                                <div className="col-12 col-md-4 text-md-end">
-                                    <a href="/Login_view?role=doctor" className="btn-modern-primary">
-                                        <i className="fa-solid fa-user-doctor me-1"></i> Doctor Admin Demo
-                                    </a>
+
+                                    <div className="modern-card p-4">
+                                        <h5 className="fw-bold text-main mb-2">
+                                            <i className="fa-solid fa-circle-question text-primary me-2"></i> What kind of glasses do I need?
+                                        </h5>
+                                        <p className="text-sub small mb-0" style={{ lineHeight: '1.7' }}>
+                                            You only need standard Red/Cyan (anaglyph) glasses. They are inexpensive (often available online for just a few dollars) and can be worn over regular prescription glasses if needed.
+                                        </p>
+                                    </div>
+
+                                    <div className="modern-card p-4">
+                                        <h5 className="fw-bold text-main mb-2">
+                                            <i className="fa-solid fa-circle-question text-primary me-2"></i> Can eye doctors monitor my progress?
+                                        </h5>
+                                        <p className="text-sub small mb-0" style={{ lineHeight: '1.7' }}>
+                                            Yes! LazyEye includes a dedicated Doctor &amp; Clinic Portal. Optometrists and specialists can view session compliance, adherence records, and log clinical review notes for each patient.
+                                        </p>
+                                    </div>
                                 </div>
                             </div>
                         </div>
                     </div>
                 </section>
 
-                {/* Contact & Clinic Inquiries */}
-                <section id="contact" className="py-5" style={{ backgroundColor: 'var(--bg-surface-secondary)' }}>
+                {/* Contact Section */}
+                <section id="contact" className="py-5" style={{ background: 'var(--bg-surface-secondary)' }}>
                     <div className="container">
                         <div className="row g-5 align-items-center">
-                            <div className="col-12 col-lg-6" data-aos="fade-up">
-                                <span className="badge bg-primary-subtle text-primary border border-primary-subtle px-2 py-1 rounded-1 fw-bold mb-2" style={{ fontSize: '0.74rem', fontFamily: 'ui-monospace, monospace' }}>
-                                    SUPPORT &amp; INTAKE
-                                </span>
-                                <h3 className="fw-bold mb-3 text-main" style={{ letterSpacing: '-0.02em' }}>Optometric Equipment &amp; Calibration Support</h3>
-                                <p className="text-sub small mb-4" style={{ lineHeight: '1.65' }}>
-                                    Have questions regarding optical lens matching, red/cyan contrast attenuation guidelines, or enrolling an amblyopic patient? Contact our clinic operations team.
+                            <div className="col-12 col-lg-6">
+                                <span className="badge bg-primary-subtle text-primary px-3 py-2 rounded-pill fw-bold mb-2">Get In Touch</span>
+                                <h2 className="fw-bold text-main mb-3">Have Questions About Vision Therapy?</h2>
+                                <p className="text-sub mb-4" style={{ lineHeight: '1.7' }}>
+                                    Whether you are a parent asking about your child’s therapy or an eye care clinic interested in using LazyEye for your patients, we are here to help.
                                 </p>
                                 <div className="d-flex flex-column gap-3">
-                                    <div className="d-flex align-items-center gap-3 p-3 modern-card">
-                                        <div className="bg-primary-subtle text-primary rounded-2 p-2 d-flex align-items-center justify-content-center" style={{ width: 40, height: 40 }}>
+                                    <div className="d-flex align-items-center gap-3 modern-card p-3">
+                                        <div className="rounded-circle bg-primary-subtle text-primary d-flex align-items-center justify-content-center" style={{ width: 44, height: 44, minWidth: 44 }}>
                                             <i className="fa-solid fa-phone"></i>
                                         </div>
                                         <div>
-                                            <small className="text-muted d-block font-mono" style={{ fontSize: '0.72rem' }}>CLINICAL HELPLINE</small>
-                                            <a href="tel:+919890376644" className="fw-bold text-main" style={{ fontSize: '0.92rem' }}>+91 9890376644</a>
+                                            <small className="text-muted d-block">Helpline</small>
+                                            <a href="tel:+919890376644" className="fw-bold text-main">+91 9890376644</a>
                                         </div>
                                     </div>
-                                    <div className="d-flex align-items-center gap-3 p-3 modern-card">
-                                        <div className="bg-primary-subtle text-primary rounded-2 p-2 d-flex align-items-center justify-content-center" style={{ width: 40, height: 40 }}>
+                                    <div className="d-flex align-items-center gap-3 modern-card p-3">
+                                        <div className="rounded-circle bg-primary-subtle text-primary d-flex align-items-center justify-content-center" style={{ width: 44, height: 44, minWidth: 44 }}>
                                             <i className="fa-solid fa-envelope"></i>
                                         </div>
                                         <div>
-                                            <small className="text-muted d-block font-mono" style={{ fontSize: '0.72rem' }}>OPERATIONS DESK</small>
-                                            <a href="mailto:info@lazyeye.com" className="fw-bold text-main" style={{ fontSize: '0.92rem' }}>info@lazyeye.com</a>
+                                            <small className="text-muted d-block">Email Support</small>
+                                            <a href="mailto:lazyeyegames24*7@gmail.com" className="fw-bold text-main">lazyeyegames24*7@gmail.com</a>
                                         </div>
                                     </div>
                                 </div>
                             </div>
-                            <div className="col-12 col-lg-6" data-aos="zoom-in">
+                            <div className="col-12 col-lg-6">
                                 <div className="modern-card p-4 shadow-sm">
-                                    <h5 className="fw-bold mb-3 text-main">Clinical Intake Inquiry</h5>
-                                    <form onSubmit={(e) => { e.preventDefault(); alert('Inquiry received. A vision specialist will contact you.'); }}>
+                                    <h4 className="fw-bold mb-3 text-main">Send Us a Message</h4>
+                                    <form onSubmit={(e) => { e.preventDefault(); alert('Thank you! Your message has been received. Our team will contact you shortly.'); }}>
                                         <div className="mb-3">
-                                            <label className="form-label text-sub small fw-semibold">Patient or Doctor Name</label>
-                                            <input type="text" className="form-control" placeholder="Full name" required />
+                                            <label className="form-label text-sub small fw-semibold">Your Name</label>
+                                            <input type="text" className="form-control" placeholder="e.g. Rahul Sharma" required />
                                         </div>
                                         <div className="mb-3">
-                                            <label className="form-label text-sub small fw-semibold">Contact Email</label>
-                                            <input type="email" className="form-control" placeholder="email@domain.com" required />
+                                            <label className="form-label text-sub small fw-semibold">Email or Phone Number</label>
+                                            <input type="text" className="form-control" placeholder="e.g. rahul@example.com or 9876543210" required />
                                         </div>
                                         <div className="mb-3">
-                                            <label className="form-label text-sub small fw-semibold">Patient Age &amp; Amblyopia History</label>
-                                            <input type="text" className="form-control" placeholder="e.g. 11 years, left eye suppression" />
+                                            <label className="form-label text-sub small fw-semibold">Message / Inquiry</label>
+                                            <textarea className="form-control" rows="3" placeholder="Tell us about the patient's age or any questions you have..." required></textarea>
                                         </div>
-                                        <button type="submit" className="btn-modern-primary w-100 justify-content-center">
-                                            <i className="fa-solid fa-paper-plane me-1"></i> Send Intake Request
+                                        <button type="submit" className="btn-modern-primary w-100 py-3 justify-content-center fw-bold">
+                                            <i className="fa-solid fa-paper-plane me-2"></i> Submit Inquiry
                                         </button>
                                     </form>
                                 </div>

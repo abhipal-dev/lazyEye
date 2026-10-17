@@ -24,10 +24,10 @@ export default class Footer extends React.Component {
                             <h6 className="fw-bold mb-3 text-main"><i className="fa-solid fa-compass text-primary me-2"></i>Navigation</h6>
                             <ul className="list-unstyled small d-flex flex-column gap-2 mb-0">
                                 <li><a href="/" className="text-muted text-decoration-none">Home</a></li>
-                                <li><a href="/#science" className="text-muted text-decoration-none">Neuro-Optometric Research</a></li>
-                                <li><a href="/#protocol" className="text-muted text-decoration-none">Therapy Protocol</a></li>
-                                <li><a href="/#curriculum" className="text-muted text-decoration-none">Dichoptic Engines</a></li>
-                                <li><a href="/#contact" className="text-muted text-decoration-none">Contact Clinic</a></li>
+                                <li><a href="/#intro" className="text-muted text-decoration-none">What is Lazy Eye?</a></li>
+                                <li><a href="/#how-it-works" className="text-muted text-decoration-none">How It Works</a></li>
+                                <li><a href="/#games" className="text-muted text-decoration-none">Therapy Games</a></li>
+                                <li><a href="/#contact" className="text-muted text-decoration-none">Contact Support</a></li>
                             </ul>
                         </div>
 
