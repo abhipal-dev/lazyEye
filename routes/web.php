@@ -64,6 +64,7 @@ Route::post('/logConsultation', [UserController::class, 'logConsultation']);
 Route::get('/fetchConsultations', [UserController::class, 'fetchConsultations']);
 Route::get('/fetchGameRecords', [UserController::class, 'fetchGameRecords']);
 Route::get('/fetchPatientActivity', [UserController::class, 'fetchPatientActivity']);
+Route::match(['get', 'post'], '/seedPatientSessions', [UserController::class, 'seedPatientSessions']);
 
 Route::post('/Approve', [UserController::class, 'approve']);
 

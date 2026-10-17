@@ -15,6 +15,8 @@ class VerifyCsrfToken extends Middleware
         '/SaveGameRecords',
         '/assignDoctor',
         '/logConsultation',
-        '/fetchGameRecords'
+        '/fetchGameRecords',
+        '/seedPatientSessions',
+        '/seedDemoData'
     ];
 }

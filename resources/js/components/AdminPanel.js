@@ -577,7 +577,18 @@ export default class AdminDashboard extends React.Component {
                                         <small className="text-sub" id="pam_patient_subtitle">Detailed compliance, game history, and binocular engagement</small>
                                     </div>
                                 </div>
-                                <button type="button" className="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                                <div className="d-flex align-items-center gap-2">
+                                    <button 
+                                        type="button" 
+                                        className="btn btn-outline-secondary btn-sm rounded-pill px-3 d-flex align-items-center gap-1 shadow-sm"
+                                        id="pam_print_btn"
+                                        onClick={() => window.print()}
+                                        title="Print Clinical Summary Dossier"
+                                    >
+                                        <i className="fa-solid fa-print me-1 text-primary"></i> Print Report
+                                    </button>
+                                    <button type="button" className="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                                </div>
                             </div>
                             <div className="modal-body p-4">
                                 {/* Patient Profile Snapshot Banner */}
@@ -598,72 +609,103 @@ export default class AdminDashboard extends React.Component {
                                                 </div>
                                             </div>
                                         </div>
-                                        <div className="d-flex align-items-center gap-2">
+                                        <div className="d-flex align-items-center gap-2 flex-wrap">
+                                            <button 
+                                                type="button" 
+                                                className="btn btn-sm btn-outline-primary rounded-pill px-3 py-1 shadow-sm d-flex align-items-center gap-1"
+                                                id="pam_quick_seed_btn"
+                                                title="Generate 30-Day Therapy Sessions for Demo Evaluation"
+                                            >
+                                                <i className="fa-solid fa-bolt text-warning"></i>
+                                                <span>Simulate 30-Day Sessions</span>
+                                            </button>
                                             <span className="badge bg-primary px-3 py-2 rounded-pill fw-semibold" id="pam_target_time">Target: 20 mins/day</span>
                                         </div>
                                     </div>
                                 </div>
 
-                                {/* 4 Summary Stat Cards */}
-                                <div className="row g-3 mb-4">
-                                    <div className="col-6 col-md-3">
-                                        <div className="p-3 rounded-4 shadow-sm h-100" style={{ backgroundColor: 'var(--bg-card)', border: '1px solid var(--border-color)' }}>
-                                            <div className="small text-sub text-uppercase fw-bold">Total Sessions</div>
-                                            <h3 className="fw-bold text-main mt-1 mb-0" id="pam_total_sessions">0</h3>
-                                            <small className="text-muted">Therapy plays logged</small>
-                                        </div>
+                                {/* Clinical Empty State Card (Visible when 0 therapy records exist) */}
+                                <div id="pam_empty_state" className="card border-0 p-4 mb-4 text-center d-none" style={{ backgroundColor: 'var(--bg-surface-secondary)', borderRadius: '1rem', border: '1px dashed var(--border-color)' }}>
+                                    <div className="rounded-circle bg-primary-subtle text-primary mx-auto mb-3 d-flex align-items-center justify-content-center" style={{ width: 56, height: 56 }}>
+                                        <i className="fa-solid fa-gamepad fa-xl"></i>
                                     </div>
-                                    <div className="col-6 col-md-3">
-                                        <div className="p-3 rounded-4 shadow-sm h-100" style={{ backgroundColor: 'var(--bg-card)', border: '1px solid var(--border-color)' }}>
-                                            <div className="small text-sub text-uppercase fw-bold">Therapy Time</div>
-                                            <h3 className="fw-bold text-primary mt-1 mb-0" id="pam_total_minutes">0 mins</h3>
-                                            <small className="text-muted">Cumulative binocular work</small>
-                                        </div>
-                                    </div>
-                                    <div className="col-6 col-md-3">
-                                        <div className="p-3 rounded-4 shadow-sm h-100" style={{ backgroundColor: 'var(--bg-card)', border: '1px solid var(--border-color)' }}>
-                                            <div className="small text-sub text-uppercase fw-bold">Compliance Rate</div>
-                                            <h3 className="fw-bold text-success mt-1 mb-0" id="pam_compliance_rate">0%</h3>
-                                            <small className="text-muted">Daily target met ratio</small>
-                                        </div>
-                                    </div>
-                                    <div className="col-6 col-md-3">
-                                        <div className="p-3 rounded-4 shadow-sm h-100" style={{ backgroundColor: 'var(--bg-card)', border: '1px solid var(--border-color)' }}>
-                                            <div className="small text-sub text-uppercase fw-bold">Active Days</div>
-                                            <h3 className="fw-bold text-warning mt-1 mb-0" id="pam_active_days">0</h3>
-                                            <small className="text-muted">Distinct therapy days</small>
-                                        </div>
+                                    <h5 className="fw-bold text-main mb-1">No Therapy Sessions Recorded Yet</h5>
+                                    <p className="text-sub mx-auto mb-3 small" style={{ maxWidth: 540 }}>
+                                        This patient is enrolled in the dichoptic vision therapy program. When the patient logs in at <code>/user</code> and plays assigned dichoptic games (Snake, Tetris, Bubble Shooter), their compliance, score, and visual acuity records will appear here automatically.
+                                    </p>
+                                    <div className="d-flex align-items-center justify-content-center gap-2 flex-wrap">
+                                        <button type="button" className="btn btn-primary btn-sm rounded-pill px-4 shadow-sm" id="pam_seed_patient_btn">
+                                            <i className="fa-solid fa-bolt me-1"></i> Generate 30-Day Clinical Records (Demo Mode)
+                                        </button>
+                                        <a href="/user" target="_blank" className="btn btn-outline-secondary btn-sm rounded-pill px-3">
+                                            <i className="fa-solid fa-arrow-up-right-from-square me-1"></i> Open Patient Game Portal
+                                        </a>
                                     </div>
                                 </div>
 
-                                {/* Therapy Heatmap Card */}
-                                <div className="card border-0 shadow-sm p-4 mb-4" style={{ backgroundColor: 'var(--bg-card)', borderRadius: '1rem', border: '1px solid var(--border-color)' }}>
-                                    <div className="d-flex align-items-center justify-content-between mb-3 flex-wrap gap-2">
-                                        <div>
-                                            <h5 className="fw-bold mb-1 text-main">
-                                                <i className="fa-solid fa-calendar-days text-primary me-2"></i>Therapy Activity Heatmap Calendar
-                                            </h5>
-                                            <small className="text-sub">Daily therapy intensity and session frequency over the past 90 days. Click any date block to inspect sessions.</small>
+                                {/* Main Metrics & Heatmap Container */}
+                                <div id="pam_metrics_and_charts">
+                                    {/* 4 Summary Stat Cards */}
+                                    <div className="row g-3 mb-4">
+                                        <div className="col-6 col-md-3">
+                                            <div className="p-3 rounded-4 shadow-sm h-100" style={{ backgroundColor: 'var(--bg-card)', border: '1px solid var(--border-color)' }}>
+                                                <div className="small text-sub text-uppercase fw-bold">Total Sessions</div>
+                                                <h3 className="fw-bold text-main mt-1 mb-0" id="pam_total_sessions">0</h3>
+                                                <small className="text-muted">Therapy plays logged</small>
+                                            </div>
                                         </div>
-                                        <div className="d-flex align-items-center gap-1 small text-sub">
-                                            <span>Less</span>
-                                            <span className="d-inline-block rounded-1" style={{ width: 12, height: 12, background: 'var(--border-color)' }}></span>
-                                            <span className="d-inline-block rounded-1" style={{ width: 12, height: 12, background: '#9be9a8' }}></span>
-                                            <span className="d-inline-block rounded-1" style={{ width: 12, height: 12, background: '#40c463' }}></span>
-                                            <span className="d-inline-block rounded-1" style={{ width: 12, height: 12, background: '#216e39' }}></span>
-                                            <span>More</span>
+                                        <div className="col-6 col-md-3">
+                                            <div className="p-3 rounded-4 shadow-sm h-100" style={{ backgroundColor: 'var(--bg-card)', border: '1px solid var(--border-color)' }}>
+                                                <div className="small text-sub text-uppercase fw-bold">Therapy Time</div>
+                                                <h3 className="fw-bold text-primary mt-1 mb-0" id="pam_total_minutes">0 mins</h3>
+                                                <small className="text-muted">Cumulative binocular work</small>
+                                            </div>
+                                        </div>
+                                        <div className="col-6 col-md-3">
+                                            <div className="p-3 rounded-4 shadow-sm h-100" style={{ backgroundColor: 'var(--bg-card)', border: '1px solid var(--border-color)' }}>
+                                                <div className="small text-sub text-uppercase fw-bold">Compliance Rate</div>
+                                                <h3 className="fw-bold text-success mt-1 mb-0" id="pam_compliance_rate">0%</h3>
+                                                <small className="text-muted">Daily target met ratio</small>
+                                            </div>
+                                        </div>
+                                        <div className="col-6 col-md-3">
+                                            <div className="p-3 rounded-4 shadow-sm h-100" style={{ backgroundColor: 'var(--bg-card)', border: '1px solid var(--border-color)' }}>
+                                                <div className="small text-sub text-uppercase fw-bold">Active Days</div>
+                                                <h3 className="fw-bold text-warning mt-1 mb-0" id="pam_active_days">0</h3>
+                                                <small className="text-muted" id="pam_streak_label">Therapy engagement</small>
+                                            </div>
                                         </div>
                                     </div>
 
-                                    {/* Heatmap Grid Container rendered dynamically by adminScript */}
-                                    <div className="overflow-auto pb-2" id="pam_heatmap_wrapper" style={{ minHeight: '120px' }}>
-                                        <div className="d-flex align-items-center justify-content-center py-4 text-sub">
-                                            <i className="fa-solid fa-spinner fa-spin me-2"></i> Loading therapy activity heatmap...
+                                    {/* Therapy Heatmap Card */}
+                                    <div className="card border-0 shadow-sm p-4 mb-4" style={{ backgroundColor: 'var(--bg-card)', borderRadius: '1rem', border: '1px solid var(--border-color)' }}>
+                                        <div className="d-flex align-items-center justify-content-between mb-3 flex-wrap gap-2">
+                                            <div>
+                                                <h5 className="fw-bold mb-1 text-main">
+                                                    <i className="fa-solid fa-calendar-days text-primary me-2"></i>Therapy Activity Heatmap Calendar
+                                                </h5>
+                                                <small className="text-sub">Daily therapy intensity and session frequency over the past 84 days (12 weeks). Click any day to filter sessions below.</small>
+                                            </div>
+                                            <div className="d-flex align-items-center gap-1 small text-sub">
+                                                <span>Less</span>
+                                                <span className="d-inline-block rounded-1" style={{ width: 12, height: 12, background: 'var(--border-color)' }}></span>
+                                                <span className="d-inline-block rounded-1" style={{ width: 12, height: 12, background: '#a7f3d0' }}></span>
+                                                <span className="d-inline-block rounded-1" style={{ width: 12, height: 12, background: '#34d399' }}></span>
+                                                <span className="d-inline-block rounded-1" style={{ width: 12, height: 12, background: '#059669' }}></span>
+                                                <span>More</span>
+                                            </div>
                                         </div>
-                                    </div>
-                                    <div id="pam_selected_date_filter" className="small text-primary fw-semibold mt-2 d-none">
-                                        Showing sessions for selected date: <span id="pam_filter_date_label"></span>
-                                        <button type="button" className="btn btn-sm btn-link text-decoration-none ms-2" id="pam_clear_date_filter">Clear Filter</button>
+
+                                        {/* Heatmap Grid Container rendered dynamically by adminScript */}
+                                        <div className="overflow-auto pb-2" id="pam_heatmap_wrapper" style={{ minHeight: '120px' }}>
+                                            <div className="d-flex align-items-center justify-content-center py-4 text-sub">
+                                                <i className="fa-solid fa-spinner fa-spin me-2"></i> Loading therapy activity heatmap...
+                                            </div>
+                                        </div>
+                                        <div id="pam_selected_date_filter" className="small text-primary fw-semibold mt-2 d-none">
+                                            Showing sessions for selected date: <span id="pam_filter_date_label"></span>
+                                            <button type="button" className="btn btn-sm btn-link text-decoration-none ms-2" id="pam_clear_date_filter">Clear Filter</button>
+                                        </div>
                                     </div>
                                 </div>
 
@@ -683,7 +725,7 @@ export default class AdminDashboard extends React.Component {
 
                                 <div className="tab-content" id="pamTabContent">
                                     <div className="tab-pane fade show active" id="pam-sessions" role="tabpanel">
-                                        <div className="table-responsive rounded-3 border" style={{ borderColor: 'var(--border-color)', maxHeight: '280px' }}>
+                                        <div className="table-responsive rounded-3 border" style={{ borderColor: 'var(--border-color)', maxHeight: '320px' }}>
                                             <table className="table table-hover table-striped mb-0 small" id="pam_sessions_table">
                                                 <thead className="table-light sticky-top">
                                                     <tr>
@@ -698,9 +740,21 @@ export default class AdminDashboard extends React.Component {
                                                 </tbody>
                                             </table>
                                         </div>
+                                        {/* Modal Sessions Pagination Toolbar */}
+                                        <div className="d-flex align-items-center justify-content-between p-2 mt-1 flex-wrap gap-2" style={{ backgroundColor: 'var(--bg-surface-secondary)', borderRadius: '0.5rem' }}>
+                                            <small className="text-sub" id="pam_sessions_page_info">Showing 0 to 0 of 0 sessions</small>
+                                            <div className="btn-group btn-group-sm" id="pam_sessions_pagination_btns">
+                                                <button className="btn btn-outline-secondary btn-sm" id="pam_sessions_prev_btn" type="button" disabled>
+                                                    <i className="fa-solid fa-chevron-left me-1"></i> Prev
+                                                </button>
+                                                <button className="btn btn-outline-secondary btn-sm" id="pam_sessions_next_btn" type="button" disabled>
+                                                    Next <i className="fa-solid fa-chevron-right ms-1"></i>
+                                                </button>
+                                            </div>
+                                        </div>
                                     </div>
                                     <div className="tab-pane fade" id="pam-consultations" role="tabpanel">
-                                        <div className="table-responsive rounded-3 border" style={{ borderColor: 'var(--border-color)', maxHeight: '280px' }}>
+                                        <div className="table-responsive rounded-3 border" style={{ borderColor: 'var(--border-color)', maxHeight: '320px' }}>
                                             <table className="table table-hover table-striped mb-0 small" id="pam_consultations_table">
                                                 <thead className="table-light sticky-top">
                                                     <tr>

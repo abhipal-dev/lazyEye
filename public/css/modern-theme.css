@@ -1901,8 +1901,31 @@ tr.patient-record-row:hover td {
   footer,
   .d-print-none,
   .btn,
-  #iframe,
-  .modal {
+  .btn-close,
+  #iframe {
+    display: none !important;
+  }
+  .modal:not(.show) {
+    display: none !important;
+  }
+  .modal.show {
+    position: static !important;
+    display: block !important;
+    overflow: visible !important;
+    background: transparent !important;
+  }
+  .modal.show .modal-dialog {
+    max-width: 100% !important;
+    margin: 0 !important;
+    transform: none !important;
+  }
+  .modal.show .modal-content {
+    border: none !important;
+    box-shadow: none !important;
+    background: #ffffff !important;
+    color: #000000 !important;
+  }
+  .modal-backdrop {
     display: none !important;
   }
   #layoutSidenav {

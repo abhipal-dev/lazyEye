@@ -153,6 +153,155 @@ function updateFilterActive(activeClass, forceSidebar) {
     }
 }
 
+// ==========================================
+// CLIENT-SIDE TABLE PAGINATION & SEARCH ENGINE
+// ==========================================
+
+var adminTableState = {
+    category: '',
+    data: [],
+    currentPage: 1,
+    pageSize: 10,
+    searchQuery: '',
+    currentSlice: [],
+    rowRenderer: null
+};
+
+function setupAdminTableData(category, data, rendererFn) {
+    if (adminTableState.category !== category) {
+        adminTableState.category = category;
+        adminTableState.currentPage = 1;
+        adminTableState.searchQuery = '';
+        $('#adminTableSearchInput').val('');
+    }
+    adminTableState.data = data || [];
+    adminTableState.rowRenderer = rendererFn;
+    window.currentTableData = data;
+    renderCurrentAdminTablePage();
+}
+
+function renderCurrentAdminTablePage() {
+    if (!adminTableState.rowRenderer) return;
+
+    let q = (adminTableState.searchQuery || '').trim().toLowerCase();
+    let filtered = adminTableState.data || [];
+    if (q) {
+        filtered = filtered.filter(item => {
+            let searchable = Object.values(item).filter(v => v !== null && typeof v !== 'object').join(' ').toLowerCase();
+            return searchable.includes(q);
+        });
+    }
+
+    let total = filtered.length;
+    let pageSize = (adminTableState.pageSize === 'all') ? total : parseInt(adminTableState.pageSize);
+    if (!pageSize || pageSize < 1) pageSize = 10;
+
+    let totalPages = Math.ceil(total / pageSize) || 1;
+    if (adminTableState.currentPage > totalPages) adminTableState.currentPage = totalPages;
+    if (adminTableState.currentPage < 1) adminTableState.currentPage = 1;
+
+    let startIndex = (adminTableState.currentPage - 1) * pageSize;
+    let endIndex = (adminTableState.pageSize === 'all') ? total : Math.min(startIndex + pageSize, total);
+    let pageData = filtered.slice(startIndex, endIndex);
+    adminTableState.currentSlice = pageData;
+
+    $('tbody').html('');
+    if (total === 0) {
+        let colCount = $('thead tr th').length || 8;
+        $('tbody').append(`<tr><td colspan="${colCount}" class="text-center py-4 text-muted"><i class="fa-solid fa-magnifying-glass me-2"></i>No matching records found.</td></tr>`);
+    } else {
+        pageData.forEach((row, i) => {
+            adminTableState.rowRenderer(row, i);
+        });
+    }
+
+    // Update pagination info text
+    if (total === 0) {
+        $('#adminTablePaginationInfo').text('Showing 0 to 0 of 0 entries');
+    } else {
+        let infoStr = `Showing ${startIndex + 1} to ${endIndex} of ${total} entries`;
+        if (q && adminTableState.data.length !== total) {
+            infoStr += ` (filtered from ${adminTableState.data.length} total records)`;
+        }
+        $('#adminTablePaginationInfo').text(infoStr);
+    }
+
+    renderAdminPaginationNav(adminTableState.currentPage, totalPages);
+}
+
+function renderAdminPaginationNav(currentPage, totalPages) {
+    let nav = $('#adminTablePaginationNav');
+    nav.html('');
+    if (totalPages <= 1) return;
+
+    let prevDisabled = (currentPage === 1) ? 'disabled' : '';
+    nav.append(`<li class="page-item ${prevDisabled}"><a class="page-link cursor-pointer admin-page-link" data-page="${currentPage - 1}" aria-label="Previous">&laquo; Prev</a></li>`);
+
+    let startPage = Math.max(1, currentPage - 2);
+    let endPage = Math.min(totalPages, currentPage + 2);
+
+    if (startPage > 1) {
+        nav.append(`<li class="page-item"><a class="page-link cursor-pointer admin-page-link" data-page="1">1</a></li>`);
+        if (startPage > 2) {
+            nav.append(`<li class="page-item disabled"><span class="page-link">&hellip;</span></li>`);
+        }
+    }
+
+    for (let p = startPage; p <= endPage; p++) {
+        let active = (p === currentPage) ? 'active' : '';
+        nav.append(`<li class="page-item ${active}"><a class="page-link cursor-pointer admin-page-link" data-page="${p}">${p}</a></li>`);
+    }
+
+    if (endPage < totalPages) {
+        if (endPage < totalPages - 1) {
+            nav.append(`<li class="page-item disabled"><span class="page-link">&hellip;</span></li>`);
+        }
+        nav.append(`<li class="page-item"><a class="page-link cursor-pointer admin-page-link" data-page="${totalPages}">${totalPages}</a></li>`);
+    }
+
+    let nextDisabled = (currentPage === totalPages) ? 'disabled' : '';
+    nav.append(`<li class="page-item ${nextDisabled}"><a class="page-link cursor-pointer admin-page-link" data-page="${currentPage + 1}" aria-label="Next">Next &raquo;</a></li>`);
+}
+
+$(document).on('click', '.admin-page-link', function (e) {
+    e.preventDefault();
+    let p = parseInt($(this).attr('data-page'));
+    if (!isNaN(p) && p >= 1) {
+        adminTableState.currentPage = p;
+        renderCurrentAdminTablePage();
+    }
+});
+
+$(document).on('input', '#adminTableSearchInput', function () {
+    adminTableState.searchQuery = $(this).val();
+    adminTableState.currentPage = 1;
+    renderCurrentAdminTablePage();
+});
+
+$(document).on('change', '#adminTablePageSize', function () {
+    adminTableState.pageSize = $(this).val();
+    adminTableState.currentPage = 1;
+    renderCurrentAdminTablePage();
+});
+
+// Row Renderers for each data category
+function renderRegisterRow(e, sliceIdx) {
+    let localSubmitted = formatUtcToLocal(e.created_at, 'DD/MM/YYYY, hh:mm A');
+    $('tbody').append(`
+        <tr class="patient-record-row cursor-pointer" data-index="` + sliceIdx + `" title="Click row to inspect registration dossier">
+        <td>`+ e.reg_id + `</td>
+        <td><strong>`+ e.fullname + `</strong></td>
+        <td><span class="badge bg-secondary-subtle text-secondary">`+ e.username + `</span></td>
+        <td><span class="badge bg-warning-subtle text-warning"><i class="fa-solid fa-clock me-1"></i>Pending Approval</span></td>
+        <td>`+ e.gender + `</td>
+        <td>`+ e.email + `</td>
+        <td>`+ localSubmitted + `</td>
+        <td class="text-center"><button class="btn btn-sm btn-success rounded-pill px-3" onclick="approveRegisters(`+ e.reg_id + `,'registers')"><i class="fa-solid fa-check me-1"></i>Approve</button></td>
+        <td class="text-center"><button class="btn btn-sm btn-outline-danger rounded-pill px-3" onclick="deleteData(`+ e.reg_id + `,'registers')"><i class="fa-solid fa-trash me-1"></i>Decline</button></td>
+        </tr>`
+    );
+}
+
 function fetchRegisters() {
     latestActiveCategory = 'fetchRegisters';
     updateFilterActive('fetchRegisters', true);
@@ -161,12 +310,8 @@ function fetchRegisters() {
         type: "get",
         success: function (data) {
             if (latestActiveCategory !== 'fetchRegisters') return;
-            window.currentTableData = data;
             activeTableContentType = 'Registers';
-            $('tbody').html('');
-            $('thead').html('');
-            $('div.card-header span.fw-semibold').text('Applications -> Pending Patient Registrations');
-            $('thead').append(`
+            $('thead').html(`
                 <tr>
                 <th>ID</th>
                 <th>Full Name</th>
@@ -178,28 +323,28 @@ function fetchRegisters() {
                 <th colspan="2" class="text-center">Action</th>
                 </tr>
             `);
-            if (!data || data.length === 0) {
-                $('tbody').append(`<tr><td colspan="9" class="text-center text-muted py-4"><i class="fa-solid fa-circle-check text-success me-1"></i> No pending registrations at this time.</td></tr>`);
-                return;
-            }
-            data.forEach((e, idx) => {
-                let localSubmitted = formatUtcToLocal(e.created_at, 'DD/MM/YYYY, hh:mm A');
-                $('tbody').append(`
-                    <tr class="patient-record-row cursor-pointer" data-index="` + idx + `" title="Click row to inspect registration dossier">
-                    <td>`+ e.reg_id + `</td>
-                    <td><strong>`+ e.fullname + `</strong></td>
-                    <td><span class="badge bg-secondary-subtle text-secondary">`+ e.username + `</span></td>
-                    <td><span class="badge bg-warning-subtle text-warning"><i class="fa-solid fa-clock me-1"></i>Pending Approval</span></td>
-                    <td>`+ e.gender + `</td>
-                    <td>`+ e.email + `</td>
-                    <td>`+ localSubmitted + `</td>
-                    <td class="text-center"><button class="btn btn-sm btn-success rounded-pill px-3" onclick="approveRegisters(`+ e.reg_id + `,'registers')"><i class="fa-solid fa-check me-1"></i>Approve</button></td>
-                    <td class="text-center"><button class="btn btn-sm btn-outline-danger rounded-pill px-3" onclick="deleteData(`+ e.reg_id + `,'registers')"><i class="fa-solid fa-trash me-1"></i>Decline</button></td>
-                    </tr>`
-                );
-            });
+            $('div.card-header span.fw-semibold').text('Applications -> Pending Patient Registrations');
+            setupAdminTableData('Registers', data, renderRegisterRow);
         }
     });
+}
+
+function renderDoctorRow(e, sliceIdx) {
+    let localJoined = formatUtcToLocal(e.created_at, 'DD/MM/YYYY');
+    $('tbody').append(`
+        <tr class="patient-record-row cursor-pointer" data-index="` + sliceIdx + `" title="Click row to inspect clinical practitioner dossier">
+        <td>`+ e.id + `</td>
+        <td><strong>`+ e.fullname + `</strong></td>
+        <td><span class="badge bg-secondary-subtle text-secondary">`+ e.username + `</span></td>
+        <td><span class="badge bg-info-subtle text-info"><i class="fa-solid fa-user-doctor me-1"></i>Doctor</span></td>
+        <td>`+ e.gender + `</td>
+        <td>`+ e.email + `</td>
+        <td>`+ (e.user_playing_time || 20) + ` mins/day</td>
+        <td>`+ localJoined + `</td>
+        <td class="text-center"><button class="btn btn-sm btn-outline-primary rounded-pill px-3 edit" data-bs-toggle="modal" data-bs-target="#editModal" data-id="`+ e.id + `" data-fullname="`+ (e.fullname || '') + `" data-username="`+ (e.username || '') + `" data-email="`+ (e.email || '') + `" data-gender="`+ (e.gender || 'Male') + `" data-type="`+ (e.accounttype || 'doctor') + `" data-time="`+ (e.user_playing_time || 20) + `"><i class="fa-solid fa-pen-to-square me-1"></i>Edit</button></td>
+        <td class="text-center"><button class="btn btn-sm btn-outline-danger rounded-pill px-3" onclick="deleteData(`+ e.id + `,'doctors')"><i class="fa-solid fa-trash me-1"></i>Delete</button></td>
+        </tr>`
+    );
 }
 
 function fetchDoctors() {
@@ -210,12 +355,8 @@ function fetchDoctors() {
         type: "get",
         success: function (data) {
             if (latestActiveCategory !== 'fetchDoctors') return;
-            window.currentTableData = data;
             activeTableContentType = "Doctors";
-            $('tbody').html('');
-            $('thead').html('');
-            $('div.card-header span.fw-semibold').text('Clinical Staff -> Doctors & Vision Therapists');
-            $('thead').append(`
+            $('thead').html(`
                 <tr>
                 <th>ID</th>
                 <th>Doctor / Specialist</th>
@@ -228,29 +369,32 @@ function fetchDoctors() {
                 <th colspan="2" class="text-center">Action</th>
                 </tr>
             `);
-            if (!data || data.length === 0) {
-                $('tbody').append(`<tr><td colspan="10" class="text-center text-muted py-4">No doctors registered yet. Click "Add User / Doctor" to onboard staff.</td></tr>`);
-                return;
-            }
-            data.forEach((e, idx) => {
-                let localJoined = formatUtcToLocal(e.created_at, 'DD/MM/YYYY');
-                $('tbody').append(`
-                    <tr class="patient-record-row cursor-pointer" data-index="` + idx + `" title="Click row to inspect clinical practitioner dossier">
-                    <td>`+ e.id + `</td>
-                    <td><strong>`+ e.fullname + `</strong></td>
-                    <td><span class="badge bg-secondary-subtle text-secondary">`+ e.username + `</span></td>
-                    <td><span class="badge bg-info-subtle text-info"><i class="fa-solid fa-user-doctor me-1"></i>Doctor</span></td>
-                    <td>`+ e.gender + `</td>
-                    <td>`+ e.email + `</td>
-                    <td>`+ (e.user_playing_time || 20) + ` mins/day</td>
-                    <td>`+ localJoined + `</td>
-                    <td class="text-center"><button class="btn btn-sm btn-outline-primary rounded-pill px-3 edit" data-bs-toggle="modal" data-bs-target="#editModal" data-id="`+ e.id + `" data-fullname="`+ (e.fullname || '') + `" data-username="`+ (e.username || '') + `" data-email="`+ (e.email || '') + `" data-gender="`+ (e.gender || 'Male') + `" data-type="`+ (e.accounttype || 'doctor') + `" data-time="`+ (e.user_playing_time || 20) + `"><i class="fa-solid fa-pen-to-square me-1"></i>Edit</button></td>
-                    <td class="text-center"><button class="btn btn-sm btn-outline-danger rounded-pill px-3" onclick="deleteData(`+ e.id + `,'doctors')"><i class="fa-solid fa-trash me-1"></i>Delete</button></td>
-                    </tr>`
-                );
-            });
+            $('div.card-header span.fw-semibold').text('Clinical Staff -> Doctors & Vision Therapists');
+            setupAdminTableData('Doctors', data, renderDoctorRow);
         }
     });
+}
+
+function renderAdminRow(e, sliceIdx) {
+    let badge = (e.accounttype === 'root')
+        ? '<span class="badge bg-dark-subtle text-dark border"><i class="fa-solid fa-crown me-1 text-warning"></i>Root Superadmin</span>'
+        : '<span class="badge bg-danger-subtle text-danger"><i class="fa-solid fa-user-shield me-1"></i>Clinic Admin</span>';
+
+    let localJoined = formatUtcToLocal(e.created_at, 'DD/MM/YYYY');
+    $('tbody').append(`
+        <tr class="patient-record-row cursor-pointer" data-index="` + sliceIdx + `" title="Click row to inspect administrator credentials">
+        <td>`+ e.id + `</td>
+        <td><strong>`+ e.fullname + `</strong></td>
+        <td><span class="badge bg-secondary-subtle text-secondary">`+ e.username + `</span></td>
+        <td>`+ badge + `</td>
+        <td>`+ e.gender + `</td>
+        <td>`+ e.email + `</td>
+        <td>Full System Control</td>
+        <td>`+ localJoined + `</td>
+        <td class="text-center"><button class="btn btn-sm btn-outline-primary rounded-pill px-3 edit" data-bs-toggle="modal" data-bs-target="#editModal" data-id="`+ e.id + `" data-fullname="`+ (e.fullname || '') + `" data-username="`+ (e.username || '') + `" data-email="`+ (e.email || '') + `" data-gender="`+ (e.gender || 'Male') + `" data-type="`+ (e.accounttype || 'admin') + `" data-time="`+ (e.user_playing_time || 20) + `"><i class="fa-solid fa-pen-to-square me-1"></i>Edit</button></td>
+        <td class="text-center"><button class="btn btn-sm btn-outline-danger rounded-pill px-3" onclick="deleteData(`+ e.id + `,'admins')"><i class="fa-solid fa-trash me-1"></i>Delete</button></td>
+        </tr>`
+    );
 }
 
 function fetchAdmins() {
@@ -261,12 +405,8 @@ function fetchAdmins() {
         type: "get",
         success: function (data) {
             if (latestActiveCategory !== 'fetchAdmins') return;
-            window.currentTableData = data;
             activeTableContentType = "Admins";
-            $('tbody').html('');
-            $('thead').html('');
-            $('div.card-header span.fw-semibold').text('Administrative Staff -> System Administrators');
-            $('thead').append(`
+            $('thead').html(`
                 <tr>
                 <th>ID</th>
                 <th>Admin Name</th>
@@ -279,33 +419,50 @@ function fetchAdmins() {
                 <th colspan="2" class="text-center">Action</th>
                 </tr>
             `);
-            if (!data || data.length === 0) {
-                $('tbody').append(`<tr><td colspan="10" class="text-center text-muted py-4"><i class="fa-solid fa-lock text-warning me-2"></i>Restricted Access: Only Root Superadmin can view and manage system administrators.</td></tr>`);
-                return;
-            }
-            data.forEach((e, idx) => {
-                let badge = (e.accounttype === 'root')
-                    ? '<span class="badge bg-dark-subtle text-dark border"><i class="fa-solid fa-crown me-1 text-warning"></i>Root Superadmin</span>'
-                    : '<span class="badge bg-danger-subtle text-danger"><i class="fa-solid fa-user-shield me-1"></i>Clinic Admin</span>';
-
-                let localJoined = formatUtcToLocal(e.created_at, 'DD/MM/YYYY');
-                $('tbody').append(`
-                    <tr class="patient-record-row cursor-pointer" data-index="` + idx + `" title="Click row to inspect administrator credentials">
-                    <td>`+ e.id + `</td>
-                    <td><strong>`+ e.fullname + `</strong></td>
-                    <td><span class="badge bg-secondary-subtle text-secondary">`+ e.username + `</span></td>
-                    <td>`+ badge + `</td>
-                    <td>`+ e.gender + `</td>
-                    <td>`+ e.email + `</td>
-                    <td>Full System Control</td>
-                    <td>`+ localJoined + `</td>
-                    <td class="text-center"><button class="btn btn-sm btn-outline-primary rounded-pill px-3 edit" data-bs-toggle="modal" data-bs-target="#editModal" data-id="`+ e.id + `" data-fullname="`+ (e.fullname || '') + `" data-username="`+ (e.username || '') + `" data-email="`+ (e.email || '') + `" data-gender="`+ (e.gender || 'Male') + `" data-type="`+ (e.accounttype || 'admin') + `" data-time="`+ (e.user_playing_time || 20) + `"><i class="fa-solid fa-pen-to-square me-1"></i>Edit</button></td>
-                    <td class="text-center"><button class="btn btn-sm btn-outline-danger rounded-pill px-3" onclick="deleteData(`+ e.id + `,'admins')"><i class="fa-solid fa-trash me-1"></i>Delete</button></td>
-                    </tr>`
-                );
-            });
+            $('div.card-header span.fw-semibold').text('Administrative Staff -> System Administrators');
+            setupAdminTableData('Admins', data, renderAdminRow);
         }
     });
+}
+
+function renderUserRow(e, sliceIdx) {
+    let badge = (e.accounttype === 'Unpaid User')
+        ? '<span class="badge bg-warning-subtle text-warning">Pending Payment</span>'
+        : '<span class="badge bg-primary-subtle text-primary"><i class="fa-solid fa-circle-check me-1"></i>Active Patient</span>';
+
+    let doctorBadge = '';
+    if (e.doctor_name) {
+        doctorBadge = `
+            <div class="d-flex align-items-center gap-1">
+                <span class="badge bg-info-subtle text-info fw-semibold"><i class="fa-solid fa-user-doctor me-1"></i>`+ e.doctor_name + `</span>
+                <button class="btn btn-xs btn-link text-primary p-0 assign-doc-btn" data-patient-id="`+ e.id + `" data-patient-name="`+ (e.fullname || '') + `" data-doctor-id="`+ (e.doctor_id || '') + `" title="Change Doctor"><i class="fa-solid fa-arrows-rotate"></i></button>
+            </div>`;
+    } else {
+        doctorBadge = `
+            <div class="d-flex align-items-center gap-1">
+                <span class="badge bg-warning-subtle text-warning fw-semibold">Unassigned</span>
+                <button class="btn btn-xs btn-outline-primary rounded-pill py-0 px-2 assign-doc-btn" data-patient-id="`+ e.id + `" data-patient-name="`+ (e.fullname || '') + `" data-doctor-id="" title="Assign Doctor"><i class="fa-solid fa-user-plus me-1"></i>Assign</button>
+            </div>`;
+    }
+
+    let localEnrolled = formatUtcToLocal(e.created_at, 'DD/MM/YYYY');
+
+    $('tbody').append(`
+        <tr class="patient-record-row cursor-pointer" data-index="` + sliceIdx + `" title="Click row to inspect clinical patient dossier & calibration">
+        <td>`+ e.id + `</td>
+        <td><strong>`+ e.fullname + `</strong></td>
+        <td><span class="badge bg-secondary-subtle text-secondary">`+ e.username + `</span></td>
+        <td>`+ doctorBadge + `</td>
+        <td>`+ badge + `</td>
+        <td>`+ e.gender + `</td>
+        <td>`+ (e.user_playing_time || 20) + ` mins/day</td> 
+        <td>`+ localEnrolled + `</td>
+        <td class="text-center"><button class="btn btn-sm btn-outline-success rounded-pill px-2 view-activity-btn" data-patient-id="`+ e.id + `" data-patient-name="`+ (e.fullname || '') + `" title="View Patient Activity Report & Heatmap"><i class="fa-solid fa-fire text-danger me-1"></i>Activity</button></td>
+        <td class="text-center"><button class="btn btn-sm btn-outline-info rounded-pill px-2 log-review-btn" data-patient-id="`+ e.id + `" data-patient-name="`+ (e.fullname || '') + `" data-doctor-id="`+ (e.doctor_id || 23) + `" title="Log Clinical Review"><i class="fa-solid fa-stethoscope me-1"></i>Review</button></td>
+        <td class="text-center"><button class="btn btn-sm btn-outline-primary rounded-pill px-3 edit" data-bs-toggle="modal" data-bs-target="#editModal" data-id="`+ e.id + `" data-fullname="`+ (e.fullname || '') + `" data-username="`+ (e.username || '') + `" data-email="`+ (e.email || '') + `" data-gender="`+ (e.gender || 'Male') + `" data-type="`+ (e.accounttype || 'user') + `" data-time="`+ (e.user_playing_time || 20) + `" data-doctor="`+ (e.doctor_id || '') + `"><i class="fa-solid fa-pen-to-square me-1"></i>Edit</button></td>
+        <td class="text-center"><button class="btn btn-sm btn-outline-danger rounded-pill px-3" onclick="deleteData(`+ e.id + `,'users')"><i class="fa-solid fa-trash me-1"></i>Delete</button></td>
+        </tr>`
+    );
 }
 
 function fetchUsers(silentPreload) {
@@ -331,16 +488,12 @@ function fetchUsers(silentPreload) {
             if (silentPreload && $('#table-section').is(':hidden')) {
                 return;
             }
-            // Guard against stale response if user switched away
             if (latestActiveCategory !== 'fetchUsers') {
                 return;
             }
 
             activeTableContentType = "Users";
-            $('tbody').html('');
-            $('thead').html('');
-            $('div.card-header span.fw-semibold').text('Patients -> Active Therapy Patients');
-            $('thead').append(`
+            $('thead').html(`
                 <tr>
                 <th>ID</th>
                 <th>Patient Name</th>
@@ -353,52 +506,41 @@ function fetchUsers(silentPreload) {
                 <th colspan="4" class="text-center">Action</th>
                 </tr>
             `);
-            if (!data || data.length === 0) {
-                $('tbody').append(`<tr><td colspan="12" class="text-center text-muted py-4">No active patients found.</td></tr>`);
-                return;
-            }
-
-            data.forEach((e, idx) => {
-                let badge = (e.accounttype === 'Unpaid User')
-                    ? '<span class="badge bg-warning-subtle text-warning">Pending Payment</span>'
-                    : '<span class="badge bg-primary-subtle text-primary"><i class="fa-solid fa-circle-check me-1"></i>Active Patient</span>';
-
-                let doctorBadge = '';
-                if (e.doctor_name) {
-                    doctorBadge = `
-                        <div class="d-flex align-items-center gap-1">
-                            <span class="badge bg-info-subtle text-info fw-semibold"><i class="fa-solid fa-user-doctor me-1"></i>`+ e.doctor_name + `</span>
-                            <button class="btn btn-xs btn-link text-primary p-0 assign-doc-btn" data-patient-id="`+ e.id + `" data-patient-name="`+ (e.fullname || '') + `" data-doctor-id="`+ (e.doctor_id || '') + `" title="Change Doctor"><i class="fa-solid fa-arrows-rotate"></i></button>
-                        </div>`;
-                } else {
-                    doctorBadge = `
-                        <div class="d-flex align-items-center gap-1">
-                            <span class="badge bg-warning-subtle text-warning fw-semibold">Unassigned</span>
-                            <button class="btn btn-xs btn-outline-primary rounded-pill py-0 px-2 assign-doc-btn" data-patient-id="`+ e.id + `" data-patient-name="`+ (e.fullname || '') + `" data-doctor-id="" title="Assign Doctor"><i class="fa-solid fa-user-plus me-1"></i>Assign</button>
-                        </div>`;
-                }
-
-                let localEnrolled = formatUtcToLocal(e.created_at, 'DD/MM/YYYY');
-
-                $('tbody').append(`
-                    <tr class="patient-record-row cursor-pointer" data-index="` + idx + `" title="Click row to inspect clinical patient dossier & calibration">
-                    <td>`+ e.id + `</td>
-                    <td><strong>`+ e.fullname + `</strong></td>
-                    <td><span class="badge bg-secondary-subtle text-secondary">`+ e.username + `</span></td>
-                    <td>`+ doctorBadge + `</td>
-                    <td>`+ badge + `</td>
-                    <td>`+ e.gender + `</td>
-                    <td>`+ (e.user_playing_time || 20) + ` mins/day</td> 
-                    <td>`+ localEnrolled + `</td>
-                    <td class="text-center"><button class="btn btn-sm btn-outline-success rounded-pill px-2 view-activity-btn" data-patient-id="`+ e.id + `" data-patient-name="`+ (e.fullname || '') + `" title="View Patient Activity Report & Heatmap"><i class="fa-solid fa-fire text-danger me-1"></i>Activity</button></td>
-                    <td class="text-center"><button class="btn btn-sm btn-outline-info rounded-pill px-2 log-review-btn" data-patient-id="`+ e.id + `" data-patient-name="`+ (e.fullname || '') + `" data-doctor-id="`+ (e.doctor_id || 23) + `" title="Log Clinical Review"><i class="fa-solid fa-stethoscope me-1"></i>Review</button></td>
-                    <td class="text-center"><button class="btn btn-sm btn-outline-primary rounded-pill px-3 edit" data-bs-toggle="modal" data-bs-target="#editModal" data-id="`+ e.id + `" data-fullname="`+ (e.fullname || '') + `" data-username="`+ (e.username || '') + `" data-email="`+ (e.email || '') + `" data-gender="`+ (e.gender || 'Male') + `" data-type="`+ (e.accounttype || 'user') + `" data-time="`+ (e.user_playing_time || 20) + `" data-doctor="`+ (e.doctor_id || '') + `"><i class="fa-solid fa-pen-to-square me-1"></i>Edit</button></td>
-                    <td class="text-center"><button class="btn btn-sm btn-outline-danger rounded-pill px-3" onclick="deleteData(`+ e.id + `,'users')"><i class="fa-solid fa-trash me-1"></i>Delete</button></td>
-                    </tr>`
-                );
-            });
+            $('div.card-header span.fw-semibold').text('Patients -> Active Therapy Patients');
+            setupAdminTableData('Users', data, renderUserRow);
         }
     });
+}
+
+function renderConsultationRow(e, sliceIdx) {
+    let statusBadge = (e.status === 'Reviewed')
+        ? '<span class="badge bg-success-subtle text-success"><i class="fa-solid fa-circle-check me-1"></i>Reviewed</span>'
+        : `<span class="badge bg-info-subtle text-info">${e.status}</span>`;
+
+    let complianceColor = 'text-success bg-success-subtle';
+    if (e.compliance_assessment === 'Moderate') complianceColor = 'text-warning bg-warning-subtle';
+    if (e.compliance_assessment === 'Low') complianceColor = 'text-danger bg-danger-subtle';
+
+    let localTime = formatUtcToLocal(e.created_at, 'DD MMM YYYY, hh:mm A');
+
+    $('tbody').append(`
+        <tr class="patient-record-row cursor-pointer" data-index="` + sliceIdx + `" title="Click row to inspect clinical review dossier">
+        <td><strong>#`+ e.id + `</strong></td>
+        <td>
+            <span class="fw-bold text-main d-block"><i class="fa-solid fa-user-doctor me-1 text-info"></i>`+ e.doctor_name + `</span>
+            <small class="text-muted">@`+ e.doctor_username + `</small>
+        </td>
+        <td>
+            <span class="fw-bold text-main d-block">`+ e.patient_name + `</span>
+            <small class="text-muted">@`+ e.patient_username + `</small>
+        </td>
+        <td>`+ statusBadge + `</td>
+        <td><span class="badge `+ complianceColor + ` py-1 px-2 fw-semibold">`+ e.compliance_assessment + `</span></td>
+        <td><span class="fw-bold text-primary">`+ e.prescribed_minutes + ` mins/day</span></td>
+        <td style="max-width: 280px;" class="small text-sub">`+ (e.notes || '<span class="text-muted italic">Routine clinical review completed.</span>') + `</td>
+        <td class="small text-nowrap"><i class="fa-regular fa-clock me-1 text-primary"></i>`+ localTime + `</td>
+        </tr>
+    `);
 }
 
 function fetchConsultations() {
@@ -409,12 +551,8 @@ function fetchConsultations() {
         type: "get",
         success: function (data) {
             if (latestActiveCategory !== 'fetchConsultations') return;
-            window.currentTableData = data;
             activeTableContentType = "Consultations";
-            $('tbody').html('');
-            $('thead').html('');
-            $('div.card-header span.fw-semibold').text('Clinical Staff -> Doctor Reviews & Patient Consultations');
-            $('thead').append(`
+            $('thead').html(`
                 <tr>
                 <th>Review ID</th>
                 <th>Doctor / Specialist</th>
@@ -426,40 +564,8 @@ function fetchConsultations() {
                 <th>Reviewed At (Local)</th>
                 </tr>
             `);
-            if (!data || data.length === 0) {
-                $('tbody').append(`<tr><td colspan="8" class="text-center text-muted py-4"><i class="fa-solid fa-stethoscope me-1 text-primary"></i> No doctor consultations recorded yet. Click "Review" on any patient row to log an assessment.</td></tr>`);
-                return;
-            }
-            data.forEach((e, idx) => {
-                let statusBadge = (e.status === 'Reviewed')
-                    ? '<span class="badge bg-success-subtle text-success"><i class="fa-solid fa-circle-check me-1"></i>Reviewed</span>'
-                    : `<span class="badge bg-info-subtle text-info">${e.status}</span>`;
-
-                let complianceColor = 'text-success bg-success-subtle';
-                if (e.compliance_assessment === 'Moderate') complianceColor = 'text-warning bg-warning-subtle';
-                if (e.compliance_assessment === 'Low') complianceColor = 'text-danger bg-danger-subtle';
-
-                let localTime = formatUtcToLocal(e.created_at, 'DD MMM YYYY, hh:mm A');
-
-                $('tbody').append(`
-                    <tr class="patient-record-row cursor-pointer" data-index="` + idx + `" title="Click row to inspect clinical review dossier">
-                    <td><strong>#`+ e.id + `</strong></td>
-                    <td>
-                        <span class="fw-bold text-main d-block"><i class="fa-solid fa-user-doctor me-1 text-info"></i>`+ e.doctor_name + `</span>
-                        <small class="text-muted">@`+ e.doctor_username + `</small>
-                    </td>
-                    <td>
-                        <span class="fw-bold text-main d-block">`+ e.patient_name + `</span>
-                        <small class="text-muted">@`+ e.patient_username + `</small>
-                    </td>
-                    <td>`+ statusBadge + `</td>
-                    <td><span class="badge `+ complianceColor + ` py-1 px-2 fw-semibold">`+ e.compliance_assessment + `</span></td>
-                    <td><span class="fw-bold text-primary">`+ e.prescribed_minutes + ` mins/day</span></td>
-                    <td style="max-width: 280px;" class="small text-sub">`+ (e.notes || '<span class="text-muted italic">Routine clinical review completed.</span>') + `</td>
-                    <td class="small text-nowrap"><i class="fa-regular fa-clock me-1 text-primary"></i>`+ localTime + `</td>
-                    </tr>
-                `);
-            });
+            $('div.card-header span.fw-semibold').text('Clinical Staff -> Doctor Reviews & Patient Consultations');
+            setupAdminTableData('Consultations', data, renderConsultationRow);
         }
     });
 }
@@ -863,9 +969,11 @@ $(document).on('click', '#datatablesSimple tbody tr.patient-record-row', functio
     if ($(e.target).closest('button, a, input, select, .btn, .assign-doc-btn').length) {
         return;
     }
-    let idx = $(this).attr('data-index');
-    if (window.currentTableData && window.currentTableData[idx]) {
-        showRecordDetailsModal(window.currentTableData[idx], activeTableContentType);
+    let idx = parseInt($(this).attr('data-index'));
+    let record = (adminTableState.currentSlice && adminTableState.currentSlice[idx]) 
+        || (window.currentTableData && window.currentTableData[idx]);
+    if (record) {
+        showRecordDetailsModal(record, activeTableContentType);
     }
 });
 
@@ -1231,12 +1339,24 @@ function findGameIconAddress(game_name) {
     return '/images/lazyeye-icon.svg';
 }
 
+var currentActivePatientId = null;
 var currentPatientSessions = [];
+var pamSessionsState = {
+    currentPage: 1,
+    pageSize: 8,
+    filteredDate: null,
+    sessions: []
+};
 
 function openPatientActivity(patientId) {
     if (!patientId) return;
+    currentActivePatientId = patientId;
+    pamSessionsState.currentPage = 1;
+    pamSessionsState.filteredDate = null;
 
     $('#pam_patient_name').text('Loading...');
+    $('#pam_empty_state').addClass('d-none');
+    $('#pam_metrics_and_charts').removeClass('d-none');
     $('#pam_heatmap_wrapper').html('<div class="d-flex align-items-center justify-content-center py-4 text-sub"><i class="fa-solid fa-spinner fa-spin me-2"></i> Loading therapy activity heatmap...</div>');
     $('#pam_sessions_table tbody').html('<tr><td colspan="4" class="text-center py-3 text-muted"><i class="fa-solid fa-spinner fa-spin me-2"></i> Loading records...</td></tr>');
     $('#pam_consultations_table tbody').html('<tr><td colspan="5" class="text-center py-3 text-muted"><i class="fa-solid fa-spinner fa-spin me-2"></i> Loading consultations...</td></tr>');
@@ -1261,6 +1381,7 @@ function openPatientActivity(patientId) {
             let p = res.patient;
             let m = res.metrics;
             currentPatientSessions = res.recent_sessions || [];
+            pamSessionsState.sessions = currentPatientSessions;
 
             // Patient Profile Snapshot
             $('#pam_patient_name').text(p.fullname || 'Patient');
@@ -1278,11 +1399,20 @@ function openPatientActivity(patientId) {
             $('#pam_compliance_rate').text(m.compliance_rate + '%');
             $('#pam_active_days').text(m.days_active);
 
+            // Empty state handling
+            if (!currentPatientSessions || currentPatientSessions.length === 0) {
+                $('#pam_empty_state').removeClass('d-none');
+                $('#pam_metrics_and_charts').addClass('d-none');
+            } else {
+                $('#pam_empty_state').addClass('d-none');
+                $('#pam_metrics_and_charts').removeClass('d-none');
+            }
+
             // Render Heatmap Calendar (84 days / 12 weeks)
             renderPatientHeatmap(res.heatmap_data || []);
 
-            // Render Sessions
-            renderPatientSessions(currentPatientSessions);
+            // Render Sessions with pagination
+            updatePatientSessionsView();
             $('#pam_session_count').text(currentPatientSessions.length);
 
             // Render Consultations
@@ -1306,8 +1436,25 @@ function renderPatientHeatmap(heatmapData) {
         heatmapMap[item.date] = item;
     });
 
+    // Calculate current consecutive active streak
+    let streak = 0;
+    let checkDate = new Date();
+    for (let i = 0; i < 45; i++) {
+        let checkStr = checkDate.toISOString().slice(0, 10);
+        if (heatmapMap[checkStr] && heatmapMap[checkStr].count > 0) {
+            streak++;
+            checkDate.setDate(checkDate.getDate() - 1);
+        } else if (i === 0) {
+            // If today has no play yet, check from yesterday
+            checkDate.setDate(checkDate.getDate() - 1);
+        } else {
+            break;
+        }
+    }
+    $('#pam_streak_label').text(streak > 0 ? (streak + '-day active streak 🔥') : 'Therapy engagement');
+
     let today = new Date();
-    let daysToRender = 84;
+    let daysToRender = 84; // 12 full weeks
     let startDate = new Date();
     startDate.setDate(today.getDate() - daysToRender + 1);
 
@@ -1318,7 +1465,15 @@ function renderPatientHeatmap(heatmapData) {
     while (cur <= today) {
         let dateStr = cur.toISOString().slice(0, 10);
         let dayInfo = heatmapMap[dateStr] || { date: dateStr, count: 0, duration_minutes: 0, games: [] };
-        curWeek.push(dayInfo);
+        curWeek.push({
+            date: dateStr,
+            month: cur.toLocaleString('default', { month: 'short' }),
+            dayOfMonth: cur.getDate(),
+            dayOfWeek: cur.getDay(),
+            count: dayInfo.count,
+            duration_minutes: dayInfo.duration_minutes,
+            games: dayInfo.games || []
+        });
         if (curWeek.length === 7) {
             weeks.push(curWeek);
             curWeek = [];
@@ -1329,10 +1484,27 @@ function renderPatientHeatmap(heatmapData) {
         weeks.push(curWeek);
     }
 
-    let html = '<div class="d-flex gap-2 justify-content-start overflow-auto p-2" style="min-width: 640px;">';
+    let html = '<div class="d-flex flex-column gap-1 overflow-auto p-2" style="min-width: 660px;">';
     
-    // Day of week labels
-    html += '<div class="d-flex flex-column gap-1 text-muted" style="font-size: 10px; line-height: 14px; margin-top: 1px;">';
+    // Top Month Headers Row
+    html += '<div class="d-flex gap-2" style="padding-left: 28px; height: 16px; font-size: 11px; font-weight: 600; color: var(--text-sub);">';
+    let lastRenderedMonth = '';
+    weeks.forEach(week => {
+        let firstDay = week[0];
+        if (firstDay && firstDay.month !== lastRenderedMonth) {
+            html += `<div style="width: 14px; text-align: left; overflow: visible; white-space: nowrap;">${firstDay.month}</div>`;
+            lastRenderedMonth = firstDay.month;
+        } else {
+            html += '<div style="width: 14px;"></div>';
+        }
+    });
+    html += '</div>';
+
+    // Heatmap Grid Container with Day Labels
+    html += '<div class="d-flex gap-2 justify-content-start align-items-center">';
+    
+    // Day of week labels (M, W, F)
+    html += '<div class="d-flex flex-column gap-1 text-muted" style="font-size: 10px; line-height: 14px; width: 20px;">';
     html += '<div style="height: 14px;">M</div>';
     html += '<div style="height: 14px;"></div>';
     html += '<div style="height: 14px;">W</div>';
@@ -1349,25 +1521,27 @@ function renderPatientHeatmap(heatmapData) {
             let bgColor = 'var(--bg-surface-secondary, #e2e8f0)';
             let borderColor = 'var(--border-color, #cbd5e1)';
             if (count === 1) {
-                bgColor = '#9be9a8';
-                borderColor = '#40c463';
+                bgColor = '#a7f3d0';
+                borderColor = '#6ee7b7';
             } else if (count === 2) {
-                bgColor = '#40c463';
-                borderColor = '#30a14e';
+                bgColor = '#34d399';
+                borderColor = '#10b981';
             } else if (count >= 3) {
-                bgColor = '#216e39';
-                borderColor = '#196127';
+                bgColor = '#059669';
+                borderColor = '#047857';
             }
 
             let gamesStr = (day.games && day.games.length > 0) ? (' • Games: ' + day.games.join(', ')) : '';
             let title = day.date + ' • ' + count + ' session(s) (' + day.duration_minutes + ' mins)' + gamesStr;
+            let isSelected = (pamSessionsState.filteredDate === day.date);
+            let selectedStyle = isSelected ? 'outline: 2px solid var(--primary-color, #2563eb); z-index: 2;' : '';
 
             html += `<div 
                 class="pam-heatmap-cell cursor-pointer rounded-1" 
                 data-date="${day.date}" 
                 data-count="${count}"
                 title="${title}" 
-                style="width: 14px; height: 14px; background-color: ${bgColor}; border: 1px solid ${borderColor}; transition: transform 0.15s ease;"
+                style="width: 14px; height: 14px; background-color: ${bgColor}; border: 1px solid ${borderColor}; transition: transform 0.15s ease; ${selectedStyle}"
                 onmouseover="this.style.transform='scale(1.25)'"
                 onmouseout="this.style.transform='scale(1)'"
             ></div>`;
@@ -1375,25 +1549,37 @@ function renderPatientHeatmap(heatmapData) {
         html += '</div>';
     });
 
-    html += '</div>';
+    html += '</div></div>';
     $('#pam_heatmap_wrapper').html(html);
 }
 
-function renderPatientSessions(sessions, filterDate) {
+function updatePatientSessionsView() {
+    let list = pamSessionsState.sessions || [];
+    if (pamSessionsState.filteredDate) {
+        list = list.filter(s => s.played_at && s.played_at.slice(0, 10) === pamSessionsState.filteredDate);
+    }
+
+    let total = list.length;
+    let totalPages = Math.ceil(total / pamSessionsState.pageSize) || 1;
+    if (pamSessionsState.currentPage > totalPages) pamSessionsState.currentPage = totalPages;
+    if (pamSessionsState.currentPage < 1) pamSessionsState.currentPage = 1;
+
+    let start = (pamSessionsState.currentPage - 1) * pamSessionsState.pageSize;
+    let end = Math.min(start + pamSessionsState.pageSize, total);
+    let slice = list.slice(start, end);
+
     let tbody = $('#pam_sessions_table tbody');
     tbody.html('');
 
-    let list = sessions || [];
-    if (filterDate) {
-        list = list.filter(s => s.played_at && s.played_at.slice(0, 10) === filterDate);
-    }
-
-    if (list.length === 0) {
-        tbody.append(`<tr><td colspan="4" class="text-center py-4 text-muted">No sessions found${filterDate ? ' for ' + filterDate : ''}.</td></tr>`);
+    if (total === 0) {
+        tbody.append(`<tr><td colspan="4" class="text-center py-4 text-muted"><i class="fa-solid fa-gamepad me-1"></i> No sessions recorded${pamSessionsState.filteredDate ? ' for ' + pamSessionsState.filteredDate : ''}.</td></tr>`);
+        $('#pam_sessions_page_info').text('Showing 0 sessions');
+        $('#pam_sessions_prev_btn').prop('disabled', true);
+        $('#pam_sessions_next_btn').prop('disabled', true);
         return;
     }
 
-    list.forEach(s => {
+    slice.forEach(s => {
         let icon = findGameIconAddress(s.game_name);
         let mins = Math.floor((s.duration_seconds || 1200) / 60);
         let secs = (s.duration_seconds || 1200) % 60;
@@ -1414,6 +1600,10 @@ function renderPatientSessions(sessions, filterDate) {
             </tr>
         `);
     });
+
+    $('#pam_sessions_page_info').text(`Showing ${start + 1} to ${end} of ${total} sessions (Page ${pamSessionsState.currentPage} of ${totalPages})`);
+    $('#pam_sessions_prev_btn').prop('disabled', pamSessionsState.currentPage <= 1);
+    $('#pam_sessions_next_btn').prop('disabled', pamSessionsState.currentPage >= totalPages);
 }
 
 function renderPatientConsultations(consultations) {
@@ -1444,25 +1634,94 @@ function renderPatientConsultations(consultations) {
     });
 }
 
+// Modal Sessions Prev / Next Handlers
+$(document).on('click', '#pam_sessions_prev_btn', function () {
+    if (pamSessionsState.currentPage > 1) {
+        pamSessionsState.currentPage--;
+        updatePatientSessionsView();
+    }
+});
+
+$(document).on('click', '#pam_sessions_next_btn', function () {
+    pamSessionsState.currentPage++;
+    updatePatientSessionsView();
+});
+
+// View Patient Activity Click
 $(document).on('click', '.view-activity-btn', function () {
     let patientId = $(this).attr('data-patient-id');
     openPatientActivity(patientId);
 });
 
+// Heatmap Cell Click Handler (Filters sessions by selected day)
 $(document).on('click', '.pam-heatmap-cell', function () {
     let date = $(this).attr('data-date');
-    if (date) {
+    if (!date) return;
+
+    if (pamSessionsState.filteredDate === date) {
+        // Toggle off filter if clicked again
+        pamSessionsState.filteredDate = null;
+        pamSessionsState.currentPage = 1;
+        $('#pam_selected_date_filter').addClass('d-none');
+        $('.pam-heatmap-cell').css('outline', 'none');
+        updatePatientSessionsView();
+    } else {
+        pamSessionsState.filteredDate = date;
+        pamSessionsState.currentPage = 1;
+        $('.pam-heatmap-cell').css('outline', 'none');
+        $(this).css('outline', '2px solid var(--primary-color, #2563eb)');
         $('#pam_filter_date_label').text(date);
         $('#pam_selected_date_filter').removeClass('d-none');
-        renderPatientSessions(currentPatientSessions, date);
+        updatePatientSessionsView();
     }
 });
 
+// Clear Date Filter Click
 $(document).on('click', '#pam_clear_date_filter', function () {
+    pamSessionsState.filteredDate = null;
+    pamSessionsState.currentPage = 1;
     $('#pam_selected_date_filter').addClass('d-none');
-    renderPatientSessions(currentPatientSessions);
+    $('.pam-heatmap-cell').css('outline', 'none');
+    updatePatientSessionsView();
+});
+
+// Seed Patient Clinical Records (Demo Mode) Button Handlers
+$(document).on('click', '#pam_seed_patient_btn, #pam_quick_seed_btn', function () {
+    if (!currentActivePatientId) return;
+
+    let btn = $(this);
+    let origHtml = btn.html();
+    btn.prop('disabled', true).html('<i class="fa-solid fa-spinner fa-spin me-1"></i> Simulating 30-Day Records...');
+
+    let token = $('meta[name="csrf-token"]').attr('content');
+    $.ajax({
+        url: "/seedPatientSessions",
+        type: "post",
+        headers: { 'X-CSRF-TOKEN': token },
+        data: { patient_id: currentActivePatientId },
+        success: function (res) {
+            btn.prop('disabled', false).html(origHtml);
+            if (res.status === 'success') {
+                Swal.fire({
+                    icon: 'success',
+                    title: 'Clinical Data Simulated!',
+                    text: res.message || '30 days of therapy logs successfully generated.',
+                    timer: 2000,
+                    showConfirmButton: false
+                });
+                openPatientActivity(currentActivePatientId);
+            } else {
+                Swal.fire('Notice', res.message || 'Could not seed sessions', 'info');
+            }
+        },
+        error: function () {
+            btn.prop('disabled', false).html(origHtml);
+            Swal.fire('Error', 'Failed to generate therapy sessions.', 'error');
+        }
+    });
 });
 
 window.openPatientActivity = openPatientActivity;
+
 
 

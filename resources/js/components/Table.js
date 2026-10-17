@@ -131,6 +131,39 @@ export default class Table extends React.Component{
                 <div className="table-scroll-hint d-none">
                     <i className="fa-solid fa-arrows-left-right me-1"></i> Swipe horizontally to see all columns
                 </div>
+
+                {/* Table Live Search & Rows-Per-Page Toolbar */}
+                <div className="card-body p-3 border-bottom d-flex align-items-center justify-content-between flex-wrap gap-2" style={{ borderColor: 'var(--border-color)', backgroundColor: 'var(--bg-surface-secondary)' }}>
+                    <div className="d-flex align-items-center gap-2 flex-grow-1" style={{ maxWidth: 380 }}>
+                        <div className="input-group input-group-sm">
+                            <span className="input-group-text bg-transparent border-end-0 text-muted" style={{ borderColor: 'var(--border-color)' }}>
+                                <i className="fa-solid fa-magnifying-glass"></i>
+                            </span>
+                            <input 
+                                type="search" 
+                                id="adminTableSearchInput" 
+                                className="form-control form-control-sm border-start-0" 
+                                placeholder="Search by name, username, email, doctor..." 
+                                style={{ backgroundColor: 'var(--bg-card)', borderColor: 'var(--border-color)', color: 'var(--text-main)' }}
+                            />
+                        </div>
+                    </div>
+                    <div className="d-flex align-items-center gap-2">
+                        <span className="small text-sub text-nowrap">Show:</span>
+                        <select 
+                            id="adminTablePageSize" 
+                            className="form-select form-select-sm" 
+                            style={{ width: 'auto', backgroundColor: 'var(--bg-card)', borderColor: 'var(--border-color)', color: 'var(--text-main)' }}
+                            defaultValue="10"
+                        >
+                            <option value="10">10 per page</option>
+                            <option value="25">25 per page</option>
+                            <option value="50">50 per page</option>
+                            <option value="all">All records</option>
+                        </select>
+                    </div>
+                </div>
+
                 <div className="card-body table-responsive p-0">
                     <table id="datatablesSimple" className='table table-hover table-striped mb-0'>
                         <thead className='thead-info'>
@@ -140,6 +173,18 @@ export default class Table extends React.Component{
                            
                         </tbody>
                     </table>
+                </div>
+
+                {/* Table Pagination Footer */}
+                <div className="card-footer bg-transparent py-3 px-3 d-flex align-items-center justify-content-between flex-wrap gap-2" style={{ borderColor: 'var(--border-color)' }}>
+                    <div className="small text-sub" id="adminTablePaginationInfo">
+                        Showing 0 to 0 of 0 entries
+                    </div>
+                    <nav aria-label="Table pagination">
+                        <ul className="pagination pagination-sm mb-0" id="adminTablePaginationNav">
+                            {/* Dynamically populated by adminScript.js */}
+                        </ul>
+                    </nav>
                 </div>
             </div>
             </div>

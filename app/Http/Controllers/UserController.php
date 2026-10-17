@@ -506,8 +506,101 @@ class UserController extends Controller
         ]);
     }
 
+    public static function generateSessionsForPatient($patientId, $daysBack = 45) {
+        $games = ['Tetris', 'Snake', 'Bubble Shooter', 'Flappy Bird', 'Menja', 'Sticky Holds', 'Ball Catcher', 'Ping Pong'];
+        $records = [];
+        $baseScore = rand(35, 65);
+
+        for ($d = $daysBack; $d >= 0; $d--) {
+            // Patient plays on ~80% of days
+            if (rand(1, 10) > 8) continue;
+
+            $sessionsToday = (rand(1, 10) > 7) ? 2 : 1;
+            for ($s = 0; $s < $sessionsToday; $s++) {
+                $game = $games[array_rand($games)];
+                $duration = rand(720, 1500); // 12 - 25 minutes
+                // Progressive score increase over time
+                $dayProgress = intval(($daysBack - $d) * 2.2);
+                $score = $baseScore + $dayProgress + rand(-8, 25);
+                if ($score < 10) $score = 15;
+
+                $hour = ($s === 0) ? rand(9, 14) : rand(16, 21);
+                $minute = rand(0, 59);
+                $second = rand(0, 59);
+
+                $timestamp = date('Y-m-d H:i:s', strtotime("-{$d} days") + ($hour * 3600 + $minute * 60 + $second - (12 * 3600)));
+                $records[] = [
+                    'user_id' => $patientId,
+                    'game_name' => $game,
+                    'score' => $score,
+                    'duration_seconds' => $duration,
+                    'played_at' => $timestamp,
+                    'created_at' => $timestamp,
+                    'updated_at' => $timestamp
+                ];
+            }
+        }
+
+        if (!empty($records)) {
+            DB::table('game_records')->insert($records);
+        }
+        return count($records);
+    }
+
+    public function seedPatientSessions(Request $req){
+        return self::safelyQuery(function() use ($req) {
+            $patientId = $req->patient_id ?: $req->id;
+
+            if ($patientId && $patientId !== 'all') {
+                $patient = DB::table('users')->where('id', $patientId)->first();
+                if (!$patient) {
+                    return response()->json(['status' => 'error', 'message' => 'Patient not found'], 404);
+                }
+                $count = self::generateSessionsForPatient($patientId, 45);
+
+                // Ensure a clinical review exists
+                $hasConsult = DB::table('doctor_consultations')->where('patient_id', $patientId)->exists();
+                if (!$hasConsult) {
+                    $docId = $patient->doctor_id ?: (DB::table('users')->where('accounttype', 'doctor')->value('id') ?: 23);
+                    DB::table('doctor_consultations')->insert([
+                        'doctor_id' => $docId,
+                        'patient_id' => $patientId,
+                        'status' => 'Prescribed',
+                        'notes' => 'Baseline vision assessment complete. Patient demonstrates suppression of amblyopic eye under binocular conditions. Prescribed 20 mins/day dichoptic therapy (Tetris & Snake) with red/blue anaglyph glasses.',
+                        'compliance_assessment' => 'Good',
+                        'prescribed_minutes' => intval($patient->user_playing_time ?: 20),
+                        'created_at' => gmdate('Y-m-d H:i:s', strtotime('-12 days')),
+                        'updated_at' => gmdate('Y-m-d H:i:s', strtotime('-12 days'))
+                    ]);
+                }
+
+                return response()->json([
+                    'status' => 'success',
+                    'message' => "Successfully generated {$count} clinical therapy sessions for {$patient->fullname}!",
+                    'sessions_count' => $count,
+                    'patient_id' => $patientId
+                ]);
+            } else {
+                $patients = DB::table('users')->whereNotIn('accounttype', ['admin', 'root', 'doctor'])->get();
+                $totalSeeded = 0;
+                foreach ($patients as $p) {
+                    $totalSeeded += self::generateSessionsForPatient($p->id, 45);
+                }
+                return response()->json([
+                    'status' => 'success',
+                    'message' => "Successfully seeded {$totalSeeded} sessions across " . count($patients) . " active patients!",
+                    'total_sessions' => $totalSeeded
+                ]);
+            }
+        });
+    }
+
     public function seedDemoData(){
         self::ensureDatabaseReady(true);
+        $patients = DB::table('users')->whereNotIn('accounttype', ['admin', 'root', 'doctor'])->get();
+        foreach ($patients as $p) {
+            self::generateSessionsForPatient($p->id, 45);
+        }
         return response()->json([
             'status' => 'success',
             'message' => 'Clinical demo records successfully initialized!'
