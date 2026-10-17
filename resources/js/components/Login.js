@@ -101,31 +101,31 @@ export default class Login extends React.Component {
                             {/* Left Side: Illustration & Vision Therapy Benefits */}
                             <div className="col-12 col-lg-5 text-center d-none d-lg-block">
                                 <div className="p-4 rounded-4 text-start shadow-sm" style={{ background: 'var(--bg-surface-secondary)', border: '1px solid var(--border-color)' }}>
-                                    <div className="text-center mb-3">
-                                        <img 
-                                            src="/images/auth-therapy-illustration.svg" 
-                                            className="img-fluid" 
-                                            alt="Dichoptic Vision Therapy" 
-                                            style={{ maxHeight: '240px', width: '100%', objectFit: 'contain' }}
-                                        />
+                                    <div className="d-flex align-items-center gap-2 mb-3">
+                                        <div className="rounded-3 bg-primary text-white d-flex align-items-center justify-content-center" style={{ width: 36, height: 36 }}>
+                                            <i className="fa-solid fa-glasses"></i>
+                                        </div>
+                                        <div>
+                                            <h5 className="fw-bold mb-0 text-main">Dichoptic Therapeutics</h5>
+                                            <span className="text-muted small">Clinical Amblyopia Platform</span>
+                                        </div>
                                     </div>
-                                    <div className="d-flex align-items-center gap-2 mb-2">
-                                        <span className="badge bg-primary px-3 py-2 rounded-pill fw-semibold">
-                                            {isDoctor ? 'Clinical Management' : 'Vision Therapy'}
-                                        </span>
-                                        <span className="badge bg-info-subtle text-info px-3 py-2 rounded-pill fw-semibold">
-                                            {isDoctor ? 'Doctor & Admin' : 'Patient Access'}
-                                        </span>
-                                    </div>
-                                    <h4 className="fw-bold mb-2 text-main">
-                                        {isDoctor ? 'Optometrist & Clinic Console' : 'Dichoptic Therapy Games'}
-                                    </h4>
-                                    <p className="text-sub small mb-3" style={{ lineHeight: '1.6' }}>
+                                    <p className="text-sub small mb-3" style={{ lineHeight: '1.65' }}>
                                         {isDoctor 
-                                            ? 'Manage assigned patient cohorts, review therapy logs, monitor adherence rates, and log clinical assessments.'
-                                            : 'Log in to play your 15–20 minute prescribed sessions with Red/Cyan 3D glasses and track your visual recovery.'
+                                            ? 'Access the optometrist workstation to manage patient cohorts, monitor adherence rates, review therapy time logs, and submit clinical evaluations.'
+                                            : 'Log in to access your prescribed 20-minute daily gaming sessions with real-time Red/Cyan contrast balance.'
                                         }
                                     </p>
+
+                                    <div className="p-3 rounded-3 mb-3" style={{ background: 'var(--bg-card)', border: '1px solid var(--border-color)' }}>
+                                        <div className="small fw-bold text-main mb-2">Platform Capabilities:</div>
+                                        <ul className="list-unstyled d-flex flex-column gap-2 mb-0 small text-sub" style={{ fontSize: '0.82rem' }}>
+                                            <li><i className="fa-solid fa-check text-success me-2"></i> Dual-channel chromatic separation (630nm / 490nm)</li>
+                                            <li><i className="fa-solid fa-check text-success me-2"></i> 10 interactive therapeutic game engines</li>
+                                            <li><i className="fa-solid fa-check text-success me-2"></i> Automated 20-min daily adherence logging</li>
+                                            <li><i className="fa-solid fa-check text-success me-2"></i> Optometrist supervision &amp; consultation notes</li>
+                                        </ul>
+                                    </div>
 
                                     {/* Quick Test Demo Credentials for Recruiters */}
                                     <div className="p-3 rounded-3" style={{ background: 'var(--bg-card)', border: '1px solid var(--border-color)' }}>

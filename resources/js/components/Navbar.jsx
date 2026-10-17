@@ -31,19 +31,19 @@ export default class Navbar extends React.Component {
                     <div className="collapse navbar-collapse" id="navbarSupportedContent">
                         <ul className="navbar-nav mx-auto mb-2 mb-lg-0 align-items-center gap-lg-1">
                             <li className="nav-item">
-                                <a className="nav-link" href="/">Home</a>
+                                <a className="nav-link" href="/">Overview</a>
                             </li>
                             <li className="nav-item">
-                                <a className="nav-link" href="/#intro">What is Lazy Eye?</a>
+                                <a className="nav-link" href="/#science">Clinical Science</a>
                             </li>
                             <li className="nav-item">
-                                <a className="nav-link" href="/#how-it-works">How It Works</a>
+                                <a className="nav-link" href="/#how-it-works">Protocol</a>
                             </li>
                             <li className="nav-item">
-                                <a className="nav-link" href="/#games">Therapy Games</a>
+                                <a className="nav-link" href="/#games">Game Suite</a>
                             </li>
                             <li className="nav-item">
-                                <a className="nav-link" href="/#contact">Contact</a>
+                                <a className="nav-link" href="/Login_view?role=doctor">Doctor Portal</a>
                             </li>
                         </ul>
                         

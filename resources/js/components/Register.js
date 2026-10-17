@@ -259,10 +259,10 @@ export default class Register extends React.Component {
                                         </div>
                                     </div>
 
-                                    <div className="p-3 rounded-3" style={{ background: 'rgba(59, 130, 246, 0.08)', border: '1px solid rgba(59, 130, 246, 0.2)' }}>
+                                    <div className="p-3 rounded-3" style={{ background: 'var(--bg-card)', border: '1px solid var(--border-color)' }}>
                                         <small className="d-block text-sub" style={{ fontSize: '0.78rem' }}>
-                                            <i className="fa-solid fa-circle-info text-primary me-1"></i>
-                                            <strong>Research Prototype Notice:</strong> LazyEye is an open-source digital therapeutics demo engineered for dichoptic vision research.
+                                            <i className="fa-solid fa-shield-halved text-primary me-1"></i>
+                                            <strong>Secure Patient Privacy:</strong> Clinical records and contrast calibration profiles are encrypted and accessible exclusively to your authorized eye specialist.
                                         </small>
                                     </div>
                                 </div>

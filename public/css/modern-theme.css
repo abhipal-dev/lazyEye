@@ -428,106 +428,103 @@ a:hover {
   margin-top: 0.25rem;
 }
 
-/* Interactive Optics Calibration Simulator (Hero Right Column) */
-.optics-lab-card {
+/* ========================================================
+   SAAS PRODUCT PREVIEW COMPONENT (Hero Right Column)
+   ======================================================== */
+.saas-app-window {
   background: var(--bg-card);
   border: 1px solid var(--border-color);
-  border-radius: 14px;
-  box-shadow: 0 8px 30px rgba(0, 0, 0, 0.08);
+  border-radius: 12px;
+  box-shadow: 0 16px 36px -10px rgba(0, 0, 0, 0.12), 0 0 0 1px rgba(0, 0, 0, 0.04);
   overflow: hidden;
   text-align: left;
 }
 
-.optics-lab-header {
+.saas-window-bar {
   background: var(--bg-surface-secondary);
   border-bottom: 1px solid var(--border-color);
-  padding: 0.75rem 1.25rem;
+  padding: 0.65rem 1rem;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.saas-window-dots {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.saas-dot {
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  display: inline-block;
+}
+.saas-dot-red { background: #ef4444; }
+.saas-dot-yellow { background: #f59e0b; }
+.saas-dot-green { background: #10b981; }
+
+.saas-window-title {
+  font-size: 0.76rem;
+  font-weight: 600;
+  color: var(--text-muted);
+  font-family: ui-monospace, SFMono-Regular, monospace;
+}
+
+.saas-window-status {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  font-size: 0.72rem;
+  font-weight: 600;
+  padding: 0.2rem 0.55rem;
+  border-radius: 4px;
+  background: rgba(16, 185, 129, 0.12);
+  color: #10b981;
+}
+
+.saas-window-telemetry {
+  background: var(--bg-surface-secondary);
+  border-bottom: 1px solid var(--border-color);
+  padding: 0.65rem 1rem;
   display: flex;
   align-items: center;
   justify-content: space-between;
   font-size: 0.78rem;
-  font-family: ui-monospace, monospace;
 }
 
-.optics-viewport {
-  background: #0b1120;
-  height: 220px;
+.saas-viewport-canvas {
+  background: #090d16;
+  min-height: 230px;
   position: relative;
   display: flex;
   align-items: center;
   justify-content: center;
   overflow: hidden;
+  padding: 1.25rem;
 }
 
-.optics-grid-overlay {
+.saas-viewport-grid {
   position: absolute;
-  top: 0;
-  left: 0;
-  right: 0;
-  bottom: 0;
+  inset: 0;
   background-image: 
-    linear-gradient(rgba(255, 255, 255, 0.05) 1px, transparent 1px),
-    linear-gradient(90deg, rgba(255, 255, 255, 0.05) 1px, transparent 1px);
-  background-size: 20px 20px;
+    linear-gradient(rgba(255, 255, 255, 0.04) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(255, 255, 255, 0.04) 1px, transparent 1px);
+  background-size: 24px 24px;
   pointer-events: none;
 }
 
-.optics-crosshair-center {
-  position: absolute;
-  width: 100%;
-  height: 100%;
-  pointer-events: none;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-}
-
-.optics-crosshair-center::before {
-  content: '';
-  position: absolute;
-  width: 120px;
-  height: 1px;
-  background: rgba(255, 255, 255, 0.15);
-}
-
-.optics-crosshair-center::after {
-  content: '';
-  position: absolute;
-  height: 120px;
-  width: 1px;
-  background: rgba(255, 255, 255, 0.15);
-}
-
-.stimulus-layer {
-  position: absolute;
-  transition: opacity 0.15s ease, transform 0.15s ease;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-}
-
-.stimulus-layer.stimulus-red {
-  color: #ff2a4b;
-  text-shadow: 0 0 10px rgba(255, 42, 75, 0.7);
-  mix-blend-mode: screen;
-}
-
-.stimulus-layer.stimulus-cyan {
-  color: #00e5ff;
-  text-shadow: 0 0 10px rgba(0, 229, 255, 0.7);
-  mix-blend-mode: screen;
-}
-
-.optics-slider-control {
-  padding: 1rem 1.25rem;
+.saas-slider-strip {
   background: var(--bg-card);
   border-top: 1px solid var(--border-color);
+  padding: 0.85rem 1rem;
 }
 
-.filter-mode-btn {
-  font-size: 0.78rem;
+.saas-tab-btn {
+  font-size: 0.76rem;
   font-weight: 600;
-  padding: 0.4rem 0.8rem;
+  padding: 0.35rem 0.75rem;
   border-radius: 6px;
   border: 1px solid var(--border-color);
   background: var(--bg-surface-secondary);
@@ -535,7 +532,7 @@ a:hover {
   transition: all 0.15s ease;
 }
 
-.filter-mode-btn.active {
+.saas-tab-btn.active {
   background: var(--primary);
   color: #ffffff;
   border-color: var(--primary);
