@@ -51,24 +51,44 @@ export default class Table extends React.Component{
                         </div>
                         <div className="d-flex align-items-center gap-2 flex-wrap">
                             <div className="table-filter-group">
-                                <button className="table-filter-btn fetchUsers active" type="button" onClick={() => window.fetchUsers && window.fetchUsers()}>
+                                <button 
+                                    className={`table-filter-btn fetchUsers ${(!this.props.activeCategory || this.props.activeCategory === 'fetchUsers') ? 'active' : ''}`} 
+                                    type="button" 
+                                    onClick={() => window.fetchUsers && window.fetchUsers()}
+                                >
                                     <i className="fa-solid fa-users me-1 text-primary"></i>{isDoctor ? 'My Patients' : 'Patients'}
                                 </button>
                                 {!isDoctor && (
-                                    <button className="table-filter-btn fetchDoctors" type="button" onClick={() => window.fetchDoctors && window.fetchDoctors()}>
+                                    <button 
+                                        className={`table-filter-btn fetchDoctors ${this.props.activeCategory === 'fetchDoctors' ? 'active' : ''}`} 
+                                        type="button" 
+                                        onClick={() => window.fetchDoctors && window.fetchDoctors()}
+                                    >
                                         <i className="fa-solid fa-user-doctor me-1 text-info"></i>Doctors
                                     </button>
                                 )}
-                                <button className="table-filter-btn fetchConsultations" type="button" onClick={() => window.fetchConsultations && window.fetchConsultations()}>
+                                <button 
+                                    className={`table-filter-btn fetchConsultations ${this.props.activeCategory === 'fetchConsultations' ? 'active' : ''}`} 
+                                    type="button" 
+                                    onClick={() => window.fetchConsultations && window.fetchConsultations()}
+                                >
                                     <i className="fa-solid fa-stethoscope me-1 text-danger"></i>{isDoctor ? 'My Reviews' : 'Clinical Reviews'}
                                 </button>
                                 {isRoot && (
-                                    <button className="table-filter-btn fetchAdmins" type="button" onClick={() => window.fetchAdmins && window.fetchAdmins()}>
+                                    <button 
+                                        className={`table-filter-btn fetchAdmins ${this.props.activeCategory === 'fetchAdmins' ? 'active' : ''}`} 
+                                        type="button" 
+                                        onClick={() => window.fetchAdmins && window.fetchAdmins()}
+                                    >
                                         <i className="fa-solid fa-user-shield me-1 text-success"></i>Admins
                                     </button>
                                 )}
                                 {!isDoctor && (
-                                    <button className="table-filter-btn fetchRegisters" type="button" onClick={() => window.fetchRegisters && window.fetchRegisters()}>
+                                    <button 
+                                        className={`table-filter-btn fetchRegisters ${this.props.activeCategory === 'fetchRegisters' ? 'active' : ''}`} 
+                                        type="button" 
+                                        onClick={() => window.fetchRegisters && window.fetchRegisters()}
+                                    >
                                         <i className="fa-solid fa-user-plus me-1 text-warning"></i>Pending
                                     </button>
                                 )}

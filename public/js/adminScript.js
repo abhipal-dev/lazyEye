@@ -1,7 +1,14 @@
 // import { isArguments } from "lodash";
 var activeTableContentType = "";
 $(document).ready(function () {
-    fetchUsers();
+    // Strictly isolate views on initial page load: show Overview Dashboard, hide Data Tables
+    $('#table-section').hide().addClass('d-none');
+    $('#dashboard-section').show().removeClass('d-none');
+    $('#layoutSidenav_nav .nav-link').removeClass('active');
+    $('#layoutSidenav_nav .nav-link.dashboardButton').addClass('active');
+
+    // Preload users silently in background without overriding active dashboard tab
+    fetchUsers(true);
 });
 window.addEventListener('DOMContentLoaded', event => {
     // Toggle the side navigation
@@ -99,17 +106,23 @@ function approveRegisters(id, type) {
     })
 }
 
-function scrollToTable() {
+function showTable(categoryFn) {
+    const cat = categoryFn || 'fetchUsers';
     if (window.switchToAdminTable) {
-        window.switchToAdminTable(activeTableContentType ? ('fetch' + activeTableContentType) : 'fetchUsers');
+        window.switchToAdminTable(cat);
     } else {
-        $('#dashboard-section').addClass('d-none');
-        $('#table-section').removeClass('d-none');
-        const el = document.getElementById('table-section');
-        if (el) {
-            el.scrollIntoView({ behavior: 'smooth' });
+        $('#dashboard-section').hide().addClass('d-none');
+        $('#table-section').show().removeClass('d-none');
+        if (typeof window[cat] === 'function') {
+            window[cat]();
         }
+        updateFilterActive(cat, true);
     }
+    window.scrollTo({ top: 0, behavior: 'instant' });
+}
+
+function scrollToTable(categoryFn) {
+    showTable(categoryFn || (activeTableContentType ? ('fetch' + activeTableContentType) : 'fetchUsers'));
 }
 
 function formatUtcToLocal(utcString, format = 'DD MMM YYYY, hh:mm A') {
@@ -124,14 +137,16 @@ function formatUtcToLocal(utcString, format = 'DD MMM YYYY, hh:mm A') {
     }
 }
 
-function updateFilterActive(activeClass) {
+function updateFilterActive(activeClass, forceSidebar) {
     // 1. Table filter buttons - strictly one active
     $('.table-filter-btn').removeClass('active');
     $('.table-filter-btn.' + activeClass).addClass('active');
 
-    // 2. Sidebar navigation items - clear ALL active states first, then activate strictly the current item
-    $('#layoutSidenav_nav .nav-link').removeClass('active');
-    $('#layoutSidenav_nav .nav-link.' + activeClass).addClass('active');
+    // 2. Sidebar navigation items - only switch sidebar active state if table-section is visible or forceSidebar is true
+    if (forceSidebar || $('#table-section').is(':visible')) {
+        $('#layoutSidenav_nav .nav-link').removeClass('active');
+        $('#layoutSidenav_nav .nav-link.' + activeClass).addClass('active');
+    }
 }
 
 function fetchRegisters() {
@@ -283,14 +298,16 @@ function fetchAdmins() {
     });
 }
 
-function fetchUsers() {
+function fetchUsers(silentPreload) {
     $.ajax({
         url: "/fetchUsers",
         type: "get",
         success: function (data) {
             window.currentTableData = data;
             activeTableContentType = "Users";
-            updateFilterActive('fetchUsers');
+            if (!silentPreload) {
+                updateFilterActive('fetchUsers');
+            }
             $('tbody').html('');
             $('thead').html('');
             $('div.card-header span.fw-semibold').text('Patients -> Active Therapy Patients');
@@ -462,10 +479,13 @@ function showDashboard() {
     if (window.switchToAdminDashboard) {
         window.switchToAdminDashboard();
     } else {
-        $('#dashboard-section').removeClass('d-none');
-        $('#table-section').addClass('d-none');
+        $('#table-section').hide().addClass('d-none');
+        $('#dashboard-section').show().removeClass('d-none');
+        $('#layoutSidenav_nav .nav-link').removeClass('active');
+        $('#layoutSidenav_nav .nav-link.dashboardButton').addClass('active');
+        $('.table-filter-btn').removeClass('active');
     }
-    window.scrollTo({ top: 0, behavior: 'smooth' });
+    window.scrollTo({ top: 0, behavior: 'instant' });
 }
 
 function showRecordDetailsModal(record, type) {
@@ -854,34 +874,33 @@ window.fetchDoctors = fetchDoctors;
 window.fetchAdmins = fetchAdmins;
 window.fetchRegisters = fetchRegisters;
 window.fetchConsultations = fetchConsultations;
+window.showTable = showTable;
 window.scrollToTable = scrollToTable;
 window.showDashboard = showDashboard;
 window.showRecordDetailsModal = showRecordDetailsModal;
 
-$(document).on('click', '.fetchRegisters', function () {
-    fetchRegisters();
-    scrollToTable();
+$(document).on('click', '#layoutSidenav_nav .nav-link.fetchRegisters, .table-filter-btn.fetchRegisters', function (e) {
+    e.preventDefault();
+    showTable('fetchRegisters');
 });
-$(document).on('click', '.fetchAdmins', function () {
-    fetchAdmins();
-    scrollToTable();
+$(document).on('click', '#layoutSidenav_nav .nav-link.fetchAdmins, .table-filter-btn.fetchAdmins', function (e) {
+    e.preventDefault();
+    showTable('fetchAdmins');
 });
-$(document).on('click', '.fetchUsers', function () {
-    fetchUsers();
-    scrollToTable();
+$(document).on('click', '#layoutSidenav_nav .nav-link.fetchUsers, .table-filter-btn.fetchUsers', function (e) {
+    e.preventDefault();
+    showTable('fetchUsers');
 });
-$(document).on('click', '.fetchDoctors', function () {
-    fetchDoctors();
-    scrollToTable();
+$(document).on('click', '#layoutSidenav_nav .nav-link.fetchDoctors, .table-filter-btn.fetchDoctors', function (e) {
+    e.preventDefault();
+    showTable('fetchDoctors');
 });
-$(document).on('click', '.fetchConsultations', function () {
-    fetchConsultations();
-    scrollToTable();
+$(document).on('click', '#layoutSidenav_nav .nav-link.fetchConsultations, .table-filter-btn.fetchConsultations', function (e) {
+    e.preventDefault();
+    showTable('fetchConsultations');
 });
-$(document).on('click', '.dashboardButton', function () {
-    $('#layoutSidenav_nav .nav-link').removeClass('active');
-    $(this).addClass('active');
-    $('.table-filter-btn').removeClass('active');
+$(document).on('click', '#layoutSidenav_nav .nav-link.dashboardButton', function (e) {
+    e.preventDefault();
     showDashboard();
 });
 $(document).on('click', '.logoutButton', function () {

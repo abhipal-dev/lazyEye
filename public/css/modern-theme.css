@@ -1925,3 +1925,10 @@ tr.patient-record-row:hover td {
     color: #000000 !important;
   }
 }
+
+/* Mutual exclusivity between Dashboard Overview and Table sections */
+#dashboard-section.d-none,
+#table-section.d-none {
+  display: none !important;
+}
+

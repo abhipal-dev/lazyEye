@@ -24,6 +24,10 @@ export default class AdminDashboard extends React.Component {
     }
 
     componentDidMount() {
+        // Enforce strict mutual exclusivity on load
+        $('#table-section').hide().addClass('d-none');
+        $('#dashboard-section').show().removeClass('d-none');
+
         // Expose view switcher methods globally for adminScript and buttons
         window.switchToAdminDashboard = () => {
             this.switchToDashboard();
@@ -53,20 +57,29 @@ export default class AdminDashboard extends React.Component {
     }
 
     switchToDashboard = () => {
-        this.setState({ activeView: 'dashboard' });
+        this.setState({ activeView: 'dashboard' }, () => {
+            $('#table-section').hide().addClass('d-none');
+            $('#dashboard-section').show().removeClass('d-none');
+        });
         $('#layoutSidenav_nav .nav-link').removeClass('active');
         $('#layoutSidenav_nav .nav-link.dashboardButton').addClass('active');
         $('.table-filter-btn').removeClass('active');
-        window.scrollTo({ top: 0, behavior: 'smooth' });
+        window.scrollTo({ top: 0, behavior: 'instant' });
     };
 
     switchToTable = (categoryFn) => {
         const cat = categoryFn || 'fetchUsers';
         this.setState({ activeView: 'table', activeTableCategory: cat }, () => {
+            $('#dashboard-section').hide().addClass('d-none');
+            $('#table-section').show().removeClass('d-none');
             if (typeof window[cat] === 'function') {
                 window[cat]();
             }
-            window.scrollTo({ top: 0, behavior: 'smooth' });
+            $('#layoutSidenav_nav .nav-link').removeClass('active');
+            $('#layoutSidenav_nav .nav-link.' + cat).addClass('active');
+            $('.table-filter-btn').removeClass('active');
+            $('.table-filter-btn.' + cat).addClass('active');
+            window.scrollTo({ top: 0, behavior: 'instant' });
         });
     };
     render() {
@@ -255,13 +268,21 @@ export default class AdminDashboard extends React.Component {
                     >
                         <main>
                             <div className="container-fluid px-2 px-sm-3 px-md-4">
-                                <div id="dashboard-section" className={this.state.activeView === 'dashboard' ? '' : 'd-none'}>
+                                <div 
+                                    id="dashboard-section" 
+                                    className={this.state.activeView === 'dashboard' ? '' : 'd-none'}
+                                    style={{ display: this.state.activeView === 'dashboard' ? 'block' : 'none' }}
+                                >
                                     <Dashboard 
                                         currentUser={this.state.data} 
                                         onNavigateToTable={(category) => this.switchToTable(category)} 
                                     />
                                 </div>
-                                <div id="table-section" className={this.state.activeView === 'table' ? '' : 'd-none'}>
+                                <div 
+                                    id="table-section" 
+                                    className={this.state.activeView === 'table' ? '' : 'd-none'}
+                                    style={{ display: this.state.activeView === 'table' ? 'block' : 'none' }}
+                                >
                                     <Table 
                                         currentUser={this.state.data} 
                                         activeCategory={this.state.activeTableCategory}

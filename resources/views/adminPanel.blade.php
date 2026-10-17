@@ -7,13 +7,13 @@
             <meta name="viewport" content="width=device-width, initial-scale=1.0">
             <meta http-equiv="Content-Security-Policy" content="upgrade-insecure-requests">
             <title>Lazy Eye : Admin Panel</title>
-            <script src="{{ asset('js/theme.js') }}"></script>
+            <script src="{{ asset('js/theme.js') }}?v={{ file_exists(public_path('js/theme.js')) ? filemtime(public_path('js/theme.js')) : time() }}"></script>
             <link rel="preconnect" href="https://fonts.googleapis.com">
             <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
             <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
             <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
             <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css">
-            <link href="{{ asset('css/adminStyle.css') }}" rel="stylesheet" />
+            <link href="{{ asset('css/adminStyle.css') }}?v={{ file_exists(public_path('css/adminStyle.css')) ? filemtime(public_path('css/adminStyle.css')) : time() }}" rel="stylesheet" />
             <link href="{{ asset('css/modern-theme.css') }}?v={{ file_exists(public_path('css/modern-theme.css')) ? filemtime(public_path('css/modern-theme.css')) : time() }}" rel="stylesheet" />
             <link href="{{ asset('css/sweetAlert2.min.css') }}" rel="stylesheet" />
 
@@ -34,7 +34,7 @@
         <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.8.0/Chart.min.js" crossorigin="anonymous"></script>
             <!-- <script src="assets/demo/chart-area-demo.js"></script> -->
             <!-- <script src="assets/demo/chart-bar-demo.js"></script> -->
-        <script src="{{asset('js/adminScript.js')}}"></script>
+        <script src="{{ asset('js/adminScript.js') }}?v={{ file_exists(public_path('js/adminScript.js')) ? filemtime(public_path('js/adminScript.js')) : time() }}"></script>
 <script src="{{asset('js/sweetAlert2.min.js')}}"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.29.4/moment-with-locales.min.js" integrity="sha512-42PE0rd+wZ2hNXftlM78BSehIGzezNeQuzihiBCvUEB3CVxHvsShF86wBWwQORNxNINlBPuq7rG4WWhNiTVHFg==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
 

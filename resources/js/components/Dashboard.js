@@ -201,7 +201,11 @@ export default class Dashboard extends React.Component {
                     {/* Card 1: Patients */}
                     <div className="col-12 col-sm-6 col-xl-3">
                         <div 
-                            className="card border-0 shadow-sm h-100 p-3 cursor-pointer fetchUsers"
+                            className="card border-0 shadow-sm h-100 p-3 cursor-pointer kpi-card"
+                            onClick={() => {
+                                if (this.props.onNavigateToTable) this.props.onNavigateToTable('fetchUsers');
+                                else if (window.switchToAdminTable) window.switchToAdminTable('fetchUsers');
+                            }}
                             style={{ 
                                 backgroundColor: 'var(--bg-card)', 
                                 border: '1px solid var(--border-color)',
@@ -229,7 +233,11 @@ export default class Dashboard extends React.Component {
                     <div className="col-12 col-sm-6 col-xl-3">
                         {isDoctor ? (
                             <div 
-                                className="card border-0 shadow-sm h-100 p-3 cursor-pointer fetchConsultations"
+                                className="card border-0 shadow-sm h-100 p-3 cursor-pointer kpi-card"
+                                onClick={() => {
+                                    if (this.props.onNavigateToTable) this.props.onNavigateToTable('fetchConsultations');
+                                    else if (window.switchToAdminTable) window.switchToAdminTable('fetchConsultations');
+                                }}
                                 style={{ 
                                     backgroundColor: 'var(--bg-card)', 
                                     border: '1px solid var(--border-color)',
@@ -251,7 +259,11 @@ export default class Dashboard extends React.Component {
                             </div>
                         ) : (
                             <div 
-                                className="card border-0 shadow-sm h-100 p-3 cursor-pointer fetchDoctors"
+                                className="card border-0 shadow-sm h-100 p-3 cursor-pointer kpi-card"
+                                onClick={() => {
+                                    if (this.props.onNavigateToTable) this.props.onNavigateToTable('fetchDoctors');
+                                    else if (window.switchToAdminTable) window.switchToAdminTable('fetchDoctors');
+                                }}
                                 style={{ 
                                     backgroundColor: 'var(--bg-card)', 
                                     border: '1px solid var(--border-color)',
@@ -299,7 +311,11 @@ export default class Dashboard extends React.Component {
                             </div>
                         ) : isRoot ? (
                             <div 
-                                className="card border-0 shadow-sm h-100 p-3 cursor-pointer fetchAdmins"
+                                className="card border-0 shadow-sm h-100 p-3 cursor-pointer kpi-card"
+                                onClick={() => {
+                                    if (this.props.onNavigateToTable) this.props.onNavigateToTable('fetchAdmins');
+                                    else if (window.switchToAdminTable) window.switchToAdminTable('fetchAdmins');
+                                }}
                                 style={{ 
                                     backgroundColor: 'var(--bg-card)', 
                                     border: '1px solid var(--border-color)',
@@ -321,7 +337,11 @@ export default class Dashboard extends React.Component {
                             </div>
                         ) : (
                             <div 
-                                className="card border-0 shadow-sm h-100 p-3 cursor-pointer fetchConsultations"
+                                className="card border-0 shadow-sm h-100 p-3 cursor-pointer kpi-card"
+                                onClick={() => {
+                                    if (this.props.onNavigateToTable) this.props.onNavigateToTable('fetchConsultations');
+                                    else if (window.switchToAdminTable) window.switchToAdminTable('fetchConsultations');
+                                }}
                                 style={{ 
                                     backgroundColor: 'var(--bg-card)', 
                                     border: '1px solid var(--border-color)',
@@ -369,7 +389,11 @@ export default class Dashboard extends React.Component {
                             </div>
                         ) : (
                             <div 
-                                className="card border-0 shadow-sm h-100 p-3 cursor-pointer fetchRegisters"
+                                className="card border-0 shadow-sm h-100 p-3 cursor-pointer kpi-card"
+                                onClick={() => {
+                                    if (this.props.onNavigateToTable) this.props.onNavigateToTable('fetchRegisters');
+                                    else if (window.switchToAdminTable) window.switchToAdminTable('fetchRegisters');
+                                }}
                                 style={{ 
                                     backgroundColor: 'var(--bg-card)', 
                                     border: stats.pending_registers > 0 ? '1px solid var(--warning)' : '1px solid var(--border-color)',
@@ -558,35 +582,72 @@ export default class Dashboard extends React.Component {
                     </div>
                 </div>
 
-                {/* Filter Navigation Tabs Bar */}
+                {/* Dedicated Records Navigation Card */}
                 <div className="card border-0 shadow-sm p-3 mb-2" style={{ backgroundColor: 'var(--bg-card)', border: '1px solid var(--border-color)', borderRadius: '1rem' }}>
-                    <div className="d-flex align-items-center justify-content-between flex-wrap gap-2">
+                    <div className="d-flex align-items-center justify-content-between flex-wrap gap-3">
                         <div className="d-flex align-items-center gap-2 flex-wrap">
-                            <span className="fw-bold text-main small me-2"><i className="fa-solid fa-filter me-1 text-primary"></i>Quick Records:</span>
-                            <button className="btn btn-sm btn-outline-primary rounded-pill px-3 fetchUsers">
-                                <i className="fa-solid fa-users me-1"></i> {isDoctor ? 'My Patients' : 'Patients'} ({stats.total_patients})
+                            <span className="fw-bold text-main small me-2">
+                                <i className="fa-solid fa-database text-primary me-1"></i>Database Records:
+                            </span>
+                            <button 
+                                type="button"
+                                className="btn btn-sm btn-outline-primary rounded-pill px-3 fw-semibold"
+                                onClick={() => {
+                                    if (this.props.onNavigateToTable) this.props.onNavigateToTable('fetchUsers');
+                                    else if (window.switchToAdminTable) window.switchToAdminTable('fetchUsers');
+                                }}
+                            >
+                                <i className="fa-solid fa-users me-1"></i> {isDoctor ? 'My Patients' : 'Active Patients'} ({stats.total_patients})
                             </button>
                             {!isDoctor && (
-                                <button className="btn btn-sm btn-outline-info rounded-pill px-3 fetchDoctors">
+                                <button 
+                                    type="button"
+                                    className="btn btn-sm btn-outline-info rounded-pill px-3 fw-semibold"
+                                    onClick={() => {
+                                        if (this.props.onNavigateToTable) this.props.onNavigateToTable('fetchDoctors');
+                                        else if (window.switchToAdminTable) window.switchToAdminTable('fetchDoctors');
+                                    }}
+                                >
                                     <i className="fa-solid fa-user-doctor me-1"></i> Doctors ({stats.total_doctors})
                                 </button>
                             )}
-                            <button className="btn btn-sm btn-outline-danger rounded-pill px-3 fetchConsultations">
+                            <button 
+                                type="button"
+                                className="btn btn-sm btn-outline-danger rounded-pill px-3 fw-semibold"
+                                onClick={() => {
+                                    if (this.props.onNavigateToTable) this.props.onNavigateToTable('fetchConsultations');
+                                    else if (window.switchToAdminTable) window.switchToAdminTable('fetchConsultations');
+                                }}
+                            >
                                 <i className="fa-solid fa-stethoscope me-1"></i> {isDoctor ? 'My Reviews' : 'Clinical Reviews'} ({stats.total_consultations})
                             </button>
                             {isRoot && (
-                                <button className="btn btn-sm btn-outline-success rounded-pill px-3 fetchAdmins">
+                                <button 
+                                    type="button"
+                                    className="btn btn-sm btn-outline-success rounded-pill px-3 fw-semibold"
+                                    onClick={() => {
+                                        if (this.props.onNavigateToTable) this.props.onNavigateToTable('fetchAdmins');
+                                        else if (window.switchToAdminTable) window.switchToAdminTable('fetchAdmins');
+                                    }}
+                                >
                                     <i className="fa-solid fa-user-shield me-1"></i> Admins ({stats.total_admins})
                                 </button>
                             )}
                             {!isDoctor && (
-                                <button className="btn btn-sm btn-outline-warning rounded-pill px-3 fetchRegisters">
+                                <button 
+                                    type="button"
+                                    className="btn btn-sm btn-outline-warning rounded-pill px-3 fw-semibold"
+                                    onClick={() => {
+                                        if (this.props.onNavigateToTable) this.props.onNavigateToTable('fetchRegisters');
+                                        else if (window.switchToAdminTable) window.switchToAdminTable('fetchRegisters');
+                                    }}
+                                >
                                     <i className="fa-solid fa-user-clock me-1"></i> Pending Approvals ({stats.pending_registers})
                                 </button>
                             )}
                         </div>
-                        <div className="small" style={{ color: 'var(--text-muted)' }}>
-                            Click any category above to view data records below &darr;
+                        <div className="small text-muted">
+                            <i className="fa-solid fa-arrow-right text-primary me-1"></i> Open dedicated table view
                         </div>
                     </div>
                 </div>
