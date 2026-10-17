@@ -16,7 +16,7 @@
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.1/jquery.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
     <script src="https://unpkg.com/aos@next/dist/aos.js"></script>
-    <link rel="stylesheet" href="{{ asset('css/modern-theme.css') }}">
+    <link rel="stylesheet" href="{{ asset('css/modern-theme.css') }}?v={{ file_exists(public_path('css/modern-theme.css')) ? filemtime(public_path('css/modern-theme.css')) : time() }}">
     <link href="{{ asset('css/sweetAlert2.min.css') }}" rel="stylesheet" />
     <title>Lazy Eye Vision Therapy</title>
     <style>
@@ -114,8 +114,8 @@ function scrollToTop() {
 window.addEventListener("scroll", webdevanim1);
 window.addEventListener("scroll", webdevanim2);
 </script>
-<script src="{{asset('js/sweetAlert2.min.js')}}"></script>
-<script src="{{asset('js/app.js')}}"></script>
-<script src="{{asset('js/frontendScript.js')}}"></script>
+<script src="{{ asset('js/sweetAlert2.min.js') }}"></script>
+<script src="{{ asset('js/app.js') }}?v={{ file_exists(public_path('js/app.js')) ? filemtime(public_path('js/app.js')) : time() }}"></script>
+<script src="{{ asset('js/frontendScript.js') }}"></script>
 </body>
 </html>
