@@ -1,13 +1,16 @@
 // import { isArguments } from "lodash";
 var activeTableContentType = "";
+var latestActiveCategory = "fetchUsers";
+
 $(document).ready(function () {
     // Strictly isolate views on initial page load: show Overview Dashboard, hide Data Tables
+    latestActiveCategory = "fetchUsers";
     $('#table-section').hide().addClass('d-none');
     $('#dashboard-section').show().removeClass('d-none');
     $('#layoutSidenav_nav .nav-link').removeClass('active');
     $('#layoutSidenav_nav .nav-link.dashboardButton').addClass('active');
 
-    // Preload users silently in background without overriding active dashboard tab
+    // Preload users silently in background without overriding active dashboard tab or table content
     fetchUsers(true);
 });
 window.addEventListener('DOMContentLoaded', event => {
@@ -108,6 +111,8 @@ function approveRegisters(id, type) {
 
 function showTable(categoryFn) {
     const cat = categoryFn || 'fetchUsers';
+    latestActiveCategory = cat;
+    updateFilterActive(cat, true);
     if (window.switchToAdminTable) {
         window.switchToAdminTable(cat);
     } else {
@@ -116,7 +121,6 @@ function showTable(categoryFn) {
         if (typeof window[cat] === 'function') {
             window[cat]();
         }
-        updateFilterActive(cat, true);
     }
     window.scrollTo({ top: 0, behavior: 'instant' });
 }
@@ -150,13 +154,15 @@ function updateFilterActive(activeClass, forceSidebar) {
 }
 
 function fetchRegisters() {
+    latestActiveCategory = 'fetchRegisters';
+    updateFilterActive('fetchRegisters', true);
     $.ajax({
         url: "/fetchRegisters",
         type: "get",
         success: function (data) {
+            if (latestActiveCategory !== 'fetchRegisters') return;
             window.currentTableData = data;
             activeTableContentType = 'Registers';
-            updateFilterActive('fetchRegisters');
             $('tbody').html('');
             $('thead').html('');
             $('div.card-header span.fw-semibold').text('Applications -> Pending Patient Registrations');
@@ -197,13 +203,15 @@ function fetchRegisters() {
 }
 
 function fetchDoctors() {
+    latestActiveCategory = 'fetchDoctors';
+    updateFilterActive('fetchDoctors', true);
     $.ajax({
         url: "/fetchDoctors",
         type: "get",
         success: function (data) {
+            if (latestActiveCategory !== 'fetchDoctors') return;
             window.currentTableData = data;
             activeTableContentType = "Doctors";
-            updateFilterActive('fetchDoctors');
             $('tbody').html('');
             $('thead').html('');
             $('div.card-header span.fw-semibold').text('Clinical Staff -> Doctors & Vision Therapists');
@@ -246,13 +254,15 @@ function fetchDoctors() {
 }
 
 function fetchAdmins() {
+    latestActiveCategory = 'fetchAdmins';
+    updateFilterActive('fetchAdmins', true);
     $.ajax({
         url: "/fetchAdmins",
         type: "get",
         success: function (data) {
+            if (latestActiveCategory !== 'fetchAdmins') return;
             window.currentTableData = data;
             activeTableContentType = "Admins";
-            updateFilterActive('fetchAdmins');
             $('tbody').html('');
             $('thead').html('');
             $('div.card-header span.fw-semibold').text('Administrative Staff -> System Administrators');
@@ -299,15 +309,34 @@ function fetchAdmins() {
 }
 
 function fetchUsers(silentPreload) {
+    if (!silentPreload) {
+        latestActiveCategory = 'fetchUsers';
+        updateFilterActive('fetchUsers', true);
+    }
     $.ajax({
         url: "/fetchUsers",
         type: "get",
         success: function (data) {
             window.currentTableData = data;
-            activeTableContentType = "Users";
-            if (!silentPreload) {
-                updateFilterActive('fetchUsers');
+            // Also populate consultation modal patient selector
+            let patientSelect = $('#consultation_patient_select');
+            if (patientSelect.length && data) {
+                patientSelect.html('<option value="">-- Select Patient --</option>');
+                data.forEach(p => {
+                    patientSelect.append(`<option value="${p.id}">${p.fullname} (@${p.username})</option>`);
+                });
             }
+
+            // Silent preload on dashboard should only cache data/selectors, not render table DOM
+            if (silentPreload && $('#table-section').is(':hidden')) {
+                return;
+            }
+            // Guard against stale response if user switched away
+            if (latestActiveCategory !== 'fetchUsers') {
+                return;
+            }
+
+            activeTableContentType = "Users";
             $('tbody').html('');
             $('thead').html('');
             $('div.card-header span.fw-semibold').text('Patients -> Active Therapy Patients');
@@ -327,15 +356,6 @@ function fetchUsers(silentPreload) {
             if (!data || data.length === 0) {
                 $('tbody').append(`<tr><td colspan="12" class="text-center text-muted py-4">No active patients found.</td></tr>`);
                 return;
-            }
-
-            // Also populate consultation modal patient selector
-            let patientSelect = $('#consultation_patient_select');
-            if (patientSelect.length) {
-                patientSelect.html('<option value="">-- Select Patient --</option>');
-                data.forEach(p => {
-                    patientSelect.append(`<option value="${p.id}">${p.fullname} (@${p.username})</option>`);
-                });
             }
 
             data.forEach((e, idx) => {
@@ -382,13 +402,15 @@ function fetchUsers(silentPreload) {
 }
 
 function fetchConsultations() {
+    latestActiveCategory = 'fetchConsultations';
+    updateFilterActive('fetchConsultations', true);
     $.ajax({
         url: "/fetchConsultations",
         type: "get",
         success: function (data) {
+            if (latestActiveCategory !== 'fetchConsultations') return;
             window.currentTableData = data;
             activeTableContentType = "Consultations";
-            updateFilterActive('fetchConsultations');
             $('tbody').html('');
             $('thead').html('');
             $('div.card-header span.fw-semibold').text('Clinical Staff -> Doctor Reviews & Patient Consultations');

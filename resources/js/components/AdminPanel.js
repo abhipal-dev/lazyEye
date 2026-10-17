@@ -57,6 +57,9 @@ export default class AdminDashboard extends React.Component {
     }
 
     switchToDashboard = () => {
+        if (this.state.activeView === 'dashboard') {
+            return;
+        }
         this.setState({ activeView: 'dashboard' }, () => {
             $('#table-section').hide().addClass('d-none');
             $('#dashboard-section').show().removeClass('d-none');
@@ -69,6 +72,9 @@ export default class AdminDashboard extends React.Component {
 
     switchToTable = (categoryFn) => {
         const cat = categoryFn || 'fetchUsers';
+        if (this.state.activeView === 'table' && this.state.activeTableCategory === cat) {
+            return;
+        }
         this.setState({ activeView: 'table', activeTableCategory: cat }, () => {
             $('#dashboard-section').hide().addClass('d-none');
             $('#table-section').show().removeClass('d-none');
@@ -190,7 +196,7 @@ export default class AdminDashboard extends React.Component {
                                     <div className="sb-sidenav-menu-heading">
                                         {isDoctor ? 'Clinical Practice' : isRoot ? 'Superadmin Jurisdiction' : 'Clinic Operations'}
                                     </div>
-                                    <a className={`nav-link dashboardButton cursor-pointer ${this.state.activeView === 'dashboard' ? 'active' : ''}`} onClick={() => this.switchToDashboard()}>
+                                    <a className={`nav-link dashboardButton cursor-pointer ${this.state.activeView === 'dashboard' ? 'active' : ''}`} onClick={(e) => { e.preventDefault(); e.stopPropagation(); this.switchToDashboard(); }}>
                                         <div className="sb-nav-link-icon"><i className="fa-solid fa-gauge-high"></i></div>
                                         {isDoctor ? 'Clinical Overview' : 'Overview Dashboard'}
                                     </a>
@@ -198,32 +204,32 @@ export default class AdminDashboard extends React.Component {
                                     <div className="sb-sidenav-menu-heading">
                                         {isDoctor ? 'Assigned Patients' : 'User & Patient Records'}
                                     </div>
-                                    <a className={`nav-link fetchUsers cursor-pointer ${this.state.activeView === 'table' && this.state.activeTableCategory === 'fetchUsers' ? 'active' : ''}`} onClick={() => this.switchToTable('fetchUsers')}>
+                                    <a className={`nav-link fetchUsers cursor-pointer ${this.state.activeView === 'table' && this.state.activeTableCategory === 'fetchUsers' ? 'active' : ''}`} onClick={(e) => { e.preventDefault(); e.stopPropagation(); this.switchToTable('fetchUsers'); }}>
                                         <div className="sb-nav-link-icon"><i className="fa-solid fa-users text-primary"></i></div>
                                         {isDoctor ? 'My Assigned Patients' : 'Active Patients'}
                                     </a>
 
                                     {!isDoctor && (
-                                        <a className={`nav-link fetchDoctors cursor-pointer ${this.state.activeView === 'table' && this.state.activeTableCategory === 'fetchDoctors' ? 'active' : ''}`} onClick={() => this.switchToTable('fetchDoctors')}>
+                                        <a className={`nav-link fetchDoctors cursor-pointer ${this.state.activeView === 'table' && this.state.activeTableCategory === 'fetchDoctors' ? 'active' : ''}`} onClick={(e) => { e.preventDefault(); e.stopPropagation(); this.switchToTable('fetchDoctors'); }}>
                                             <div className="sb-nav-link-icon"><i className="fa-solid fa-user-doctor text-info"></i></div>
                                             Doctors &amp; Staff
                                         </a>
                                     )}
 
-                                    <a className={`nav-link fetchConsultations cursor-pointer ${this.state.activeView === 'table' && this.state.activeTableCategory === 'fetchConsultations' ? 'active' : ''}`} onClick={() => this.switchToTable('fetchConsultations')}>
+                                    <a className={`nav-link fetchConsultations cursor-pointer ${this.state.activeView === 'table' && this.state.activeTableCategory === 'fetchConsultations' ? 'active' : ''}`} onClick={(e) => { e.preventDefault(); e.stopPropagation(); this.switchToTable('fetchConsultations'); }}>
                                         <div className="sb-nav-link-icon"><i className="fa-solid fa-stethoscope text-danger"></i></div>
                                         {isDoctor ? 'My Clinical Reviews' : 'Clinical Reviews'}
                                     </a>
 
                                     {!isDoctor && (
-                                        <a className={`nav-link fetchRegisters cursor-pointer ${this.state.activeView === 'table' && this.state.activeTableCategory === 'fetchRegisters' ? 'active' : ''}`} onClick={() => this.switchToTable('fetchRegisters')}>
+                                        <a className={`nav-link fetchRegisters cursor-pointer ${this.state.activeView === 'table' && this.state.activeTableCategory === 'fetchRegisters' ? 'active' : ''}`} onClick={(e) => { e.preventDefault(); e.stopPropagation(); this.switchToTable('fetchRegisters'); }}>
                                             <div className="sb-nav-link-icon"><i className="fa-solid fa-user-plus text-warning"></i></div>
                                             Pending Registrations
                                         </a>
                                     )}
 
                                     {isRoot && (
-                                        <a className={`nav-link fetchAdmins cursor-pointer ${this.state.activeView === 'table' && this.state.activeTableCategory === 'fetchAdmins' ? 'active' : ''}`} onClick={() => this.switchToTable('fetchAdmins')}>
+                                        <a className={`nav-link fetchAdmins cursor-pointer ${this.state.activeView === 'table' && this.state.activeTableCategory === 'fetchAdmins' ? 'active' : ''}`} onClick={(e) => { e.preventDefault(); e.stopPropagation(); this.switchToTable('fetchAdmins'); }}>
                                             <div className="sb-nav-link-icon"><i className="fa-solid fa-user-shield text-success"></i></div>
                                             Administrators
                                         </a>
@@ -286,6 +292,7 @@ export default class AdminDashboard extends React.Component {
                                     <Table 
                                         currentUser={this.state.data} 
                                         activeCategory={this.state.activeTableCategory}
+                                        onSelectCategory={(category) => this.switchToTable(category)}
                                         onBackToDashboard={() => this.switchToDashboard()} 
                                     />
                                 </div>

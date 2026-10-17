@@ -54,7 +54,12 @@ export default class Table extends React.Component{
                                 <button 
                                     className={`table-filter-btn fetchUsers ${(!this.props.activeCategory || this.props.activeCategory === 'fetchUsers') ? 'active' : ''}`} 
                                     type="button" 
-                                    onClick={() => window.fetchUsers && window.fetchUsers()}
+                                    onClick={(e) => {
+                                        e.preventDefault();
+                                        e.stopPropagation();
+                                        if (this.props.onSelectCategory) this.props.onSelectCategory('fetchUsers');
+                                        else if (window.switchToAdminTable) window.switchToAdminTable('fetchUsers');
+                                    }}
                                 >
                                     <i className="fa-solid fa-users me-1 text-primary"></i>{isDoctor ? 'My Patients' : 'Patients'}
                                 </button>
@@ -62,7 +67,12 @@ export default class Table extends React.Component{
                                     <button 
                                         className={`table-filter-btn fetchDoctors ${this.props.activeCategory === 'fetchDoctors' ? 'active' : ''}`} 
                                         type="button" 
-                                        onClick={() => window.fetchDoctors && window.fetchDoctors()}
+                                        onClick={(e) => {
+                                            e.preventDefault();
+                                            e.stopPropagation();
+                                            if (this.props.onSelectCategory) this.props.onSelectCategory('fetchDoctors');
+                                            else if (window.switchToAdminTable) window.switchToAdminTable('fetchDoctors');
+                                        }}
                                     >
                                         <i className="fa-solid fa-user-doctor me-1 text-info"></i>Doctors
                                     </button>
@@ -70,7 +80,12 @@ export default class Table extends React.Component{
                                 <button 
                                     className={`table-filter-btn fetchConsultations ${this.props.activeCategory === 'fetchConsultations' ? 'active' : ''}`} 
                                     type="button" 
-                                    onClick={() => window.fetchConsultations && window.fetchConsultations()}
+                                    onClick={(e) => {
+                                        e.preventDefault();
+                                        e.stopPropagation();
+                                        if (this.props.onSelectCategory) this.props.onSelectCategory('fetchConsultations');
+                                        else if (window.switchToAdminTable) window.switchToAdminTable('fetchConsultations');
+                                    }}
                                 >
                                     <i className="fa-solid fa-stethoscope me-1 text-danger"></i>{isDoctor ? 'My Reviews' : 'Clinical Reviews'}
                                 </button>
@@ -78,7 +93,12 @@ export default class Table extends React.Component{
                                     <button 
                                         className={`table-filter-btn fetchAdmins ${this.props.activeCategory === 'fetchAdmins' ? 'active' : ''}`} 
                                         type="button" 
-                                        onClick={() => window.fetchAdmins && window.fetchAdmins()}
+                                        onClick={(e) => {
+                                            e.preventDefault();
+                                            e.stopPropagation();
+                                            if (this.props.onSelectCategory) this.props.onSelectCategory('fetchAdmins');
+                                            else if (window.switchToAdminTable) window.switchToAdminTable('fetchAdmins');
+                                        }}
                                     >
                                         <i className="fa-solid fa-user-shield me-1 text-success"></i>Admins
                                     </button>
@@ -87,7 +107,12 @@ export default class Table extends React.Component{
                                     <button 
                                         className={`table-filter-btn fetchRegisters ${this.props.activeCategory === 'fetchRegisters' ? 'active' : ''}`} 
                                         type="button" 
-                                        onClick={() => window.fetchRegisters && window.fetchRegisters()}
+                                        onClick={(e) => {
+                                            e.preventDefault();
+                                            e.stopPropagation();
+                                            if (this.props.onSelectCategory) this.props.onSelectCategory('fetchRegisters');
+                                            else if (window.switchToAdminTable) window.switchToAdminTable('fetchRegisters');
+                                        }}
                                     >
                                         <i className="fa-solid fa-user-plus me-1 text-warning"></i>Pending
                                     </button>
