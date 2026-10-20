@@ -1273,26 +1273,30 @@ a:hover {
 }
 
 /* ========================================================
-/* ========================================================
    FEATURED CLINICAL EXERCISE HERO BANNER (Patient View)
-   Human-crafted, monochrome architectural carbon frame
+   Dynamic game backgrounds with high-contrast text & controls
    ======================================================== */
 .therapy-hero-card {
   position: relative;
-  border-radius: 12px;
+  border-radius: 16px;
   overflow: hidden;
-  margin-bottom: 2rem;
-  padding: 1.75rem 2rem;
-  background: #09090b !important;
+  margin-bottom: 2.25rem;
+  padding: 1.85rem 2.25rem 2rem 2.25rem;
   color: #ffffff;
-  border: 1px solid #27272a;
-  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.08);
-  transition: border-color 0.2s ease;
+  border: 1px solid rgba(255, 255, 255, 0.18);
+  box-shadow: 0 16px 36px -4px rgba(0, 0, 0, 0.22);
+  transition: background 0.4s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
-[data-theme="dark"] .therapy-hero-card {
-  background: #121215 !important;
-  border-color: #27272a;
+.therapy-hero-card::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: radial-gradient(circle at top right, rgba(255, 255, 255, 0.16), transparent 70%);
+  pointer-events: none;
 }
 
 .therapy-hero-header {
@@ -1308,12 +1312,14 @@ a:hover {
 .therapy-hero-badge {
   display: inline-flex;
   align-items: center;
-  background: rgba(255, 255, 255, 0.08);
-  border: 1px solid rgba(255, 255, 255, 0.16);
-  padding: 0.3rem 0.75rem;
+  background: rgba(0, 0, 0, 0.25);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+  border: 1px solid rgba(255, 255, 255, 0.24);
+  padding: 0.32rem 0.8rem;
   border-radius: 6px;
   font-size: 0.74rem;
-  font-weight: 600;
+  font-weight: 700;
   font-family: 'JetBrains Mono', monospace;
   letter-spacing: 0.05em;
   text-transform: uppercase;
@@ -1330,31 +1336,34 @@ a:hover {
   font-size: 0.76rem;
   font-weight: 600;
   font-family: 'JetBrains Mono', monospace;
-  color: #a1a1aa;
-  background: rgba(255, 255, 255, 0.06);
-  padding: 0.25rem 0.65rem;
+  color: #ffffff;
+  background: rgba(0, 0, 0, 0.25);
+  backdrop-filter: blur(6px);
+  padding: 0.28rem 0.7rem;
   border-radius: 6px;
-  border: 1px solid rgba(255, 255, 255, 0.12);
+  border: 1px solid rgba(255, 255, 255, 0.2);
 }
 
 .therapy-nav-btn {
-  width: 30px;
-  height: 30px;
+  width: 32px;
+  height: 32px;
   border-radius: 6px;
-  background: rgba(255, 255, 255, 0.08);
-  border: 1px solid rgba(255, 255, 255, 0.14);
+  background: rgba(0, 0, 0, 0.25);
+  backdrop-filter: blur(6px);
+  border: 1px solid rgba(255, 255, 255, 0.24);
   color: #ffffff;
   display: flex;
   align-items: center;
   justify-content: center;
   cursor: pointer;
-  transition: background 0.15s ease, border-color 0.15s ease;
+  transition: background 0.15s ease, border-color 0.15s ease, transform 0.15s ease;
   font-size: 0.8rem;
 }
 
 .therapy-nav-btn:hover {
-  background: rgba(255, 255, 255, 0.18);
-  border-color: rgba(255, 255, 255, 0.3);
+  background: rgba(255, 255, 255, 0.22);
+  border-color: rgba(255, 255, 255, 0.45);
+  transform: scale(1.05);
 }
 
 .therapy-hero-body {
@@ -1372,32 +1381,35 @@ a:hover {
 }
 
 .therapy-hero-title {
-  font-size: clamp(1.4rem, 2.5vw, 1.95rem);
+  font-size: clamp(1.4rem, 2.5vw, 2.05rem);
   font-weight: 800;
   line-height: 1.25;
   margin-bottom: 0.6rem;
   color: #ffffff;
   letter-spacing: -0.02em;
+  text-shadow: 0 2px 4px rgba(0, 0, 0, 0.25);
 }
 
 .therapy-hero-desc {
-  font-size: 0.92rem;
+  font-size: 0.94rem;
   line-height: 1.6;
-  color: #d4d4d8;
+  color: rgba(255, 255, 255, 0.92);
   margin-bottom: 1.25rem;
+  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.2);
 }
 
 .therapy-chip {
   display: inline-flex;
   align-items: center;
-  background: rgba(255, 255, 255, 0.06);
-  border: 1px solid rgba(255, 255, 255, 0.12);
-  padding: 0.25rem 0.65rem;
+  background: rgba(0, 0, 0, 0.25);
+  backdrop-filter: blur(6px);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  padding: 0.28rem 0.7rem;
   border-radius: 6px;
-  font-size: 0.74rem;
+  font-size: 0.76rem;
   font-family: 'JetBrains Mono', monospace;
-  font-weight: 500;
-  color: #e4e4e7;
+  font-weight: 600;
+  color: #ffffff;
 }
 
 .therapy-hero-btn {
@@ -1405,28 +1417,29 @@ a:hover {
   color: #09090b !important;
   border: 1px solid #ffffff !important;
   font-weight: 700;
-  font-size: 0.9rem;
-  padding: 0.65rem 1.4rem;
+  font-size: 0.92rem;
+  padding: 0.7rem 1.6rem;
   border-radius: 8px !important;
-  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.3) !important;
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.25) !important;
   display: inline-flex;
   align-items: center;
   gap: 0.5rem;
   cursor: pointer;
-  transition: background 0.15s ease, opacity 0.15s ease;
+  transition: transform 0.15s ease, box-shadow 0.15s ease, background 0.15s ease;
   text-decoration: none;
 }
 
 .therapy-hero-btn:hover {
   background: #f4f4f5 !important;
   color: #09090b !important;
-  opacity: 0.95;
+  transform: translateY(-2px);
+  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.35) !important;
 }
 
 .therapy-hero-art {
-  width: 170px;
-  height: 170px;
-  min-width: 170px;
+  width: 190px;
+  height: 190px;
+  min-width: 190px;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -1437,7 +1450,7 @@ a:hover {
   max-width: 100%;
   max-height: 100%;
   object-fit: contain;
-  filter: drop-shadow(0 8px 16px rgba(0, 0, 0, 0.2));
+  filter: drop-shadow(0 14px 28px rgba(0, 0, 0, 0.35));
   animation: heroFloatMascot 4s ease-in-out infinite;
 }
 
@@ -1462,7 +1475,7 @@ a:hover {
   border-radius: 4px;
   border: none;
   padding: 0;
-  background: rgba(255, 255, 255, 0.2);
+  background: rgba(255, 255, 255, 0.28);
   cursor: pointer;
   transition: width 0.2s ease, background 0.2s ease;
 }
@@ -1488,6 +1501,14 @@ a:hover {
     font-size: 0.88rem;
   }
   .therapy-hero-btn {
+    margin: 0 auto;
+  }
+  .therapy-hero-art {
+    width: 120px;
+    height: 120px;
+    min-width: 120px;
+  }
+}
     margin: 0 auto;
   }
   .therapy-hero-art {
@@ -1526,8 +1547,9 @@ a:hover {
   position: relative;
   padding: 1rem;
   overflow: hidden;
-  background: var(--bg-surface-secondary) !important;
+  background: var(--bg-surface-secondary);
   border-bottom: 1px solid var(--border-color);
+  transition: transform 0.25s ease;
 }
 
 .game-cover-icon {
@@ -1536,12 +1558,12 @@ a:hover {
   max-width: 110px;
   max-height: 110px;
   object-fit: contain;
-  filter: drop-shadow(0 4px 10px rgba(0, 0, 0, 0.08));
+  filter: drop-shadow(0 6px 14px rgba(0, 0, 0, 0.15));
   transition: transform 0.25s ease;
 }
 
 .therapy-game-card:hover .game-cover-icon {
-  transform: scale(1.06);
+  transform: scale(1.08);
 }
 
 .game-card-tag {
@@ -1549,22 +1571,94 @@ a:hover {
   top: 0.75rem;
   right: 0.75rem;
   font-size: 0.68rem;
-  font-weight: 600;
+  font-weight: 700;
   font-family: 'JetBrains Mono', monospace;
   text-transform: uppercase;
   letter-spacing: 0.04em;
-  padding: 0.2rem 0.55rem;
-  border-radius: 4px;
-  background: var(--bg-card);
-  color: var(--text-main);
-  border: 1px solid var(--border-color);
-  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.03);
+  padding: 0.25rem 0.6rem;
+  border-radius: 6px;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.06);
 }
 
-/* Tag Color Variants - Subtle Clinical Borders, No Rainbow Pastels */
-.badge-emerald, .badge-sky, .badge-indigo, .badge-purple, 
-.badge-amber, .badge-teal, .badge-slate, .badge-yellow, 
-.badge-rose, .badge-blue, .badge-neutral {
+/* Tag Color Variants - Refined clinical accents with modern subtle tints */
+.badge-emerald {
+  background: rgba(16, 185, 129, 0.14) !important;
+  color: #059669 !important;
+  border: 1px solid rgba(16, 185, 129, 0.3) !important;
+}
+[data-theme="dark"] .badge-emerald {
+  background: rgba(16, 185, 129, 0.18) !important;
+  color: #34d399 !important;
+  border-color: rgba(16, 185, 129, 0.35) !important;
+}
+
+.badge-sky, .badge-blue {
+  background: rgba(2, 132, 199, 0.14) !important;
+  color: #0284c7 !important;
+  border: 1px solid rgba(2, 132, 199, 0.3) !important;
+}
+[data-theme="dark"] .badge-sky, [data-theme="dark"] .badge-blue {
+  background: rgba(56, 189, 248, 0.18) !important;
+  color: #38bdf8 !important;
+  border-color: rgba(56, 189, 248, 0.35) !important;
+}
+
+.badge-indigo {
+  background: rgba(79, 70, 229, 0.14) !important;
+  color: #4f46e5 !important;
+  border: 1px solid rgba(79, 70, 229, 0.3) !important;
+}
+[data-theme="dark"] .badge-indigo {
+  background: rgba(99, 102, 241, 0.18) !important;
+  color: #818cf8 !important;
+  border-color: rgba(99, 102, 241, 0.35) !important;
+}
+
+.badge-purple {
+  background: rgba(147, 51, 234, 0.14) !important;
+  color: #7e22ce !important;
+  border: 1px solid rgba(147, 51, 234, 0.3) !important;
+}
+[data-theme="dark"] .badge-purple {
+  background: rgba(168, 85, 247, 0.18) !important;
+  color: #c084fc !important;
+  border-color: rgba(168, 85, 247, 0.35) !important;
+}
+
+.badge-amber, .badge-yellow {
+  background: rgba(217, 119, 6, 0.14) !important;
+  color: #b45309 !important;
+  border: 1px solid rgba(217, 119, 6, 0.3) !important;
+}
+[data-theme="dark"] .badge-amber, [data-theme="dark"] .badge-yellow {
+  background: rgba(245, 158, 11, 0.18) !important;
+  color: #fbbf24 !important;
+  border-color: rgba(245, 158, 11, 0.35) !important;
+}
+
+.badge-teal {
+  background: rgba(13, 148, 136, 0.14) !important;
+  color: #0f766e !important;
+  border: 1px solid rgba(13, 148, 136, 0.3) !important;
+}
+[data-theme="dark"] .badge-teal {
+  background: rgba(45, 212, 191, 0.18) !important;
+  color: #2dd4bf !important;
+  border-color: rgba(45, 212, 191, 0.35) !important;
+}
+
+.badge-rose {
+  background: rgba(225, 29, 72, 0.14) !important;
+  color: #be123c !important;
+  border: 1px solid rgba(225, 29, 72, 0.3) !important;
+}
+[data-theme="dark"] .badge-rose {
+  background: rgba(244, 63, 94, 0.18) !important;
+  color: #fb7185 !important;
+  border-color: rgba(244, 63, 94, 0.35) !important;
+}
+
+.badge-slate, .badge-neutral {
   background: var(--bg-card) !important;
   color: var(--text-main) !important;
   border: 1px solid var(--border-color) !important;
