@@ -29,11 +29,11 @@ window.addEventListener('DOMContentLoaded', event => {
 function deleteData(id, type) {
     Swal.fire({
         title: 'Are you sure?',
-        text: type + ' with ID ' + id + " will be deleted!",
+        text: type + ' with ID ' + id + " will be permanently removed!",
         icon: 'warning',
         showCancelButton: true,
-        confirmButtonColor: '#3085d6',
-        cancelButtonColor: '#d33',
+        confirmButtonColor: '#d33',
+        cancelButtonColor: '#64748b',
         confirmButtonText: 'Yes, Delete it!'
     }).then((result) => {
         if (result.isConfirmed) {
@@ -44,8 +44,7 @@ function deleteData(id, type) {
                 headers: { 'X-CSRF-TOKEN': token },
                 data: { id: id, type: type },
                 success: function (data) {
-                    console.log(data);
-                    if (+data) {
+                    if (+data || data === 'success' || (data && data.status === 'success')) {
                         if (type == 'users')
                             fetchUsers();
                         else if (type == 'registers')
@@ -56,57 +55,54 @@ function deleteData(id, type) {
                             fetchDoctors();
                         else
                             fetchUsers();
+                        Swal.fire('Deleted!', type + ' with ID ' + id + ' has been removed.', 'success');
+                    } else {
+                        Swal.fire('Delete Failed', (data && data.message) ? data.message : 'Could not delete item.', 'error');
                     }
+                },
+                error: function (xhr) {
+                    let msg = 'Could not delete ' + type + '.';
+                    if (xhr.responseJSON && xhr.responseJSON.message) msg = xhr.responseJSON.message;
+                    Swal.fire('Error', msg, 'error');
                 }
             });
-            Swal.fire(
-                'Deleted!',
-                type + ' with ID ' + id + ' has been deleted.',
-                'success'
-            )
         }
-    })
-
-    // console.log("ID2 -> "+id)
-    // console.log("Type -> "+type)
+    });
 }
+
 function approveRegisters(id, type) {
     Swal.fire({
-        title: 'Are you sure?',
-        text: type + ' of id ' + id + " will become User !",
-        icon: 'warning',
+        title: 'Approve Registration?',
+        text: 'Applicant (ID: ' + id + ') will be converted to an active therapy patient.',
+        icon: 'question',
         showCancelButton: true,
-        confirmButtonColor: '#3085d6',
-        cancelButtonColor: '#d33',
-        confirmButtonText: 'Yes, Approve it !'
+        confirmButtonColor: '#10b981',
+        cancelButtonColor: '#64748b',
+        confirmButtonText: 'Yes, Approve Applicant!'
     }).then((result) => {
         if (result.isConfirmed) {
-
-            if (type == 'registers') {
-                let token = $('meta[name="csrf-token"]').attr('content');
-                $.ajax({
-                    url: "/Approve",
-                    type: "post",
-                    headers: { 'X-CSRF-TOKEN': token },
-                    data: { id: id, type: type },
-                    success: function (data) {
-                        console.log(data);
-                        if (data == 'success')
-                            fetchRegisters();
-                        else {
-
-                        }
-                        // window.location.href = "/Login_view";
+            let token = $('meta[name="csrf-token"]').attr('content');
+            $.ajax({
+                url: "/Approve",
+                type: "post",
+                headers: { 'X-CSRF-TOKEN': token },
+                data: { id: id, type: type },
+                success: function (data) {
+                    if (data === 'success' || +data || (data && data.status === 'success')) {
+                        fetchRegisters();
+                        Swal.fire('Approved!', 'Applicant (ID: ' + id + ') has been enrolled as an active patient.', 'success');
+                    } else {
+                        Swal.fire('Error', (data && data.message) ? data.message : 'Could not approve applicant.', 'error');
                     }
-                });
-            }
-            Swal.fire(
-                'Approved!',
-                type + ' of id ' + id + ' is Approved',
-                'success'
-            )
+                },
+                error: function (xhr) {
+                    let msg = 'Approval failed. Please check server connection.';
+                    if (xhr.responseJSON && xhr.responseJSON.message) msg = xhr.responseJSON.message;
+                    Swal.fire('Error', msg, 'error');
+                }
+            });
         }
-    })
+    });
 }
 
 function showTable(categoryFn) {
@@ -205,10 +201,10 @@ function renderCurrentAdminTablePage() {
     let pageData = filtered.slice(startIndex, endIndex);
     adminTableState.currentSlice = pageData;
 
-    $('tbody').html('');
+    $('#datatablesSimple tbody').html('');
     if (total === 0) {
-        let colCount = $('thead tr th').length || 8;
-        $('tbody').append(`<tr><td colspan="${colCount}" class="text-center py-4 text-muted"><i class="fa-solid fa-magnifying-glass me-2"></i>No matching records found.</td></tr>`);
+        let colCount = $('#datatablesSimple thead tr th').length || 8;
+        $('#datatablesSimple tbody').append(`<tr><td colspan="${colCount}" class="text-center py-4 text-muted"><i class="fa-solid fa-magnifying-glass me-2"></i>No matching records found.</td></tr>`);
     } else {
         pageData.forEach((row, i) => {
             adminTableState.rowRenderer(row, i);
@@ -287,7 +283,7 @@ $(document).on('change', '#adminTablePageSize', function () {
 // Row Renderers for each data category
 function renderRegisterRow(e, sliceIdx) {
     let localSubmitted = formatUtcToLocal(e.created_at, 'DD/MM/YYYY, hh:mm A');
-    $('tbody').append(`
+    $('#datatablesSimple tbody').append(`
         <tr class="patient-record-row cursor-pointer" data-index="` + sliceIdx + `" title="Click row to inspect registration dossier">
         <td>`+ e.reg_id + `</td>
         <td><strong>`+ e.fullname + `</strong></td>
@@ -311,7 +307,7 @@ function fetchRegisters() {
         success: function (data) {
             if (latestActiveCategory !== 'fetchRegisters') return;
             activeTableContentType = 'Registers';
-            $('thead').html(`
+            $('#datatablesSimple thead').html(`
                 <tr>
                 <th>ID</th>
                 <th>Full Name</th>
@@ -331,7 +327,7 @@ function fetchRegisters() {
 
 function renderDoctorRow(e, sliceIdx) {
     let localJoined = formatUtcToLocal(e.created_at, 'DD/MM/YYYY');
-    $('tbody').append(`
+    $('#datatablesSimple tbody').append(`
         <tr class="patient-record-row cursor-pointer" data-index="` + sliceIdx + `" title="Click row to inspect clinical practitioner dossier">
         <td>`+ e.id + `</td>
         <td><strong>`+ e.fullname + `</strong></td>
@@ -356,7 +352,7 @@ function fetchDoctors() {
         success: function (data) {
             if (latestActiveCategory !== 'fetchDoctors') return;
             activeTableContentType = "Doctors";
-            $('thead').html(`
+            $('#datatablesSimple thead').html(`
                 <tr>
                 <th>ID</th>
                 <th>Doctor / Specialist</th>
@@ -381,7 +377,7 @@ function renderAdminRow(e, sliceIdx) {
         : '<span class="badge bg-danger-subtle text-danger"><i class="fa-solid fa-user-shield me-1"></i>Clinic Admin</span>';
 
     let localJoined = formatUtcToLocal(e.created_at, 'DD/MM/YYYY');
-    $('tbody').append(`
+    $('#datatablesSimple tbody').append(`
         <tr class="patient-record-row cursor-pointer" data-index="` + sliceIdx + `" title="Click row to inspect administrator credentials">
         <td>`+ e.id + `</td>
         <td><strong>`+ e.fullname + `</strong></td>
@@ -406,7 +402,7 @@ function fetchAdmins() {
         success: function (data) {
             if (latestActiveCategory !== 'fetchAdmins') return;
             activeTableContentType = "Admins";
-            $('thead').html(`
+            $('#datatablesSimple thead').html(`
                 <tr>
                 <th>ID</th>
                 <th>Admin Name</th>
@@ -447,7 +443,7 @@ function renderUserRow(e, sliceIdx) {
 
     let localEnrolled = formatUtcToLocal(e.created_at, 'DD/MM/YYYY');
 
-    $('tbody').append(`
+    $('#datatablesSimple tbody').append(`
         <tr class="patient-record-row cursor-pointer" data-index="` + sliceIdx + `" title="Click row to inspect clinical patient dossier & calibration">
         <td>`+ e.id + `</td>
         <td><strong>`+ e.fullname + `</strong></td>
@@ -493,7 +489,7 @@ function fetchUsers(silentPreload) {
             }
 
             activeTableContentType = "Users";
-            $('thead').html(`
+            $('#datatablesSimple thead').html(`
                 <tr>
                 <th>ID</th>
                 <th>Patient Name</th>
@@ -523,7 +519,7 @@ function renderConsultationRow(e, sliceIdx) {
 
     let localTime = formatUtcToLocal(e.created_at, 'DD MMM YYYY, hh:mm A');
 
-    $('tbody').append(`
+    $('#datatablesSimple tbody').append(`
         <tr class="patient-record-row cursor-pointer" data-index="` + sliceIdx + `" title="Click row to inspect clinical review dossier">
         <td><strong>#`+ e.id + `</strong></td>
         <td>
@@ -552,7 +548,7 @@ function fetchConsultations() {
         success: function (data) {
             if (latestActiveCategory !== 'fetchConsultations') return;
             activeTableContentType = "Consultations";
-            $('thead').html(`
+            $('#datatablesSimple thead').html(`
                 <tr>
                 <th>Review ID</th>
                 <th>Doctor / Specialist</th>
@@ -1173,6 +1169,10 @@ $(document).on('change', '#edit_accounttype', function () {
 $(document).on('submit', 'form[name="edit"]', function (e) {
     e.preventDefault();
     let form = $(this);
+    let submitBtn = form.find('button[type="submit"]');
+    let originalBtnHtml = submitBtn.html();
+    submitBtn.prop('disabled', true).html('<i class="fa-solid fa-spinner fa-spin me-1"></i> Saving...');
+
     let formData = new FormData($(this)[0]);
     let token = $('meta[name="csrf-token"]').attr('content');
     $.ajax({
@@ -1183,29 +1183,60 @@ $(document).on('submit', 'form[name="edit"]', function (e) {
         headers: { 'X-CSRF-TOKEN': token },
         data: formData,
         success: function (data) {
-            if (+data) {
-                $('#editModal').modal('hide');
-                if (activeTableContentType == "Admins")
+            submitBtn.prop('disabled', false).html(originalBtnHtml);
+            let isSuccess = false;
+            if (data == 1 || data === '1' || +data === 1) {
+                isSuccess = true;
+            } else if (typeof data === 'object' && data && (data.status === 'success' || data.success)) {
+                isSuccess = true;
+            } else if (typeof data === 'string' && data.toLowerCase().includes('success')) {
+                isSuccess = true;
+            }
+
+            if (isSuccess) {
+                let modalEl = document.getElementById('editModal');
+                if (modalEl) {
+                    let modalInst = bootstrap.Modal.getInstance(modalEl);
+                    if (modalInst) modalInst.hide();
+                    else $('#editModal').modal('hide');
+                } else {
+                    $('#editModal').modal('hide');
+                }
+
+                if (activeTableContentType === "Admins")
                     fetchAdmins();
-                else if (activeTableContentType == "Registers")
+                else if (activeTableContentType === "Registers")
                     fetchRegisters();
-                else if (activeTableContentType == "Doctors")
+                else if (activeTableContentType === "Doctors")
                     fetchDoctors();
+                else if (activeTableContentType === "Consultations")
+                    fetchConsultations();
                 else
                     fetchUsers();
-                Swal.fire(
-                    'Updated!',
-                    'User record has been successfully updated.',
-                    'success'
-                );
+
+                Swal.fire({
+                    icon: 'success',
+                    title: 'Updated!',
+                    text: 'User record has been successfully updated.',
+                    timer: 2000,
+                    showConfirmButton: false
+                });
+            } else {
+                let msg = (typeof data === 'object' && data && data.message) ? data.message : 'Could not update record.';
+                Swal.fire('Update Failed', msg, 'error');
             }
-            else {
-                Swal.fire(
-                    'Update Failed!',
-                    'Could not update record.',
-                    'error'
-                );
+        },
+        error: function (xhr) {
+            submitBtn.prop('disabled', false).html(originalBtnHtml);
+            let msg = 'Could not update user record. Please try again.';
+            if (xhr.responseJSON && xhr.responseJSON.message) {
+                msg = xhr.responseJSON.message;
+            } else if (xhr.status === 419) {
+                msg = 'Session expired. Please refresh the page.';
+            } else if (xhr.statusText) {
+                msg += ' (' + xhr.statusText + ')';
             }
+            Swal.fire('Update Error', msg, 'error');
         }
     });
 });

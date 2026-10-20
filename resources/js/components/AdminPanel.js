@@ -324,8 +324,8 @@ export default class AdminDashboard extends React.Component {
                                                     <input type="email" className="form-control" name="email" placeholder="Enter email" required="" />
                                                 </div>
                                                 <div className="form-group col-12 col-md-6">
-                                                    <label className="form-label small fw-semibold text-secondary">Password</label>
-                                                    <input type="password" name="password" id="password" className="form-control" placeholder="Enter password" required />
+                                                    <label className="form-label small fw-semibold text-secondary">Password <span className="text-muted fw-normal">(Optional)</span></label>
+                                                    <input type="password" name="password" id="password" className="form-control" placeholder="Leave blank to keep current password" />
                                                 </div>
                                                 <div className="form-group col-12 col-md-6">
                                                     <label className="form-label small fw-semibold text-secondary">Account Role</label>

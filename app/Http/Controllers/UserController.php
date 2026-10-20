@@ -78,8 +78,8 @@ class UserController extends Controller
     public function fetchAdmins(Request $req){
         return self::safelyQuery(function() use ($req) {
             list($userId, $userType) = self::getAuthUser($req);
-            // Only ROOT and ADMIN can view administrators. Doctors cannot check admins.
-            if (!in_array($userType, ['root', 'admin'])) {
+            // Doctors are restricted from viewing administrators
+            if ($userType === 'doctor') {
                 return response()->json([]);
             }
             $data = DB::table('users')->whereIn('accounttype', ['admin', 'root'])->get();
