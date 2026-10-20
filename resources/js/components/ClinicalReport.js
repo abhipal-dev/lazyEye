@@ -32,11 +32,16 @@ export default class ClinicalReport extends React.Component {
         let records = [];
 
         try {
-            if (raw && typeof raw === 'string' && raw.trim().startsWith('{')) {
-                const parsed = JSON.parse(raw);
+            let parsed = null;
+            if (raw && typeof raw === 'object') {
+                parsed = raw;
+            } else if (raw && typeof raw === 'string' && raw.trim().startsWith('{')) {
+                parsed = JSON.parse(raw);
+            }
+            if (parsed) {
                 Object.keys(parsed).forEach(timestamp => {
                     const sessionGames = parsed[timestamp];
-                    if (typeof sessionGames === 'object') {
+                    if (typeof sessionGames === 'object' && sessionGames !== null) {
                         Object.keys(sessionGames).forEach(gameName => {
                             records.push({
                                 date: moment(Number(timestamp)).format('DD/MM/YYYY HH:mm'),

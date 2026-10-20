@@ -113,13 +113,12 @@ export default class UserDashboard extends React.Component {
     fetchUserData = () => {
         let token = $('meta[name="csrf-token"]').attr('content');
         const userId = this.props.id || this.state.id;
-        if (!userId) return;
 
         $.ajax({
             url: "/fetchLoginUser",
             type: "post",
             headers: { 'X-CSRF-TOKEN': token },
-            data: { id: userId },
+            data: userId ? { id: userId } : {},
             success: (data) => {
                 if (data && data.length > 0) {
                     this.setState({

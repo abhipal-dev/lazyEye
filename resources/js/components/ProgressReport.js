@@ -9,11 +9,27 @@ import 'moment-timezone';
 export default class ProgressReport extends React.Component {
   constructor(props) {
     super(props);
-    console.log(this.props.data)
     this.state = {
       data: {},
     }
   }
+
+  componentDidMount() {
+    const end = new Date();
+    const start = new Date();
+    start.setDate(end.getDate() - 30);
+    this.getCurrentDateRecord([start, end]);
+  }
+
+  componentDidUpdate(prevProps) {
+    if (prevProps.data !== this.props.data) {
+      const end = new Date();
+      const start = new Date();
+      start.setDate(end.getDate() - 30);
+      this.getCurrentDateRecord([start, end]);
+    }
+  }
+
   getTimestamp = (date) => {
     return moment(date,this.props.date_format).unix() * 1000;
   }
@@ -35,47 +51,74 @@ export default class ProgressReport extends React.Component {
     if (game_name == 'Bouncing Ball') return '/images/bouncing-ball.png';
     return '/images/lazyeye-icon.svg';
   }
+  parseRecordsData = () => {
+    let data = {};
+    if (this.props.data) {
+      try {
+        data = typeof this.props.data === 'string' ? JSON.parse(this.props.data) : this.props.data;
+      } catch (e) {
+        console.error("Error parsing progress report data:", e);
+        data = {};
+      }
+    }
+    return data || {};
+  }
+
   printReport = (data) => {
     $('tbody').text('')
-    let dates = Object.keys(data)
+    let dates = Object.keys(data || {});
+    let totalSessionsFound = 0;
+    dates.forEach(d => {
+      if (data[d] && Object.keys(data[d]).length > 0) totalSessionsFound++;
+    });
+
+    if (totalSessionsFound === 0) {
+      $('tbody').append(`
+        <tr>
+          <td colspan="3" class="text-center py-5 text-muted">
+            <i class="fa-solid fa-file-circle-question fa-3x mb-3 text-secondary opacity-50 d-block"></i>
+            <h5 class="fw-semibold text-main mb-1">No Therapy Records in Selected Period</h5>
+            <small class="text-sub">Select another date range or play therapy games to generate progress metrics.</small>
+          </td>
+        </tr>
+      `);
+      return;
+    }
+
     for (let i = 0; i < dates.length; i++) {
-      $('tbody').append(`<tr><td colspan="3"><h3>${dates[i]}</h3></td></tr>`)
-      let game_data = Object.keys(data[dates[i]])
-      console.log(game_data.length)
-      if (game_data.length) {
-        console.log("Run if")
+      let game_data = Object.keys(data[dates[i]] || {});
+      if (!game_data.length) continue; // Skip empty days to keep the report clean and readable
+
+      $('tbody').append(`
+        <tr class="table-light">
+          <td colspan="3" class="py-2 px-3 fw-bold text-primary">
+            <i class="fa-solid fa-calendar-day me-2"></i>${dates[i]}
+          </td>
+        </tr>
+      `);
+      for (let j = 0; j < game_data.length; j++) {
+        let game_icon = this.findGameIconAddress(game_data[j]);
+        let score = data[dates[i]][game_data[j]];
         $('tbody').append(`
-                           <tr>
-                               <th class="text-primary"><h5>Game Icon</h5></th>
-                               <th class="text-primary"><h5>Game Name</h5></th>
-                                <th class="text-primary"><h5>Score</h5></th>
-                            </tr>
-          `);
-        for (let j = 0; j < game_data.length; j++) {
-          console.log(dates[i])
-          console.log(data[dates[i]])
-          let game_icon = this.findGameIconAddress(game_data[j]);
-          $('tbody').append(`
-                          <tr>
-                          <td><img src=${game_icon} style="width:2rem"></td>
-                          <td>${game_data[j]}</td>
-                          <td>${data[dates[i]][game_data[j]]}</td>
-                          </tr>
-            `)
-        }
-      } else {
-        console.log("Run else")
-        $('tbody').append(`<tr>
-          <td colspan="3" class="text-danger text-center"><h4>No Report Found</h4></td>
-          </td>`)
+          <tr>
+            <td style="width: 70px;">
+              <img src="${game_icon}" style="width: 2.2rem; height: 2.2rem; object-fit: contain;">
+            </td>
+            <td>
+              <strong class="text-main">${game_data[j]}</strong>
+              <small class="d-block text-muted">Vision Therapy Exercise</small>
+            </td>
+            <td>
+              <span class="badge bg-primary-subtle text-primary fs-6 px-3 py-1 fw-bold">${score} pts</span>
+            </td>
+          </tr>
+        `);
       }
     }
   }
 
   daily_report = (temp_date) => {
-    let data = {}
-    if (this.props.data)
-      data = JSON.parse(this.props.data)
+    let data = this.parseRecordsData();
     let startDate = this.getTimestamp(moment(temp_date[0]).format(this.props.date_format));
     let endDate = this.getTimestamp(moment(temp_date[1]).format(this.props.date_format));
     let dates = Object.keys(data)
@@ -167,9 +210,7 @@ export default class ProgressReport extends React.Component {
   // }
 
   weekly_report = (temp_date) => {
-    let data = {}
-    if (this.props.data)
-      data = JSON.parse(this.props.data)
+    let data = this.parseRecordsData();
     let startDate = this.getTimestamp(moment(temp_date[0]).format(this.props.date_format));
     let endDate = this.getTimestamp(moment(temp_date[1]).format(this.props.date_format))+86399999;
     let dates = Object.keys(data)
@@ -216,9 +257,7 @@ export default class ProgressReport extends React.Component {
   }
 
   monthly_report = (temp_date) => {
-    let data = {}
-    if (this.props.data)
-      data = JSON.parse(this.props.data)
+    let data = this.parseRecordsData();
     let startDate = this.getTimestamp(moment(temp_date[0]).format(this.props.date_format));
     let endDate = this.getTimestamp(moment(temp_date[1]).format(this.props.date_format))+86399999;
     let dates = Object.keys(data)

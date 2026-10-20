@@ -89,7 +89,7 @@ export default class Table extends React.Component{
                                 >
                                     <i className="fa-solid fa-stethoscope me-1 text-danger"></i>{isDoctor ? 'My Reviews' : 'Clinical Reviews'}
                                 </button>
-                                {isRoot && (
+                                {!isDoctor && (
                                     <button 
                                         className={`table-filter-btn fetchAdmins ${this.props.activeCategory === 'fetchAdmins' ? 'active' : ''}`} 
                                         type="button" 

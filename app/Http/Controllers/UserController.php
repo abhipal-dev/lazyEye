@@ -78,8 +78,8 @@ class UserController extends Controller
     public function fetchAdmins(Request $req){
         return self::safelyQuery(function() use ($req) {
             list($userId, $userType) = self::getAuthUser($req);
-            // Only ROOT can view administrators. Doctors and regular Admins cannot check other admins.
-            if ($userType !== 'root') {
+            // Only ROOT and ADMIN can view administrators. Doctors cannot check admins.
+            if (!in_array($userType, ['root', 'admin'])) {
                 return response()->json([]);
             }
             $data = DB::table('users')->whereIn('accounttype', ['admin', 'root'])->get();
@@ -543,8 +543,31 @@ class UserController extends Controller
 
         if (!empty($records)) {
             DB::table('game_records')->insert($records);
+            self::syncUserGameRecordsJson($patientId);
         }
         return count($records);
+    }
+
+    public static function syncUserGameRecordsJson($patientId) {
+        $records = DB::table('game_records')
+            ->where('user_id', $patientId)
+            ->orderBy('played_at', 'asc')
+            ->get();
+
+        $jsonMap = [];
+        foreach ($records as $r) {
+            $ms = strval(strtotime($r->played_at) * 1000);
+            if (!isset($jsonMap[$ms])) {
+                $jsonMap[$ms] = [];
+            }
+            $jsonMap[$ms][$r->game_name] = $r->score;
+        }
+
+        if (!empty($jsonMap)) {
+            DB::table('users')->where('id', $patientId)->update([
+                'user_game_records' => json_encode($jsonMap)
+            ]);
+        }
     }
 
     public function seedPatientSessions(Request $req){
@@ -820,9 +843,13 @@ class UserController extends Controller
 
     public function fetchLoginUser(Request $req){
         return self::safelyQuery(function() use ($req) {
+            $id = $req->id ?: session('loggedInUser', 6);
+            if ($id) {
+                self::syncUserGameRecordsJson($id);
+            }
             $data = DB::table('users')
                 ->leftJoin('users as docs', 'users.doctor_id', '=', 'docs.id')
-                ->where('users.id', $req->id)
+                ->where('users.id', $id)
                 ->select(
                     'users.*',
                     'docs.fullname as doctor_name',

@@ -243,6 +243,12 @@ export default class Games extends React.Component {
         this.startCarouselTimer();
     }
 
+    componentDidUpdate(prevProps) {
+        if (prevProps.data !== this.props.data) {
+            this.markPlayedGame();
+        }
+    }
+
     componentWillUnmount() {
         this.stopCarouselTimer();
     }

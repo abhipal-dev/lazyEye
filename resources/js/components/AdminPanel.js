@@ -228,7 +228,7 @@ export default class AdminDashboard extends React.Component {
                                         </a>
                                     )}
 
-                                    {isRoot && (
+                                    {!isDoctor && (
                                         <a className={`nav-link fetchAdmins cursor-pointer ${this.state.activeView === 'table' && this.state.activeTableCategory === 'fetchAdmins' ? 'active' : ''}`} onClick={(e) => { e.preventDefault(); e.stopPropagation(); this.switchToTable('fetchAdmins'); }}>
                                             <div className="sb-nav-link-icon"><i className="fa-solid fa-user-shield text-success"></i></div>
                                             Administrators

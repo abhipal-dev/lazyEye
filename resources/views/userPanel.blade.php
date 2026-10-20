@@ -169,35 +169,24 @@
   display: inline-block !important;
 }
 
-.activitylog-date-color-1{
-      background-color:#0f03!important;
+.activitylog-date-color-1, .react-calendar-heatmap .color-github-1 {
+      fill: #a7f3d0 !important;
+      background-color: #a7f3d0 !important;
 }
-.activitylog-date-color-2{
-      background-color:#00ff0045!important
+.activitylog-date-color-2, .activitylog-date-color-3, .react-calendar-heatmap .color-github-2 {
+      fill: #34d399 !important;
+      background-color: #34d399 !important;
 }
-.activitylog-date-color-3{
-      background-color:#00ff005c!important
+.activitylog-date-color-4, .activitylog-date-color-5, .activitylog-date-color-6, .react-calendar-heatmap .color-github-3 {
+      fill: #10b981 !important;
+      background-color: #10b981 !important;
 }
-.activitylog-date-color-4{
-      background-color:#00ff0078!important;
+.activitylog-date-color-7, .activitylog-date-color-8, .activitylog-date-color-9, .activitylog-date-color-10, .react-calendar-heatmap .color-github-4 {
+      fill: #059669 !important;
+      background-color: #059669 !important;
 }
-.activitylog-date-color-5{
-      background-color:#00ff0087!important;
-}
-.activitylog-date-color-6{
-      background-color:#00ff009c!important;
-    }
-.activitylog-date-color-7{
-      background-color:#00ff00b2!important;
-}
-.activitylog-date-color-8{
-      background-color:#0f0c!important
-}
-.activitylog-date-color-9{
-      background-color:#00ff00e8!important;
-}
-.activitylog-date-color-10{
-      background-color:#00ff00!important
+.react-calendar-heatmap .color-empty {
+      fill: var(--border-color, #e2e8f0) !important;
 }
 
     /* / ---------------Dashboard---------------- / */
@@ -211,7 +200,7 @@
 
   <script src="{{ asset('js/app.js') }}?v={{ file_exists(public_path('js/app.js')) ? filemtime(public_path('js/app.js')) : time() }}"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.8.0/Chart.min.js" crossorigin="anonymous"></script>
-  <script src="{{asset('js/userScript.js')}}"></script>
+  <script src="{{ asset('js/userScript.js') }}?v={{ file_exists(public_path('js/userScript.js')) ? filemtime(public_path('js/userScript.js')) : time() }}"></script>
   <script src="{{asset('js/sweetAlert2.min.js')}}"></script>
 
   
