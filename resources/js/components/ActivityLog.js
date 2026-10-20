@@ -103,14 +103,14 @@ export default class ActivityLog extends React.Component {
             <p className="text-sub mb-0 small">Daily visual therapy engagement and dichoptic game history</p>
           </div>
           <div className="d-flex align-items-center gap-2">
-            <span className="badge bg-primary-subtle text-primary border border-primary-subtle px-3 py-2 rounded-pill small">
+            <span className="badge border font-mono small px-3 py-2 rounded-2" style={{ backgroundColor: 'var(--bg-surface-secondary)', borderColor: 'var(--border-color)', color: 'var(--text-main)' }}>
               <i className="fa-solid fa-circle-info me-1"></i> Click any colored square to inspect that day's session scores
             </span>
           </div>
         </div>
 
         {/* Heatmap Card */}
-        <div className="card border-0 shadow-sm p-4 mb-4" style={{ backgroundColor: 'var(--bg-card)', borderRadius: '1rem', border: '1px solid var(--border-color)' }}>
+        <div className="card border-0 shadow-sm p-4 mb-4" style={{ backgroundColor: 'var(--bg-card)', borderRadius: '10px', border: '1px solid var(--border-color)' }}>
           <div className="d-flex align-items-center justify-content-between mb-3 flex-wrap gap-2">
             <div>
               <h5 className="fw-bold mb-1 text-main">
@@ -118,7 +118,7 @@ export default class ActivityLog extends React.Component {
               </h5>
               <small className="text-sub">Tracking dichoptic suppression therapy compliance over time</small>
             </div>
-            <div className="d-flex align-items-center gap-1 text-sub small">
+            <div className="d-flex align-items-center gap-1 text-sub small font-mono">
               <span>Less</span>
               <span className="d-inline-block rounded-1" style={{ width: 12, height: 12, background: 'var(--border-color, #e2e8f0)' }}></span>
               <span className="d-inline-block rounded-1" style={{ width: 12, height: 12, background: '#a7f3d0' }}></span>
@@ -157,22 +157,22 @@ export default class ActivityLog extends React.Component {
         <ReactTooltip id="activity-tooltip" />
 
         {/* Selected Day Details Table */}
-        <div className="card border-0 shadow-sm mb-4" style={{ backgroundColor: 'var(--bg-card)', borderRadius: '1rem', border: '1px solid var(--border-color)' }}>
+        <div className="card border-0 shadow-sm mb-4" style={{ backgroundColor: 'var(--bg-card)', borderRadius: '10px', border: '1px solid var(--border-color)' }}>
           <div className="card-header bg-transparent border-bottom d-flex align-items-center justify-content-between py-3 flex-wrap gap-2" style={{ borderColor: 'var(--border-color)' }}>
             <div className="d-flex align-items-center gap-2">
-              <i className="fa-solid fa-list-check text-primary"></i>
+              <i className="fa-solid fa-list-check text-main"></i>
               <span className="fw-semibold text-main">Session Records for: </span>
-              <span className="badge bg-primary px-3 py-1 rounded-pill">{currentSelectedDate}</span>
+              <span className="badge font-mono small px-3 py-1 rounded-2" style={{ backgroundColor: 'var(--btn-primary-bg)', color: 'var(--btn-primary-text)' }}>{currentSelectedDate}</span>
             </div>
             {activeDates.length > 0 && (
-              <span className="small text-muted">{sessionKeys.length} game(s) recorded on this date</span>
+              <span className="small text-muted font-mono">{sessionKeys.length} game(s) recorded on this date</span>
             )}
           </div>
           <div className="card-body table-responsive p-0">
             {sessionKeys.length === 0 ? (
               <div className="p-4 text-center text-muted">
                 <i className="fa-solid fa-gamepad fa-2x mb-2 text-secondary opacity-50 d-block"></i>
-                <div className="fw-semibold">No therapy games recorded on {currentSelectedDate}</div>
+                <div className="fw-semibold text-main">No therapy games recorded on {currentSelectedDate}</div>
                 <small className="text-sub">Select any colored square on the calendar heatmap above to inspect your session scores.</small>
               </div>
             ) : (
@@ -192,19 +192,19 @@ export default class ActivityLog extends React.Component {
                     return (
                       <tr key={idx}>
                         <td>
-                          <img src={icon} alt="" style={{ width: '32px', height: '32px', objectFit: 'contain' }} />
+                          <img src={icon} alt="" style={{ width: '30px', height: '30px', objectFit: 'contain' }} />
                         </td>
                         <td>
                           <strong className="text-main">{gameName}</strong>
                           <small className="d-block text-muted">Binocular Suppression Therapy</small>
                         </td>
                         <td>
-                          <span className="badge bg-primary-subtle text-primary fs-6 px-3 py-1 fw-bold">
+                          <span className="badge border font-mono small px-3 py-1 fw-bold" style={{ backgroundColor: 'var(--bg-surface-secondary)', borderColor: 'var(--border-color)', color: 'var(--text-main)', fontSize: '0.86rem' }}>
                             {score} pts
                           </span>
                         </td>
                         <td>
-                          <span className="badge bg-success-subtle text-success">
+                          <span className="badge bg-success-subtle text-success font-mono">
                             <i className="fa-solid fa-circle-check me-1"></i>Completed
                           </span>
                         </td>

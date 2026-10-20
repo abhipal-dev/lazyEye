@@ -99,10 +99,10 @@ export default class AdminDashboard extends React.Component {
                 <nav className="sb-topnav navbar navbar-expand dashboard-topbar">
                     {/* <!-- Navbar Brand--> */}
                     <a className="navbar-brand d-flex align-items-center gap-2" href="/admin">
-                        <img src="/images/lazyeye-icon.svg" className="d-inline-block align-top" alt="Logo" style={{ maxHeight: '34px', width: '34px' }} />
-                        <span className="fw-bold d-none d-sm-inline">
-                            Lazy<span className="text-primary">Eye</span> 
-                            <span className={`badge ${isDoctor ? 'bg-info' : isRoot ? 'bg-dark' : 'bg-primary'} ms-1 small`}>
+                        <img src="/images/lazyeye-icon.svg" className="d-inline-block align-top" alt="Logo" style={{ maxHeight: '30px', width: '30px' }} />
+                        <span className="fw-bold d-none d-sm-inline text-main" style={{ letterSpacing: '-0.02em' }}>
+                            LazyEye
+                            <span className="badge border font-mono small ms-2" style={{ backgroundColor: 'var(--bg-surface-secondary)', borderColor: 'var(--border-color)', color: 'var(--text-main)', fontSize: '0.7rem' }}>
                                 {isDoctor ? 'Doctor Portal' : isRoot ? 'Superadmin' : 'Clinic Admin'}
                             </span>
                         </span>
@@ -126,7 +126,7 @@ export default class AdminDashboard extends React.Component {
                         <ul className="navbar-nav">
                             <li className="nav-item dropdown">
                                 <a className="nav-link dropdown-toggle d-flex align-items-center gap-2 text-main px-2 py-1" id="navbarDropdown" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">
-                                    <div className="rounded-circle d-flex align-items-center justify-content-center text-white fw-bold shadow-sm position-relative overflow-hidden" style={{ width: 34, height: 34, minWidth: 34, background: isDoctor ? 'linear-gradient(135deg, #0284c7, #0369a1)' : isRoot ? 'linear-gradient(135deg, #334155, #0f172a)' : 'linear-gradient(135deg, #2563eb, #1d4ed8)', fontSize: '0.85rem' }}>
+                                    <div className="rounded-circle d-flex align-items-center justify-content-center text-main fw-bold border position-relative overflow-hidden" style={{ width: 34, height: 34, minWidth: 34, backgroundColor: 'var(--bg-surface-secondary)', borderColor: 'var(--border-color)', fontSize: '0.85rem' }}>
                                         <span>{(this.state.fullname ? this.state.fullname.charAt(0) : (isDoctor ? 'D' : 'A')).toUpperCase()}</span>
                                         {this.state.userProfileImage && !this.state.userProfileImage.includes('default') && (
                                             <img 
@@ -139,27 +139,27 @@ export default class AdminDashboard extends React.Component {
                                         )}
                                     </div>
                                     <div className="d-none d-md-flex flex-column text-start lh-sm me-1">
-                                        <span className="fw-bold text-main" style={{ fontSize: '0.86rem' }}>{this.state.fullname || (isDoctor ? 'Doctor' : 'Administrator')}</span>
+                                        <span className="fw-semibold text-main" style={{ fontSize: '0.86rem' }}>{this.state.fullname || (isDoctor ? 'Doctor' : 'Administrator')}</span>
                                         <span className="text-muted" style={{ fontSize: '0.72rem' }}>{isDoctor ? 'Vision Specialist' : isRoot ? 'Master Superadmin' : 'Clinic Operations'}</span>
                                     </div>
                                 </a>
                                 <ul className="dropdown-menu dropdown-menu-end shadow" aria-labelledby="navbarDropdown">
                                     <li className="user-dropdown-header">
                                         <div className="d-flex align-items-center gap-2">
-                                            <div className="rounded-circle text-white d-flex align-items-center justify-content-center fw-bold shadow-sm" style={{ width: 40, height: 40, minWidth: 40, background: isDoctor ? 'linear-gradient(135deg, #0284c7, #0369a1)' : isRoot ? 'linear-gradient(135deg, #334155, #0f172a)' : 'linear-gradient(135deg, #2563eb, #1d4ed8)', fontSize: '0.95rem' }}>
+                                            <div className="rounded-circle text-main d-flex align-items-center justify-content-center fw-bold border" style={{ width: 40, height: 40, minWidth: 40, backgroundColor: 'var(--bg-surface-secondary)', borderColor: 'var(--border-color)', fontSize: '0.95rem' }}>
                                                 {(this.state.fullname ? this.state.fullname.charAt(0) : 'A').toUpperCase()}
                                             </div>
                                             <div className="text-truncate">
                                                 <strong className="d-block text-main text-truncate" style={{ fontSize: '0.92rem' }}>{this.state.fullname || 'Administrator'}</strong>
-                                                <span className="small text-muted d-block text-truncate">@{this.state.username}</span>
+                                                <span className="small text-muted d-block text-truncate font-mono">@{this.state.username}</span>
                                             </div>
                                         </div>
                                         <div className="mt-2 pt-2 border-top d-flex align-items-center justify-content-between" style={{ borderColor: 'var(--border-color)' }}>
-                                            <span className={`badge ${isDoctor ? 'bg-info-subtle text-info' : isRoot ? 'bg-dark-subtle text-dark' : 'bg-primary-subtle text-primary'} small`}>
+                                            <span className="badge border font-mono small" style={{ backgroundColor: 'var(--bg-surface-secondary)', borderColor: 'var(--border-color)', color: 'var(--text-main)', fontSize: '0.72rem' }}>
                                                 <i className={`fa-solid ${isDoctor ? 'fa-user-doctor' : isRoot ? 'fa-crown' : 'fa-user-shield'} me-1`}></i>
                                                 {isDoctor ? 'Doctor / Therapist' : isRoot ? 'Root Superadmin' : 'Clinic Administrator'}
                                             </span>
-                                            <span className="small text-muted" style={{ fontSize: '0.75rem' }}>#{this.state.id}</span>
+                                            <span className="small text-muted font-mono" style={{ fontSize: '0.75rem' }}>#{this.state.id}</span>
                                         </div>
                                     </li>
                                     <li>

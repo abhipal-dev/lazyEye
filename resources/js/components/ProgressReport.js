@@ -91,8 +91,8 @@ export default class ProgressReport extends React.Component {
 
       $('tbody').append(`
         <tr class="table-light">
-          <td colspan="3" class="py-2 px-3 fw-bold text-primary">
-            <i class="fa-solid fa-calendar-day me-2"></i>${dates[i]}
+          <td colspan="3" class="py-2 px-3 fw-bold text-main font-mono">
+            <i className="fa-solid fa-calendar-day me-2"></i>${dates[i]}
           </td>
         </tr>
       `);
@@ -102,14 +102,14 @@ export default class ProgressReport extends React.Component {
         $('tbody').append(`
           <tr>
             <td style="width: 70px;">
-              <img src="${game_icon}" style="width: 2.2rem; height: 2.2rem; object-fit: contain;">
+              <img src="${game_icon}" style="width: 2rem; height: 2rem; object-fit: contain;">
             </td>
             <td>
               <strong class="text-main">${game_data[j]}</strong>
               <small class="d-block text-muted">Vision Therapy Exercise</small>
             </td>
             <td>
-              <span class="badge bg-primary-subtle text-primary fs-6 px-3 py-1 fw-bold">${score} pts</span>
+              <span class="badge border font-mono small px-3 py-1 fw-bold" style="background-color: var(--bg-surface-secondary); border-color: var(--border-color); color: var(--text-main); font-size: 0.86rem;">${score} pts</span>
             </td>
           </tr>
         `);
@@ -327,8 +327,8 @@ export default class ProgressReport extends React.Component {
         <ol className="breadcrumb mb-4">
           <li className="breadcrumb-item active">Progress Report</li>
         </ol>
-        <div className="card border-0 shadow-sm p-4 mb-4" style={{ backgroundColor: 'var(--bg-card)', borderRadius: '1rem', border: '1px solid var(--border-color)', maxWidth: '750px' }}>
-          <h5 className="fw-bold mb-3 text-main"><i className="fa-solid fa-chart-line text-primary me-2"></i>Filter Date & Period</h5>
+        <div className="card border-0 shadow-sm p-4 mb-4" style={{ backgroundColor: 'var(--bg-card)', borderRadius: '10px', border: '1px solid var(--border-color)', maxWidth: '750px' }}>
+          <h5 className="fw-bold mb-3 text-main"><i className="fa-solid fa-chart-line text-main me-2"></i>Filter Date & Period</h5>
           <div className="row g-3 align-items-center">
             <div className="col-12 col-sm-7">
               <DateRangePicker block onChange={value => this.getCurrentDateRecord(value)} format="dd/MM/yyyy"/>
@@ -343,9 +343,9 @@ export default class ProgressReport extends React.Component {
           </div>
         </div>
         <div id='log'></div>
-        <div className="card border-0 shadow-sm mb-4" style={{ backgroundColor: 'var(--bg-card)', borderRadius: '1rem', border: '1px solid var(--border-color)', maxWidth: '750px' }}>
+        <div className="card border-0 shadow-sm mb-4" style={{ backgroundColor: 'var(--bg-card)', borderRadius: '10px', border: '1px solid var(--border-color)', maxWidth: '750px' }}>
           <div className="card-header bg-transparent border-bottom" style={{ borderColor: 'var(--border-color)' }}>
-            <i className="fas fa-table me-2 text-primary"></i><span className="fw-semibold">Progress Metrics</span>
+            <i className="fas fa-table me-2 text-main"></i><span className="fw-semibold">Progress Metrics</span>
           </div>
           <div className="card-body table-responsive">
             <table id="datatablesSimple" className='table table-hover table-striped mb-0' >

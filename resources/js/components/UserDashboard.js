@@ -253,12 +253,12 @@ export default class UserDashboard extends React.Component {
 
                 {/* Admin Mode Floating Banner */}
                 {isAdmin && (
-                    <div className="bg-primary text-white py-2 px-3 d-flex align-items-center justify-content-between flex-wrap gap-2 small shadow-sm position-relative" style={{ zIndex: 1050 }}>
+                    <div className="border-bottom py-2 px-3 d-flex align-items-center justify-content-between flex-wrap gap-2 small shadow-sm position-relative" style={{ zIndex: 1050, backgroundColor: 'var(--btn-primary-bg)', color: 'var(--btn-primary-text)' }}>
                         <div className="d-flex align-items-center gap-2">
-                            <span className="badge bg-white text-primary fw-bold text-uppercase">Admin Simulator</span>
+                            <span className="badge bg-surface-secondary text-main border font-mono small text-uppercase">Admin Simulator</span>
                             <span>You are currently in <strong>Patient Therapy View</strong> as an Administrator.</span>
                         </div>
-                        <a href="/admin" className="btn btn-sm btn-light text-primary fw-bold rounded-pill px-3 py-1 shadow-sm d-flex align-items-center gap-1">
+                        <a href="/admin" className="btn btn-sm btn-secondary px-3 py-1 d-flex align-items-center gap-1">
                             <i className="fa-solid fa-arrow-left"></i> Return to Admin Panel
                         </a>
                     </div>
@@ -267,10 +267,10 @@ export default class UserDashboard extends React.Component {
                 <nav className="sb-topnav navbar navbar-expand dashboard-topbar">
                     {/* <!-- Navbar Brand--> */}
                     <a className="navbar-brand d-flex align-items-center gap-2" href="/user">
-                        <img src="/images/lazyeye-icon.svg" className="d-inline-block align-top" alt="Logo" style={{ maxHeight: '34px', width: '34px' }} />
-                        <span className="fw-bold d-none d-sm-inline">
-                            Lazy<span className="text-primary">Eye</span> 
-                            <span className={`badge ${isAdmin ? 'bg-warning-subtle text-warning' : 'bg-primary-subtle text-primary'} small ms-1`}>
+                        <img src="/images/lazyeye-icon.svg" className="d-inline-block align-top" alt="Logo" style={{ maxHeight: '30px', width: '30px' }} />
+                        <span className="fw-bold d-none d-sm-inline text-main" style={{ letterSpacing: '-0.02em' }}>
+                            LazyEye
+                            <span className="badge border font-mono small ms-2" style={{ backgroundColor: 'var(--bg-surface-secondary)', borderColor: 'var(--border-color)', color: 'var(--text-main)', fontSize: '0.7rem' }}>
                                 {isAdmin ? 'Admin View' : 'Patient'}
                             </span>
                         </span>
@@ -291,31 +291,31 @@ export default class UserDashboard extends React.Component {
                     
                     <div className="d-flex align-items-center ms-auto gap-2 gap-sm-3 me-1 me-sm-3 me-lg-4">
                         {isAdmin && (
-                            <a href="/admin" className="btn btn-sm btn-outline-primary rounded-pill px-3 py-1 fw-bold d-none d-sm-flex align-items-center gap-1">
+                            <a href="/admin" className="btn btn-sm btn-secondary px-3 py-1 fw-semibold d-none d-sm-flex align-items-center gap-1">
                                 <i className="fa-solid fa-arrow-left"></i> Admin Panel
                             </a>
                         )}
                         <ThemeToggle />
                         <ul className="navbar-nav">
                             <li className="nav-item dropdown">
-                                <a className="nav-link dropdown-toggle d-flex align-items-center gap-2 px-2 py-1 rounded-pill" id="navbarDropdown" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false" style={{ border: '1px solid var(--border-color)', background: 'var(--surface-color)' }}>
-                                    <div className="rounded-circle text-white d-flex align-items-center justify-content-center fw-bold shadow-sm" style={{ width: 32, height: 32, minWidth: 32, background: 'linear-gradient(135deg, #06b6d4, #0891b2)', fontSize: '0.85rem' }}>
+                                <a className="nav-link dropdown-toggle d-flex align-items-center gap-2 px-2 py-1" id="navbarDropdown" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                                    <div className="rounded-circle text-main d-flex align-items-center justify-content-center fw-bold border" style={{ width: 32, height: 32, minWidth: 32, backgroundColor: 'var(--bg-surface-secondary)', borderColor: 'var(--border-color)', fontSize: '0.85rem' }}>
                                         {(this.state.fullname ? this.state.fullname.charAt(0) : 'P').toUpperCase()}
                                     </div>
-                                    <div className="d-none d-md-flex flex-column text-start me-1">
-                                        <span className="fw-bold text-main" style={{ fontSize: '0.86rem' }}>{this.state.fullname || 'Patient'}</span>
+                                    <div className="d-none d-md-flex flex-column text-start me-1 lh-sm">
+                                        <span className="fw-semibold text-main" style={{ fontSize: '0.86rem' }}>{this.state.fullname || 'Patient'}</span>
                                         <span className="text-muted" style={{ fontSize: '0.72rem' }}>{isAdmin ? 'Admin View' : 'Patient Therapy'}</span>
                                     </div>
                                 </a>
                                 <ul className="dropdown-menu dropdown-menu-end shadow" aria-labelledby="navbarDropdown">
                                     <li className="user-dropdown-header">
                                         <div className="d-flex align-items-center gap-2">
-                                            <div className="rounded-circle text-white d-flex align-items-center justify-content-center fw-bold shadow-sm" style={{ width: 40, height: 40, minWidth: 40, background: 'linear-gradient(135deg, #06b6d4, #0891b2)', fontSize: '0.95rem' }}>
+                                            <div className="rounded-circle text-main d-flex align-items-center justify-content-center fw-bold border" style={{ width: 40, height: 40, minWidth: 40, backgroundColor: 'var(--bg-surface-secondary)', borderColor: 'var(--border-color)', fontSize: '0.95rem' }}>
                                                 {(this.state.fullname ? this.state.fullname.charAt(0) : 'P').toUpperCase()}
                                             </div>
                                             <div className="text-truncate">
                                                 <strong className="d-block text-main text-truncate" style={{ fontSize: '0.92rem' }}>{this.state.fullname || 'Patient'}</strong>
-                                                <span className="small text-muted d-block text-truncate">@{this.state.username}</span>
+                                                <span className="small text-muted d-block text-truncate font-mono">@{this.state.username}</span>
                                             </div>
                                         </div>
                                         <div className="mt-2 pt-2 border-top d-flex align-items-center justify-content-between" style={{ borderColor: 'var(--border-color)' }}>

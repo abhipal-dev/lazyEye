@@ -15,7 +15,7 @@ export default class Table extends React.Component{
                     <div className="d-flex align-items-center gap-3">
                         <button 
                             type="button" 
-                            className="btn btn-outline-secondary btn-sm rounded-pill px-3 py-1 d-flex align-items-center gap-2 fw-semibold"
+                            className="btn btn-secondary btn-sm px-3 d-flex align-items-center gap-2 fw-semibold"
                             onClick={() => {
                                 if (this.props.onBackToDashboard) {
                                     this.props.onBackToDashboard();
@@ -30,23 +30,23 @@ export default class Table extends React.Component{
                             <span>Back to Overview</span>
                         </button>
                         <div>
-                            <h3 className="fw-bold mb-0 text-main" style={{ fontSize: '1.35rem' }}>
+                            <h3 className="fw-bold mb-0 text-main" style={{ fontSize: '1.25rem' }}>
                                 {isDoctor ? 'Assigned Clinical Cohort' : 'Database Records & Management'}
                             </h3>
                             <small className="text-sub">Manage patients, clinical staff, and therapy records</small>
                         </div>
                     </div>
                     <div className="d-flex align-items-center gap-2">
-                        <span className="badge bg-primary-subtle text-primary border border-primary-subtle px-3 py-2 rounded-pill small">
+                        <span className="badge border font-mono small px-3 py-2 rounded-2" style={{ backgroundColor: 'var(--bg-surface-secondary)', borderColor: 'var(--border-color)', color: 'var(--text-main)' }}>
                             <i className="fa-solid fa-circle-info me-1"></i> Tip: Click any row to inspect complete clinical dossier
                         </span>
                     </div>
                 </div>
 
-                <div className="card border-0 shadow-sm mb-4" style={{ backgroundColor: 'var(--bg-card)', borderRadius: '1rem', border: '1px solid var(--border-color)' }}>
+                <div className="card border-0 shadow-sm mb-4" style={{ backgroundColor: 'var(--bg-card)', borderRadius: '10px', border: '1px solid var(--border-color)' }}>
                     <div className="card-header bg-transparent d-flex align-items-center justify-content-between py-3 flex-wrap gap-2" style={{ borderColor: 'var(--border-color)' }}>
                         <div className="d-flex align-items-center gap-2">
-                            <i className="fas fa-table text-primary"></i>
+                            <i className="fas fa-table text-main"></i>
                             <span className="fw-semibold text-main">{isDoctor ? 'Assigned Clinical Records' : 'Data Records'}</span>
                         </div>
                         <div className="d-flex align-items-center gap-2 flex-wrap">
@@ -61,7 +61,7 @@ export default class Table extends React.Component{
                                         else if (window.switchToAdminTable) window.switchToAdminTable('fetchUsers');
                                     }}
                                 >
-                                    <i className="fa-solid fa-users me-1 text-primary"></i>{isDoctor ? 'My Patients' : 'Patients'}
+                                    <i className="fa-solid fa-users me-1 text-main"></i>{isDoctor ? 'My Patients' : 'Patients'}
                                 </button>
                                 {!isDoctor && (
                                     <button 
@@ -74,7 +74,7 @@ export default class Table extends React.Component{
                                             else if (window.switchToAdminTable) window.switchToAdminTable('fetchDoctors');
                                         }}
                                     >
-                                        <i className="fa-solid fa-user-doctor me-1 text-info"></i>Doctors
+                                        <i className="fa-solid fa-user-doctor me-1 text-main"></i>Doctors
                                     </button>
                                 )}
                                 <button 
@@ -87,7 +87,7 @@ export default class Table extends React.Component{
                                         else if (window.switchToAdminTable) window.switchToAdminTable('fetchConsultations');
                                     }}
                                 >
-                                    <i className="fa-solid fa-stethoscope me-1 text-danger"></i>{isDoctor ? 'My Reviews' : 'Clinical Reviews'}
+                                    <i className="fa-solid fa-stethoscope me-1 text-main"></i>{isDoctor ? 'My Reviews' : 'Clinical Reviews'}
                                 </button>
                                 {!isDoctor && (
                                     <button 
@@ -100,7 +100,7 @@ export default class Table extends React.Component{
                                             else if (window.switchToAdminTable) window.switchToAdminTable('fetchAdmins');
                                         }}
                                     >
-                                        <i className="fa-solid fa-user-shield me-1 text-success"></i>Admins
+                                        <i className="fa-solid fa-user-shield me-1 text-main"></i>Admins
                                     </button>
                                 )}
                                 {!isDoctor && (
@@ -114,12 +114,12 @@ export default class Table extends React.Component{
                                             else if (window.switchToAdminTable) window.switchToAdminTable('fetchRegisters');
                                         }}
                                     >
-                                        <i className="fa-solid fa-user-plus me-1 text-warning"></i>Pending
+                                        <i className="fa-solid fa-user-plus me-1 text-main"></i>Pending
                                     </button>
                                 )}
                             </div>
                             <button 
-                                className="btn btn-primary btn-sm rounded-pill px-3 shadow-sm d-flex align-items-center gap-1 fw-semibold text-nowrap"
+                                className="btn btn-primary btn-sm px-3 shadow-sm d-flex align-items-center gap-1 fw-semibold text-nowrap"
                                 data-bs-toggle="modal" 
                                 data-bs-target="#createStaffModal"
                             >

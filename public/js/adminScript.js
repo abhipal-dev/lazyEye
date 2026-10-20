@@ -285,15 +285,15 @@ function renderRegisterRow(e, sliceIdx) {
     let localSubmitted = formatUtcToLocal(e.created_at, 'DD/MM/YYYY, hh:mm A');
     $('#datatablesSimple tbody').append(`
         <tr class="patient-record-row cursor-pointer" data-index="` + sliceIdx + `" title="Click row to inspect registration dossier">
-        <td>`+ e.reg_id + `</td>
+        <td class="font-mono">`+ e.reg_id + `</td>
         <td><strong>`+ e.fullname + `</strong></td>
-        <td><span class="badge bg-secondary-subtle text-secondary">`+ e.username + `</span></td>
-        <td><span class="badge bg-warning-subtle text-warning"><i class="fa-solid fa-clock me-1"></i>Pending Approval</span></td>
+        <td><span class="badge border font-mono small" style="background-color: var(--bg-surface-secondary); border-color: var(--border-color); color: var(--text-main);">`+ e.username + `</span></td>
+        <td><span class="badge bg-warning-subtle text-warning font-mono"><i class="fa-solid fa-clock me-1"></i>Pending Approval</span></td>
         <td>`+ e.gender + `</td>
         <td>`+ e.email + `</td>
-        <td>`+ localSubmitted + `</td>
-        <td class="text-center"><button class="btn btn-sm btn-success rounded-pill px-3" onclick="approveRegisters(`+ e.reg_id + `,'registers')"><i class="fa-solid fa-check me-1"></i>Approve</button></td>
-        <td class="text-center"><button class="btn btn-sm btn-outline-danger rounded-pill px-3" onclick="deleteData(`+ e.reg_id + `,'registers')"><i class="fa-solid fa-trash me-1"></i>Decline</button></td>
+        <td class="font-mono small">`+ localSubmitted + `</td>
+        <td class="text-center"><button class="btn btn-sm btn-success px-2 py-1" onclick="approveRegisters(`+ e.reg_id + `,'registers')"><i class="fa-solid fa-check me-1"></i>Approve</button></td>
+        <td class="text-center"><button class="btn btn-sm btn-outline-danger px-2 py-1" onclick="deleteData(`+ e.reg_id + `,'registers')"><i class="fa-solid fa-trash me-1"></i>Decline</button></td>
         </tr>`
     );
 }
@@ -329,16 +329,16 @@ function renderDoctorRow(e, sliceIdx) {
     let localJoined = formatUtcToLocal(e.created_at, 'DD/MM/YYYY');
     $('#datatablesSimple tbody').append(`
         <tr class="patient-record-row cursor-pointer" data-index="` + sliceIdx + `" title="Click row to inspect clinical practitioner dossier">
-        <td>`+ e.id + `</td>
+        <td class="font-mono">`+ e.id + `</td>
         <td><strong>`+ e.fullname + `</strong></td>
-        <td><span class="badge bg-secondary-subtle text-secondary">`+ e.username + `</span></td>
-        <td><span class="badge bg-info-subtle text-info"><i class="fa-solid fa-user-doctor me-1"></i>Doctor</span></td>
+        <td><span class="badge border font-mono small" style="background-color: var(--bg-surface-secondary); border-color: var(--border-color); color: var(--text-main);">`+ e.username + `</span></td>
+        <td><span class="badge border font-mono small" style="background-color: var(--bg-surface-secondary); border-color: var(--border-color); color: var(--text-main);"><i class="fa-solid fa-user-doctor me-1"></i>Doctor</span></td>
         <td>`+ e.gender + `</td>
         <td>`+ e.email + `</td>
-        <td>`+ (e.user_playing_time || 20) + ` mins/day</td>
-        <td>`+ localJoined + `</td>
-        <td class="text-center"><button class="btn btn-sm btn-outline-primary rounded-pill px-3 edit" data-bs-toggle="modal" data-bs-target="#editModal" data-id="`+ e.id + `" data-fullname="`+ (e.fullname || '') + `" data-username="`+ (e.username || '') + `" data-email="`+ (e.email || '') + `" data-gender="`+ (e.gender || 'Male') + `" data-type="`+ (e.accounttype || 'doctor') + `" data-time="`+ (e.user_playing_time || 20) + `"><i class="fa-solid fa-pen-to-square me-1"></i>Edit</button></td>
-        <td class="text-center"><button class="btn btn-sm btn-outline-danger rounded-pill px-3" onclick="deleteData(`+ e.id + `,'doctors')"><i class="fa-solid fa-trash me-1"></i>Delete</button></td>
+        <td class="font-mono">`+ (e.user_playing_time || 20) + ` mins/day</td>
+        <td class="font-mono small">`+ localJoined + `</td>
+        <td class="text-center"><button class="btn btn-sm btn-secondary px-2 py-1 edit" data-bs-toggle="modal" data-bs-target="#editModal" data-id="`+ e.id + `" data-fullname="`+ (e.fullname || '') + `" data-username="`+ (e.username || '') + `" data-email="`+ (e.email || '') + `" data-gender="`+ (e.gender || 'Male') + `" data-type="`+ (e.accounttype || 'doctor') + `" data-time="`+ (e.user_playing_time || 20) + `"><i class="fa-solid fa-pen-to-square me-1"></i>Edit</button></td>
+        <td class="text-center"><button class="btn btn-sm btn-outline-danger px-2 py-1" onclick="deleteData(`+ e.id + `,'doctors')"><i class="fa-solid fa-trash me-1"></i>Delete</button></td>
         </tr>`
     );
 }
@@ -373,22 +373,22 @@ function fetchDoctors() {
 
 function renderAdminRow(e, sliceIdx) {
     let badge = (e.accounttype === 'root')
-        ? '<span class="badge bg-dark-subtle text-dark border"><i class="fa-solid fa-crown me-1 text-warning"></i>Root Superadmin</span>'
-        : '<span class="badge bg-danger-subtle text-danger"><i class="fa-solid fa-user-shield me-1"></i>Clinic Admin</span>';
+        ? '<span class="badge border font-mono small" style="background-color: var(--bg-surface-secondary); border-color: var(--border-color); color: var(--text-main);"><i class="fa-solid fa-crown me-1 text-warning"></i>Root Superadmin</span>'
+        : '<span class="badge border font-mono small" style="background-color: var(--bg-surface-secondary); border-color: var(--border-color); color: var(--text-main);"><i class="fa-solid fa-user-shield me-1"></i>Clinic Admin</span>';
 
     let localJoined = formatUtcToLocal(e.created_at, 'DD/MM/YYYY');
     $('#datatablesSimple tbody').append(`
         <tr class="patient-record-row cursor-pointer" data-index="` + sliceIdx + `" title="Click row to inspect administrator credentials">
-        <td>`+ e.id + `</td>
+        <td class="font-mono">`+ e.id + `</td>
         <td><strong>`+ e.fullname + `</strong></td>
-        <td><span class="badge bg-secondary-subtle text-secondary">`+ e.username + `</span></td>
+        <td><span class="badge border font-mono small" style="background-color: var(--bg-surface-secondary); border-color: var(--border-color); color: var(--text-main);">`+ e.username + `</span></td>
         <td>`+ badge + `</td>
         <td>`+ e.gender + `</td>
         <td>`+ e.email + `</td>
         <td>Full System Control</td>
-        <td>`+ localJoined + `</td>
-        <td class="text-center"><button class="btn btn-sm btn-outline-primary rounded-pill px-3 edit" data-bs-toggle="modal" data-bs-target="#editModal" data-id="`+ e.id + `" data-fullname="`+ (e.fullname || '') + `" data-username="`+ (e.username || '') + `" data-email="`+ (e.email || '') + `" data-gender="`+ (e.gender || 'Male') + `" data-type="`+ (e.accounttype || 'admin') + `" data-time="`+ (e.user_playing_time || 20) + `"><i class="fa-solid fa-pen-to-square me-1"></i>Edit</button></td>
-        <td class="text-center"><button class="btn btn-sm btn-outline-danger rounded-pill px-3" onclick="deleteData(`+ e.id + `,'admins')"><i class="fa-solid fa-trash me-1"></i>Delete</button></td>
+        <td class="font-mono small">`+ localJoined + `</td>
+        <td class="text-center"><button class="btn btn-sm btn-secondary px-2 py-1 edit" data-bs-toggle="modal" data-bs-target="#editModal" data-id="`+ e.id + `" data-fullname="`+ (e.fullname || '') + `" data-username="`+ (e.username || '') + `" data-email="`+ (e.email || '') + `" data-gender="`+ (e.gender || 'Male') + `" data-type="`+ (e.accounttype || 'admin') + `" data-time="`+ (e.user_playing_time || 20) + `"><i class="fa-solid fa-pen-to-square me-1"></i>Edit</button></td>
+        <td class="text-center"><button class="btn btn-sm btn-outline-danger px-2 py-1" onclick="deleteData(`+ e.id + `,'admins')"><i class="fa-solid fa-trash me-1"></i>Delete</button></td>
         </tr>`
     );
 }
@@ -423,21 +423,21 @@ function fetchAdmins() {
 
 function renderUserRow(e, sliceIdx) {
     let badge = (e.accounttype === 'Unpaid User')
-        ? '<span class="badge bg-warning-subtle text-warning">Pending Payment</span>'
-        : '<span class="badge bg-primary-subtle text-primary"><i class="fa-solid fa-circle-check me-1"></i>Active Patient</span>';
+        ? '<span class="badge bg-warning-subtle text-warning font-mono">Pending Payment</span>'
+        : '<span class="badge bg-success-subtle text-success font-mono"><i class="fa-solid fa-circle-check me-1"></i>Active Patient</span>';
 
     let doctorBadge = '';
     if (e.doctor_name) {
         doctorBadge = `
             <div class="d-flex align-items-center gap-1">
-                <span class="badge bg-info-subtle text-info fw-semibold"><i class="fa-solid fa-user-doctor me-1"></i>`+ e.doctor_name + `</span>
-                <button class="btn btn-xs btn-link text-primary p-0 assign-doc-btn" data-patient-id="`+ e.id + `" data-patient-name="`+ (e.fullname || '') + `" data-doctor-id="`+ (e.doctor_id || '') + `" title="Change Doctor"><i class="fa-solid fa-arrows-rotate"></i></button>
+                <span class="badge border font-mono small" style="background-color: var(--bg-surface-secondary); border-color: var(--border-color); color: var(--text-main);"><i class="fa-solid fa-user-doctor me-1"></i>`+ e.doctor_name + `</span>
+                <button class="btn btn-xs btn-link text-main p-0 assign-doc-btn" data-patient-id="`+ e.id + `" data-patient-name="`+ (e.fullname || '') + `" data-doctor-id="`+ (e.doctor_id || '') + `" title="Change Doctor"><i class="fa-solid fa-arrows-rotate"></i></button>
             </div>`;
     } else {
         doctorBadge = `
             <div class="d-flex align-items-center gap-1">
-                <span class="badge bg-warning-subtle text-warning fw-semibold">Unassigned</span>
-                <button class="btn btn-xs btn-outline-primary rounded-pill py-0 px-2 assign-doc-btn" data-patient-id="`+ e.id + `" data-patient-name="`+ (e.fullname || '') + `" data-doctor-id="" title="Assign Doctor"><i class="fa-solid fa-user-plus me-1"></i>Assign</button>
+                <span class="badge bg-warning-subtle text-warning font-mono">Unassigned</span>
+                <button class="btn btn-xs btn-secondary py-0 px-2 assign-doc-btn font-mono" data-patient-id="`+ e.id + `" data-patient-name="`+ (e.fullname || '') + `" data-doctor-id="" title="Assign Doctor"><i class="fa-solid fa-user-plus me-1"></i>Assign</button>
             </div>`;
     }
 
@@ -445,18 +445,18 @@ function renderUserRow(e, sliceIdx) {
 
     $('#datatablesSimple tbody').append(`
         <tr class="patient-record-row cursor-pointer" data-index="` + sliceIdx + `" title="Click row to inspect clinical patient dossier & calibration">
-        <td>`+ e.id + `</td>
+        <td class="font-mono">`+ e.id + `</td>
         <td><strong>`+ e.fullname + `</strong></td>
-        <td><span class="badge bg-secondary-subtle text-secondary">`+ e.username + `</span></td>
+        <td><span class="badge border font-mono small" style="background-color: var(--bg-surface-secondary); border-color: var(--border-color); color: var(--text-main);">`+ e.username + `</span></td>
         <td>`+ doctorBadge + `</td>
         <td>`+ badge + `</td>
         <td>`+ e.gender + `</td>
-        <td>`+ (e.user_playing_time || 20) + ` mins/day</td> 
-        <td>`+ localEnrolled + `</td>
-        <td class="text-center"><button class="btn btn-sm btn-outline-success rounded-pill px-2 view-activity-btn" data-patient-id="`+ e.id + `" data-patient-name="`+ (e.fullname || '') + `" title="View Patient Activity Report & Heatmap"><i class="fa-solid fa-fire text-danger me-1"></i>Activity</button></td>
-        <td class="text-center"><button class="btn btn-sm btn-outline-info rounded-pill px-2 log-review-btn" data-patient-id="`+ e.id + `" data-patient-name="`+ (e.fullname || '') + `" data-doctor-id="`+ (e.doctor_id || 23) + `" title="Log Clinical Review"><i class="fa-solid fa-stethoscope me-1"></i>Review</button></td>
-        <td class="text-center"><button class="btn btn-sm btn-outline-primary rounded-pill px-3 edit" data-bs-toggle="modal" data-bs-target="#editModal" data-id="`+ e.id + `" data-fullname="`+ (e.fullname || '') + `" data-username="`+ (e.username || '') + `" data-email="`+ (e.email || '') + `" data-gender="`+ (e.gender || 'Male') + `" data-type="`+ (e.accounttype || 'user') + `" data-time="`+ (e.user_playing_time || 20) + `" data-doctor="`+ (e.doctor_id || '') + `"><i class="fa-solid fa-pen-to-square me-1"></i>Edit</button></td>
-        <td class="text-center"><button class="btn btn-sm btn-outline-danger rounded-pill px-3" onclick="deleteData(`+ e.id + `,'users')"><i class="fa-solid fa-trash me-1"></i>Delete</button></td>
+        <td class="font-mono">`+ (e.user_playing_time || 20) + ` mins/day</td> 
+        <td class="font-mono small">`+ localEnrolled + `</td>
+        <td class="text-center"><button class="btn btn-sm btn-secondary px-2 py-1 view-activity-btn" data-patient-id="`+ e.id + `" data-patient-name="`+ (e.fullname || '') + `" title="View Patient Activity Report & Heatmap"><i class="fa-solid fa-fire text-danger me-1"></i>Activity</button></td>
+        <td class="text-center"><button class="btn btn-sm btn-secondary px-2 py-1 log-review-btn" data-patient-id="`+ e.id + `" data-patient-name="`+ (e.fullname || '') + `" data-doctor-id="`+ (e.doctor_id || 23) + `" title="Log Clinical Review"><i class="fa-solid fa-stethoscope me-1"></i>Review</button></td>
+        <td class="text-center"><button class="btn btn-sm btn-secondary px-2 py-1 edit" data-bs-toggle="modal" data-bs-target="#editModal" data-id="`+ e.id + `" data-fullname="`+ (e.fullname || '') + `" data-username="`+ (e.username || '') + `" data-email="`+ (e.email || '') + `" data-gender="`+ (e.gender || 'Male') + `" data-type="`+ (e.accounttype || 'user') + `" data-time="`+ (e.user_playing_time || 20) + `" data-doctor="`+ (e.doctor_id || '') + `"><i class="fa-solid fa-pen-to-square me-1"></i>Edit</button></td>
+        <td class="text-center"><button class="btn btn-sm btn-outline-danger px-2 py-1" onclick="deleteData(`+ e.id + `,'users')"><i class="fa-solid fa-trash me-1"></i>Delete</button></td>
         </tr>`
     );
 }

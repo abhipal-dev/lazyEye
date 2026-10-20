@@ -164,14 +164,14 @@ export default class Dashboard extends React.Component {
                         {isDoctor ? (
                             <>
                                 <button 
-                                    className="btn btn-sm btn-danger rounded-pill px-3 shadow-sm d-flex align-items-center gap-1 fw-bold"
+                                    className="btn btn-sm btn-danger px-3 shadow-sm d-flex align-items-center gap-1 fw-bold"
                                     data-bs-toggle="modal" 
                                     data-bs-target="#logConsultationModal"
                                 >
                                     <i className="fa-solid fa-stethoscope"></i> Log Clinical Review
                                 </button>
                                 <button 
-                                    className="btn btn-sm btn-primary rounded-pill px-3 shadow-sm d-flex align-items-center gap-1 fw-bold"
+                                    className="btn btn-sm btn-primary px-3 shadow-sm d-flex align-items-center gap-1 fw-bold"
                                     data-bs-toggle="modal" 
                                     data-bs-target="#createStaffModal"
                                 >
@@ -180,7 +180,7 @@ export default class Dashboard extends React.Component {
                             </>
                         ) : (
                             <button 
-                                className="btn btn-sm btn-primary rounded-pill px-3 shadow-sm d-flex align-items-center gap-1 fw-bold"
+                                className="btn btn-sm btn-primary px-3 shadow-sm d-flex align-items-center gap-1 fw-bold"
                                 data-bs-toggle="modal" 
                                 data-bs-target="#createStaffModal"
                             >
@@ -189,14 +189,14 @@ export default class Dashboard extends React.Component {
                         )}
                         <a 
                             href="/user" 
-                            className="btn btn-sm btn-outline-primary rounded-pill px-3 shadow-sm d-flex align-items-center gap-1 fw-bold"
+                            className="btn btn-sm btn-secondary px-3 shadow-sm d-flex align-items-center gap-1 fw-bold"
                         >
                             <i className="fa-solid fa-gamepad"></i> Therapy Simulation
                         </a>
                     </div>
                 </div>
 
-                {/* 4 Primary KPI Cards - Unified Surface Design */}
+                {/* 4 Primary KPI Cards - Monochrome Architectural Surface Design */}
                 <div className="row g-3 mb-4">
                     {/* Card 1: Patients */}
                     <div className="col-12 col-sm-6 col-xl-3">
@@ -209,22 +209,22 @@ export default class Dashboard extends React.Component {
                             style={{ 
                                 backgroundColor: 'var(--bg-card)', 
                                 border: '1px solid var(--border-color)',
-                                borderRadius: '1rem', 
-                                transition: 'all 0.2s ease'
+                                borderRadius: '10px', 
+                                transition: 'all 0.15s ease'
                             }}
                         >
                             <div className="d-flex align-items-center justify-content-between mb-2">
-                                <span className="small fw-bold text-uppercase tracking-wider" style={{ color: 'var(--text-sub)' }}>
+                                <span className="small fw-semibold text-uppercase tracking-wider font-mono" style={{ color: 'var(--text-sub)', fontSize: '0.74rem' }}>
                                     {isDoctor ? 'Assigned Patients' : 'Active Patients'}
                                 </span>
-                                <div className="rounded-3 p-2 bg-primary-subtle text-primary d-flex align-items-center justify-content-center" style={{ width: 38, height: 38 }}>
+                                <div className="rounded-2 p-2 d-flex align-items-center justify-content-center" style={{ width: 34, height: 34, backgroundColor: 'var(--bg-surface-secondary)', border: '1px solid var(--border-color)', color: 'var(--text-main)' }}>
                                     <i className="fa-solid fa-users"></i>
                                 </div>
                             </div>
-                            <h2 className="fw-bold mb-1 text-main">{stats.total_patients}</h2>
+                            <h2 className="fw-bold mb-1 text-main tabular-nums">{stats.total_patients}</h2>
                             <div className="d-flex align-items-center justify-content-between small mt-2 pt-2 border-top" style={{ borderColor: 'var(--border-color)' }}>
                                 <span style={{ color: 'var(--text-muted)' }}>{isDoctor ? 'Under Direct Care' : 'Prescribed Cohort'}</span>
-                                <span className="text-primary fw-semibold">View List &rarr;</span>
+                                <span className="text-main fw-semibold">View List &rarr;</span>
                             </div>
                         </div>
                     </div>
@@ -241,20 +241,20 @@ export default class Dashboard extends React.Component {
                                 style={{ 
                                     backgroundColor: 'var(--bg-card)', 
                                     border: '1px solid var(--border-color)',
-                                    borderRadius: '1rem', 
-                                    transition: 'all 0.2s ease'
+                                    borderRadius: '10px', 
+                                    transition: 'all 0.15s ease'
                                 }}
                             >
                                 <div className="d-flex align-items-center justify-content-between mb-2">
-                                    <span className="small fw-bold text-uppercase tracking-wider" style={{ color: 'var(--text-sub)' }}>Clinical Reviews</span>
-                                    <div className="rounded-3 p-2 bg-info-subtle text-info d-flex align-items-center justify-content-center" style={{ width: 38, height: 38 }}>
+                                    <span className="small fw-semibold text-uppercase tracking-wider font-mono" style={{ color: 'var(--text-sub)', fontSize: '0.74rem' }}>Clinical Reviews</span>
+                                    <div className="rounded-2 p-2 d-flex align-items-center justify-content-center" style={{ width: 34, height: 34, backgroundColor: 'var(--bg-surface-secondary)', border: '1px solid var(--border-color)', color: 'var(--text-main)' }}>
                                         <i className="fa-solid fa-stethoscope"></i>
                                     </div>
                                 </div>
-                                <h2 className="fw-bold mb-1 text-main">{stats.total_consultations || 0}</h2>
+                                <h2 className="fw-bold mb-1 text-main tabular-nums">{stats.total_consultations || 0}</h2>
                                 <div className="d-flex align-items-center justify-content-between small mt-2 pt-2 border-top" style={{ borderColor: 'var(--border-color)' }}>
                                     <span style={{ color: 'var(--text-muted)' }}>Logged Sessions</span>
-                                    <span className="text-primary fw-semibold">View Reviews &rarr;</span>
+                                    <span className="text-main fw-semibold">View Reviews &rarr;</span>
                                 </div>
                             </div>
                         ) : (
@@ -267,20 +267,20 @@ export default class Dashboard extends React.Component {
                                 style={{ 
                                     backgroundColor: 'var(--bg-card)', 
                                     border: '1px solid var(--border-color)',
-                                    borderRadius: '1rem', 
-                                    transition: 'all 0.2s ease'
+                                    borderRadius: '10px', 
+                                    transition: 'all 0.15s ease'
                                 }}
                             >
                                 <div className="d-flex align-items-center justify-content-between mb-2">
-                                    <span className="small fw-bold text-uppercase tracking-wider" style={{ color: 'var(--text-sub)' }}>Doctors &amp; Staff</span>
-                                    <div className="rounded-3 p-2 bg-info-subtle text-info d-flex align-items-center justify-content-center" style={{ width: 38, height: 38 }}>
+                                    <span className="small fw-semibold text-uppercase tracking-wider font-mono" style={{ color: 'var(--text-sub)', fontSize: '0.74rem' }}>Doctors &amp; Staff</span>
+                                    <div className="rounded-2 p-2 d-flex align-items-center justify-content-center" style={{ width: 34, height: 34, backgroundColor: 'var(--bg-surface-secondary)', border: '1px solid var(--border-color)', color: 'var(--text-main)' }}>
                                         <i className="fa-solid fa-user-doctor"></i>
                                     </div>
                                 </div>
-                                <h2 className="fw-bold mb-1 text-main">{stats.total_doctors}</h2>
+                                <h2 className="fw-bold mb-1 text-main tabular-nums">{stats.total_doctors}</h2>
                                 <div className="d-flex align-items-center justify-content-between small mt-2 pt-2 border-top" style={{ borderColor: 'var(--border-color)' }}>
                                     <span style={{ color: 'var(--text-muted)' }}>Certified Practitioners</span>
-                                    <span className="text-primary fw-semibold">View Staff &rarr;</span>
+                                    <span className="text-main fw-semibold">View Staff &rarr;</span>
                                 </div>
                             </div>
                         )}
@@ -294,19 +294,19 @@ export default class Dashboard extends React.Component {
                                 style={{ 
                                     backgroundColor: 'var(--bg-card)', 
                                     border: '1px solid var(--border-color)',
-                                    borderRadius: '1rem' 
+                                    borderRadius: '10px' 
                                 }}
                             >
                                 <div className="d-flex align-items-center justify-content-between mb-2">
-                                    <span className="small fw-bold text-uppercase tracking-wider" style={{ color: 'var(--text-sub)' }}>Cohort Adherence</span>
-                                    <div className="rounded-3 p-2 bg-success-subtle text-success d-flex align-items-center justify-content-center" style={{ width: 38, height: 38 }}>
+                                    <span className="small fw-semibold text-uppercase tracking-wider font-mono" style={{ color: 'var(--text-sub)', fontSize: '0.74rem' }}>Cohort Adherence</span>
+                                    <div className="rounded-2 p-2 d-flex align-items-center justify-content-center" style={{ width: 34, height: 34, backgroundColor: 'var(--bg-surface-secondary)', border: '1px solid var(--border-color)', color: 'var(--text-main)' }}>
                                         <i className="fa-solid fa-chart-pie"></i>
                                     </div>
                                 </div>
-                                <h2 className="fw-bold mb-1 text-main">{stats.compliance_rate}%</h2>
+                                <h2 className="fw-bold mb-1 text-main tabular-nums">{stats.compliance_rate}%</h2>
                                 <div className="d-flex align-items-center justify-content-between small mt-2 pt-2 border-top" style={{ borderColor: 'var(--border-color)' }}>
                                     <span style={{ color: 'var(--text-muted)' }}>Target Protocol</span>
-                                    <span className="badge bg-success-subtle text-success fw-semibold py-1 px-2">High Adherence</span>
+                                    <span className="badge bg-success-subtle text-success fw-semibold py-1 px-2 font-mono">High Adherence</span>
                                 </div>
                             </div>
                         ) : isRoot ? (
@@ -319,20 +319,20 @@ export default class Dashboard extends React.Component {
                                 style={{ 
                                     backgroundColor: 'var(--bg-card)', 
                                     border: '1px solid var(--border-color)',
-                                    borderRadius: '1rem', 
-                                    transition: 'all 0.2s ease'
+                                    borderRadius: '10px', 
+                                    transition: 'all 0.15s ease'
                                 }}
                             >
                                 <div className="d-flex align-items-center justify-content-between mb-2">
-                                    <span className="small fw-bold text-uppercase tracking-wider" style={{ color: 'var(--text-sub)' }}>System Admins</span>
-                                    <div className="rounded-3 p-2 bg-dark-subtle text-dark d-flex align-items-center justify-content-center" style={{ width: 38, height: 38 }}>
+                                    <span className="small fw-semibold text-uppercase tracking-wider font-mono" style={{ color: 'var(--text-sub)', fontSize: '0.74rem' }}>System Admins</span>
+                                    <div className="rounded-2 p-2 d-flex align-items-center justify-content-center" style={{ width: 34, height: 34, backgroundColor: 'var(--bg-surface-secondary)', border: '1px solid var(--border-color)', color: 'var(--text-main)' }}>
                                         <i className="fa-solid fa-user-shield"></i>
                                     </div>
                                 </div>
-                                <h2 className="fw-bold mb-1 text-main">{stats.total_admins}</h2>
+                                <h2 className="fw-bold mb-1 text-main tabular-nums">{stats.total_admins}</h2>
                                 <div className="d-flex align-items-center justify-content-between small mt-2 pt-2 border-top" style={{ borderColor: 'var(--border-color)' }}>
                                     <span style={{ color: 'var(--text-muted)' }}>Root &amp; Clinic Admins</span>
-                                    <span className="text-primary fw-semibold">Manage Admins &rarr;</span>
+                                    <span className="text-main fw-semibold">Manage Admins &rarr;</span>
                                 </div>
                             </div>
                         ) : (
@@ -345,26 +345,26 @@ export default class Dashboard extends React.Component {
                                 style={{ 
                                     backgroundColor: 'var(--bg-card)', 
                                     border: '1px solid var(--border-color)',
-                                    borderRadius: '1rem', 
-                                    transition: 'all 0.2s ease'
+                                    borderRadius: '10px', 
+                                    transition: 'all 0.15s ease'
                                 }}
                             >
                                 <div className="d-flex align-items-center justify-content-between mb-2">
-                                    <span className="small fw-bold text-uppercase tracking-wider" style={{ color: 'var(--text-sub)' }}>Clinical Reviews</span>
-                                    <div className="rounded-3 p-2 bg-success-subtle text-success d-flex align-items-center justify-content-center" style={{ width: 38, height: 38 }}>
+                                    <span className="small fw-semibold text-uppercase tracking-wider font-mono" style={{ color: 'var(--text-sub)', fontSize: '0.74rem' }}>Clinical Reviews</span>
+                                    <div className="rounded-2 p-2 d-flex align-items-center justify-content-center" style={{ width: 34, height: 34, backgroundColor: 'var(--bg-surface-secondary)', border: '1px solid var(--border-color)', color: 'var(--text-main)' }}>
                                         <i className="fa-solid fa-notes-medical"></i>
                                     </div>
                                 </div>
-                                <h2 className="fw-bold mb-1 text-main">{stats.total_consultations || 0}</h2>
+                                <h2 className="fw-bold mb-1 text-main tabular-nums">{stats.total_consultations || 0}</h2>
                                 <div className="d-flex align-items-center justify-content-between small mt-2 pt-2 border-top" style={{ borderColor: 'var(--border-color)' }}>
                                     <span style={{ color: 'var(--text-muted)' }}>Doctor Assessments</span>
-                                    <span className="text-primary fw-semibold">View Reviews &rarr;</span>
+                                    <span className="text-main fw-semibold">View Reviews &rarr;</span>
                                 </div>
                             </div>
                         )}
                     </div>
 
-                    {/* Card 4: Avg Time for Doctor / Pending Intake for Admin & Root (Attention Highlight) */}
+                    {/* Card 4: Avg Time for Doctor / Pending Intake for Admin & Root */}
                     <div className="col-12 col-sm-6 col-xl-3">
                         {isDoctor ? (
                             <div 
@@ -372,19 +372,19 @@ export default class Dashboard extends React.Component {
                                 style={{ 
                                     backgroundColor: 'var(--bg-card)', 
                                     border: '1px solid var(--border-color)',
-                                    borderRadius: '1rem' 
+                                    borderRadius: '10px' 
                                 }}
                             >
                                 <div className="d-flex align-items-center justify-content-between mb-2">
-                                    <span className="small fw-bold text-uppercase tracking-wider" style={{ color: 'var(--text-sub)' }}>Avg Daily Prescribed</span>
-                                    <div className="rounded-3 p-2 bg-primary-subtle text-primary d-flex align-items-center justify-content-center" style={{ width: 38, height: 38 }}>
+                                    <span className="small fw-semibold text-uppercase tracking-wider font-mono" style={{ color: 'var(--text-sub)', fontSize: '0.74rem' }}>Avg Daily Prescribed</span>
+                                    <div className="rounded-2 p-2 d-flex align-items-center justify-content-center" style={{ width: 34, height: 34, backgroundColor: 'var(--bg-surface-secondary)', border: '1px solid var(--border-color)', color: 'var(--text-main)' }}>
                                         <i className="fa-solid fa-stopwatch"></i>
                                     </div>
                                 </div>
-                                <h2 className="fw-bold mb-1 text-main">{stats.avg_training_time} <span className="fs-6 fw-normal" style={{ color: 'var(--text-sub)' }}>min</span></h2>
+                                <h2 className="fw-bold mb-1 text-main tabular-nums">{stats.avg_training_time} <span className="fs-6 fw-normal text-sub">min</span></h2>
                                 <div className="d-flex align-items-center justify-content-between small mt-2 pt-2 border-top" style={{ borderColor: 'var(--border-color)' }}>
                                     <span style={{ color: 'var(--text-muted)' }}>Daily Standard</span>
-                                    <span className="badge bg-primary-subtle text-primary fw-semibold py-1 px-2">20 min plan</span>
+                                    <span className="badge bg-primary-subtle text-main fw-semibold py-1 px-2 font-mono">20 min plan</span>
                                 </div>
                             </div>
                         ) : (
@@ -397,22 +397,22 @@ export default class Dashboard extends React.Component {
                                 style={{ 
                                     backgroundColor: 'var(--bg-card)', 
                                     border: stats.pending_registers > 0 ? '1px solid var(--warning)' : '1px solid var(--border-color)',
-                                    borderRadius: '1rem', 
-                                    transition: 'all 0.2s ease'
+                                    borderRadius: '10px', 
+                                    transition: 'all 0.15s ease'
                                 }}
                             >
                                 <div className="d-flex align-items-center justify-content-between mb-2">
-                                    <span className="small fw-bold text-uppercase tracking-wider" style={{ color: 'var(--text-sub)' }}>Pending Registrations</span>
-                                    <div className={`rounded-3 p-2 ${stats.pending_registers > 0 ? 'bg-warning-subtle text-warning' : 'bg-secondary-subtle text-secondary'} d-flex align-items-center justify-content-center`} style={{ width: 38, height: 38 }}>
+                                    <span className="small fw-semibold text-uppercase tracking-wider font-mono" style={{ color: 'var(--text-sub)', fontSize: '0.74rem' }}>Pending Registrations</span>
+                                    <div className={`rounded-2 p-2 d-flex align-items-center justify-content-center`} style={{ width: 34, height: 34, backgroundColor: 'var(--bg-surface-secondary)', border: '1px solid var(--border-color)', color: stats.pending_registers > 0 ? 'var(--warning)' : 'var(--text-sub)' }}>
                                         <i className="fa-solid fa-user-clock"></i>
                                     </div>
                                 </div>
-                                <h2 className="fw-bold mb-1 text-main">{stats.pending_registers}</h2>
+                                <h2 className="fw-bold mb-1 text-main tabular-nums">{stats.pending_registers}</h2>
                                 <div className="d-flex align-items-center justify-content-between small mt-2 pt-2 border-top" style={{ borderColor: 'var(--border-color)' }}>
-                                    <span className={`badge ${stats.pending_registers > 0 ? 'bg-warning-subtle text-warning border border-warning-subtle' : 'bg-success-subtle text-success border border-success-subtle'} py-1 px-2 fw-semibold`}>
+                                    <span className={`badge ${stats.pending_registers > 0 ? 'bg-warning-subtle text-warning' : 'bg-success-subtle text-success'} py-1 px-2 fw-semibold font-mono`}>
                                         {stats.pending_registers > 0 ? 'Requires Action' : 'All Clear'}
                                     </span>
-                                    <span className="text-primary fw-semibold">Review &rarr;</span>
+                                    <span className="text-main fw-semibold">Review &rarr;</span>
                                 </div>
                             </div>
                         )}
@@ -420,87 +420,86 @@ export default class Dashboard extends React.Component {
                 </div>
 
                 {/* Secondary Clinical Metrics Row */}
-                {/* Secondary Clinical Metrics Row */}
                 <div className="row g-3 mb-4">
                     <div className="col-12 col-md-4">
-                        <div className="card border-0 shadow-sm p-3 h-100" style={{ backgroundColor: 'var(--bg-card)', border: '1px solid var(--border-color)', borderRadius: '1rem' }}>
+                        <div className="card border-0 shadow-sm p-3 h-100" style={{ backgroundColor: 'var(--bg-card)', border: '1px solid var(--border-color)', borderRadius: '10px' }}>
                             <div className="d-flex align-items-center gap-3">
-                                <div className="rounded-3 p-3 bg-primary-subtle text-primary d-flex align-items-center justify-content-center" style={{ width: 48, height: 48, minWidth: 48 }}>
-                                    <i className="fa-solid fa-chart-pie fa-xl"></i>
+                                <div className="rounded-2 p-3 d-flex align-items-center justify-content-center" style={{ width: 44, height: 44, minWidth: 44, backgroundColor: 'var(--bg-surface-secondary)', border: '1px solid var(--border-color)', color: 'var(--text-main)' }}>
+                                    <i className="fa-solid fa-chart-pie fa-lg"></i>
                                 </div>
                                 <div>
-                                    <span className="d-block fw-bold text-uppercase" style={{ color: 'var(--text-sub)', fontSize: '0.74rem', letterSpacing: '0.06em' }}>Adherence Compliance</span>
-                                    <h4 className="fw-bold mb-0 text-main">{stats.compliance_rate}%</h4>
+                                    <span className="d-block fw-semibold text-uppercase font-mono" style={{ color: 'var(--text-sub)', fontSize: '0.72rem', letterSpacing: '0.05em' }}>Adherence Compliance</span>
+                                    <h4 className="fw-bold mb-0 text-main tabular-nums">{stats.compliance_rate}%</h4>
                                 </div>
                             </div>
-                            <div className="progress mt-3" style={{ height: 6, borderRadius: 3, backgroundColor: 'var(--bg-surface-secondary)' }}>
-                                <div className="progress-bar bg-primary" role="progressbar" style={{ width: `${stats.compliance_rate}%` }}></div>
+                            <div className="progress mt-3" style={{ height: 4, borderRadius: 2, backgroundColor: 'var(--bg-surface-secondary)' }}>
+                                <div className="progress-bar" role="progressbar" style={{ width: `${stats.compliance_rate}%`, backgroundColor: 'var(--text-main)' }}></div>
                             </div>
-                            <small className="mt-2 d-block" style={{ color: 'var(--text-muted)', fontSize: '0.8rem' }}>Patients meeting daily assigned minutes</small>
+                            <small className="mt-2 d-block text-muted" style={{ fontSize: '0.78rem' }}>Patients meeting daily assigned minutes</small>
                         </div>
                     </div>
 
                     <div className="col-12 col-md-4">
-                        <div className="card border-0 shadow-sm p-3 h-100" style={{ backgroundColor: 'var(--bg-card)', border: '1px solid var(--border-color)', borderRadius: '1rem' }}>
+                        <div className="card border-0 shadow-sm p-3 h-100" style={{ backgroundColor: 'var(--bg-card)', border: '1px solid var(--border-color)', borderRadius: '10px' }}>
                             <div className="d-flex align-items-center gap-3">
-                                <div className="rounded-3 p-3 bg-info-subtle text-info d-flex align-items-center justify-content-center" style={{ width: 48, height: 48, minWidth: 48 }}>
-                                    <i className="fa-solid fa-stopwatch fa-xl"></i>
+                                <div className="rounded-2 p-3 d-flex align-items-center justify-content-center" style={{ width: 44, height: 44, minWidth: 44, backgroundColor: 'var(--bg-surface-secondary)', border: '1px solid var(--border-color)', color: 'var(--text-main)' }}>
+                                    <i className="fa-solid fa-stopwatch fa-lg"></i>
                                 </div>
                                 <div>
-                                    <span className="d-block fw-bold text-uppercase" style={{ color: 'var(--text-sub)', fontSize: '0.74rem', letterSpacing: '0.06em' }}>Avg Daily Session</span>
-                                    <h4 className="fw-bold mb-0 text-main">{stats.avg_training_time} <span className="fs-6 fw-normal" style={{ color: 'var(--text-sub)' }}>minutes</span></h4>
+                                    <span className="d-block fw-semibold text-uppercase font-mono" style={{ color: 'var(--text-sub)', fontSize: '0.72rem', letterSpacing: '0.05em' }}>Avg Daily Session</span>
+                                    <h4 className="fw-bold mb-0 text-main tabular-nums">{stats.avg_training_time} <span className="fs-6 fw-normal text-sub">minutes</span></h4>
                                 </div>
                             </div>
-                            <div className="progress mt-3" style={{ height: 6, borderRadius: 3, backgroundColor: 'var(--bg-surface-secondary)' }}>
-                                <div className="progress-bar bg-info" role="progressbar" style={{ width: `${Math.min(stats.avg_training_time * 5, 100)}%` }}></div>
+                            <div className="progress mt-3" style={{ height: 4, borderRadius: 2, backgroundColor: 'var(--bg-surface-secondary)' }}>
+                                <div className="progress-bar" role="progressbar" style={{ width: `${Math.min(stats.avg_training_time * 5, 100)}%`, backgroundColor: 'var(--text-main)' }}></div>
                             </div>
-                            <small className="mt-2 d-block" style={{ color: 'var(--text-muted)', fontSize: '0.8rem' }}>Optometrist standard target: 20 mins/day</small>
+                            <small className="mt-2 d-block text-muted" style={{ fontSize: '0.78rem' }}>Optometrist standard target: 20 mins/day</small>
                         </div>
                     </div>
 
                     <div className="col-12 col-md-4">
-                        <div className="card border-0 shadow-sm p-3 h-100" style={{ backgroundColor: 'var(--bg-card)', border: '1px solid var(--border-color)', borderRadius: '1rem' }}>
+                        <div className="card border-0 shadow-sm p-3 h-100" style={{ backgroundColor: 'var(--bg-card)', border: '1px solid var(--border-color)', borderRadius: '10px' }}>
                             <div className="d-flex align-items-center gap-3">
-                                <div className="rounded-3 p-3 bg-success-subtle text-success d-flex align-items-center justify-content-center" style={{ width: 48, height: 48, minWidth: 48 }}>
-                                    <i className="fa-solid fa-glasses fa-xl"></i>
+                                <div className="rounded-2 p-3 d-flex align-items-center justify-content-center" style={{ width: 44, height: 44, minWidth: 44, backgroundColor: 'var(--bg-surface-secondary)', border: '1px solid var(--border-color)', color: 'var(--text-main)' }}>
+                                    <i className="fa-solid fa-glasses fa-lg"></i>
                                 </div>
                                 <div>
-                                    <span className="d-block fw-bold text-uppercase" style={{ color: 'var(--text-sub)', fontSize: '0.74rem', letterSpacing: '0.06em' }}>Dichoptic Engines</span>
-                                    <h4 className="fw-bold mb-0 text-main">10 Active Games</h4>
+                                    <span className="d-block fw-semibold text-uppercase font-mono" style={{ color: 'var(--text-sub)', fontSize: '0.72rem', letterSpacing: '0.05em' }}>Dichoptic Engines</span>
+                                    <h4 className="fw-bold mb-0 text-main tabular-nums">10 Active Games</h4>
                                 </div>
                             </div>
-                            <div className="progress mt-3" style={{ height: 6, borderRadius: 3, backgroundColor: 'var(--bg-surface-secondary)' }}>
-                                <div className="progress-bar bg-success" role="progressbar" style={{ width: '100%' }}></div>
+                            <div className="progress mt-3" style={{ height: 4, borderRadius: 2, backgroundColor: 'var(--bg-surface-secondary)' }}>
+                                <div className="progress-bar" role="progressbar" style={{ width: '100%', backgroundColor: 'var(--text-main)' }}></div>
                             </div>
-                            <small className="mt-2 d-block" style={{ color: 'var(--text-muted)', fontSize: '0.8rem' }}>Calibrated games with dual-contrast Red/Cyan filter</small>
+                            <small className="mt-2 d-block text-muted" style={{ fontSize: '0.78rem' }}>Calibrated games with dual-contrast Red/Cyan filter</small>
                         </div>
                     </div>
                 </div>
 
                 {/* Charts & Analytics Section */}
-                <div className="row g-4 mb-4">
+                <div className="row g-3 mb-4">
                     {/* Weekly Activity Line/Area Chart */}
                     <div className="col-12 col-lg-7">
-                        <div className="card border-0 shadow-sm p-4 h-100" style={{ backgroundColor: 'var(--bg-card)', border: '1px solid var(--border-color)', borderRadius: '1rem' }}>
+                        <div className="card border-0 shadow-sm p-4 h-100" style={{ backgroundColor: 'var(--bg-card)', border: '1px solid var(--border-color)', borderRadius: '10px' }}>
                             <div className="d-flex align-items-center justify-content-between mb-3 flex-wrap gap-2">
                                 <div>
                                     <h5 className="fw-bold mb-1 text-main">
-                                        <i className="fa-solid fa-chart-line text-primary me-2"></i>Weekly Therapy Session Volume
+                                        <i className="fa-solid fa-chart-line text-main me-2"></i>Weekly Therapy Session Volume
                                     </h5>
-                                    <p className="small mb-0" style={{ color: 'var(--text-sub)' }}>Total dichoptic sessions completed across the past 7 days</p>
+                                    <p className="small mb-0 text-sub">Total dichoptic sessions completed across the past 7 days</p>
                                 </div>
-                                <span className="badge bg-success-subtle text-success py-1 px-2 fw-semibold">
+                                <span className="badge bg-success-subtle text-success py-1 px-2 fw-semibold font-mono">
                                     <i className="fa-solid fa-arrow-trend-up me-1"></i>+16.4% this week
                                 </span>
                             </div>
 
-                            {/* Responsive SVG Area Chart */}
+                            {/* Responsive SVG Area Chart - Monochrome Style */}
                             <div className="position-relative w-100" style={{ height: 180 }}>
                                 <svg viewBox={`0 0 ${chartWidth} ${chartHeight}`} className="w-100 h-100 overflow-visible">
                                     <defs>
                                         <linearGradient id="areaGradient" x1="0" y1="0" x2="0" y2="1">
-                                            <stop offset="0%" stopColor="#2563eb" stopOpacity="0.4" />
-                                            <stop offset="100%" stopColor="#2563eb" stopOpacity="0.02" />
+                                            <stop offset="0%" stopColor="var(--text-main)" stopOpacity="0.12" />
+                                            <stop offset="100%" stopColor="var(--text-main)" stopOpacity="0.01" />
                                         </linearGradient>
                                     </defs>
 
@@ -513,16 +512,16 @@ export default class Dashboard extends React.Component {
                                     <path d={areaPath} fill="url(#areaGradient)" />
 
                                     {/* Line Stroke */}
-                                    <polyline fill="none" stroke="#2563eb" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round" points={pointsString} />
+                                    <polyline fill="none" stroke="var(--text-main)" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" points={pointsString} />
 
                                     {/* Data Points */}
                                     {points.map((p, idx) => (
                                         <g key={idx} className="cursor-pointer">
-                                            <circle cx={p.x} cy={p.y} r="5" fill="#ffffff" stroke="#2563eb" strokeWidth="2.5" />
-                                            <text x={p.x} y={p.y - 10} textAnchor="middle" fontSize="10" fontWeight="bold" fill="var(--text-main)">
+                                            <circle cx={p.x} cy={p.y} r="4.5" fill="var(--bg-card)" stroke="var(--text-main)" strokeWidth="2" />
+                                            <text x={p.x} y={p.y - 10} textAnchor="middle" fontSize="10" fontWeight="bold" fill="var(--text-main)" fontFamily="'JetBrains Mono', monospace">
                                                 {p.val}
                                             </text>
-                                            <text x={p.x} y={chartHeight - 4} textAnchor="middle" fontSize="10" fill="var(--text-sub)">
+                                            <text x={p.x} y={chartHeight - 4} textAnchor="middle" fontSize="10" fill="var(--text-sub)" fontFamily="'JetBrains Mono', monospace">
                                                 {stats.weekly_sessions?.labels[idx] || ''}
                                             </text>
                                         </g>
@@ -531,42 +530,42 @@ export default class Dashboard extends React.Component {
                             </div>
 
                             <div className="d-flex align-items-center justify-content-between small mt-2 pt-2 border-top" style={{ borderColor: 'var(--border-color)', color: 'var(--text-sub)' }}>
-                                <span><i className="fa-solid fa-circle text-primary me-1" style={{ fontSize: 8 }}></i> Completed Sessions</span>
+                                <span><i className="fa-solid fa-circle text-main me-1" style={{ fontSize: 7 }}></i> Completed Sessions</span>
                                 <span>Peak Day: <strong style={{ color: 'var(--text-main)' }}>{peakDayName} ({peakDayVolume} sessions)</strong></span>
                             </div>
                         </div>
                     </div>
 
-                    {/* Game Engagement Bar Distribution */}
+                    {/* Game Engagement Bar Distribution - Monochromatic Scale */}
                     <div className="col-12 col-lg-5">
-                        <div className="card border-0 shadow-sm p-4 h-100" style={{ backgroundColor: 'var(--bg-card)', border: '1px solid var(--border-color)', borderRadius: '1rem' }}>
+                        <div className="card border-0 shadow-sm p-4 h-100" style={{ backgroundColor: 'var(--bg-card)', border: '1px solid var(--border-color)', borderRadius: '10px' }}>
                             <div className="d-flex align-items-center justify-content-between mb-3">
                                 <div>
                                     <h5 className="fw-bold mb-1 text-main">
-                                        <i className="fa-solid fa-trophy text-warning me-2"></i>Most Prescribed Games
+                                        <i className="fa-solid fa-trophy text-main me-2"></i>Most Prescribed Games
                                     </h5>
-                                    <p className="small mb-0" style={{ color: 'var(--text-sub)' }}>Engagement frequency by game module</p>
+                                    <p className="small mb-0 text-sub">Engagement frequency by game module</p>
                                 </div>
-                                <span className="badge bg-primary-subtle text-primary small">Top 5</span>
+                                <span className="badge bg-primary-subtle text-main small font-mono">Top 5</span>
                             </div>
 
                             <div className="d-flex flex-column gap-3 mt-2">
                                 {gameEntries.map(([name, count], idx) => {
                                     const percent = Math.round((count / maxGamePlays) * 100);
-                                    const colors = ['#2563eb', '#0284c7', '#10b981', '#f59e0b', '#8b5cf6'];
-                                    const color = colors[idx % colors.length];
+                                    const opacities = [1, 0.85, 0.7, 0.55, 0.4];
+                                    const opacity = opacities[idx % opacities.length];
 
                                     return (
                                         <div key={idx}>
                                             <div className="d-flex align-items-center justify-content-between small mb-1">
                                                 <span className="fw-semibold text-main">{GAME_DISPLAY_NAMES[name] || name}</span>
-                                                <span className="fw-bold" style={{ color: 'var(--text-sub)' }}>{count} plays</span>
+                                                <span className="fw-semibold font-mono" style={{ color: 'var(--text-sub)' }}>{count} plays</span>
                                             </div>
-                                            <div className="progress" style={{ height: 8, borderRadius: 4, backgroundColor: 'var(--bg-surface-secondary)' }}>
+                                            <div className="progress" style={{ height: 6, borderRadius: 3, backgroundColor: 'var(--bg-surface-secondary)' }}>
                                                 <div 
                                                     className="progress-bar" 
                                                     role="progressbar" 
-                                                    style={{ width: `${percent}%`, backgroundColor: color, borderRadius: 4 }}
+                                                    style={{ width: `${percent}%`, backgroundColor: 'var(--text-main)', opacity: opacity, borderRadius: 3 }}
                                                 ></div>
                                             </div>
                                         </div>
@@ -576,22 +575,22 @@ export default class Dashboard extends React.Component {
 
                             <div className="mt-auto pt-3 border-top d-flex justify-content-between align-items-center small" style={{ borderColor: 'var(--border-color)', color: 'var(--text-sub)' }}>
                                 <span>Recommended by Optometrists</span>
-                                <a href="/user" className="text-primary fw-semibold text-decoration-none">Test Modules &rarr;</a>
+                                <a href="/user" className="text-main fw-semibold text-decoration-none">Test Modules &rarr;</a>
                             </div>
                         </div>
                     </div>
                 </div>
 
                 {/* Dedicated Records Navigation Card */}
-                <div className="card border-0 shadow-sm p-3 mb-2" style={{ backgroundColor: 'var(--bg-card)', border: '1px solid var(--border-color)', borderRadius: '1rem' }}>
+                <div className="card border-0 shadow-sm p-3 mb-2" style={{ backgroundColor: 'var(--bg-card)', border: '1px solid var(--border-color)', borderRadius: '10px' }}>
                     <div className="d-flex align-items-center justify-content-between flex-wrap gap-3">
                         <div className="d-flex align-items-center gap-2 flex-wrap">
-                            <span className="fw-bold text-main small me-2">
-                                <i className="fa-solid fa-database text-primary me-1"></i>Database Records:
+                            <span className="fw-bold text-main small me-2 font-mono">
+                                <i className="fa-solid fa-database text-main me-1"></i>Database Records:
                             </span>
                             <button 
                                 type="button"
-                                className="btn btn-sm btn-outline-primary rounded-pill px-3 fw-semibold"
+                                className="btn btn-sm btn-secondary px-3 fw-semibold"
                                 onClick={() => {
                                     if (this.props.onNavigateToTable) this.props.onNavigateToTable('fetchUsers');
                                     else if (window.switchToAdminTable) window.switchToAdminTable('fetchUsers');
@@ -602,7 +601,7 @@ export default class Dashboard extends React.Component {
                             {!isDoctor && (
                                 <button 
                                     type="button"
-                                    className="btn btn-sm btn-outline-info rounded-pill px-3 fw-semibold"
+                                    className="btn btn-sm btn-secondary px-3 fw-semibold"
                                     onClick={() => {
                                         if (this.props.onNavigateToTable) this.props.onNavigateToTable('fetchDoctors');
                                         else if (window.switchToAdminTable) window.switchToAdminTable('fetchDoctors');
@@ -613,7 +612,7 @@ export default class Dashboard extends React.Component {
                             )}
                             <button 
                                 type="button"
-                                className="btn btn-sm btn-outline-danger rounded-pill px-3 fw-semibold"
+                                className="btn btn-sm btn-secondary px-3 fw-semibold"
                                 onClick={() => {
                                     if (this.props.onNavigateToTable) this.props.onNavigateToTable('fetchConsultations');
                                     else if (window.switchToAdminTable) window.switchToAdminTable('fetchConsultations');
@@ -624,7 +623,7 @@ export default class Dashboard extends React.Component {
                             {isRoot && (
                                 <button 
                                     type="button"
-                                    className="btn btn-sm btn-outline-success rounded-pill px-3 fw-semibold"
+                                    className="btn btn-sm btn-secondary px-3 fw-semibold"
                                     onClick={() => {
                                         if (this.props.onNavigateToTable) this.props.onNavigateToTable('fetchAdmins');
                                         else if (window.switchToAdminTable) window.switchToAdminTable('fetchAdmins');
@@ -636,7 +635,7 @@ export default class Dashboard extends React.Component {
                             {!isDoctor && (
                                 <button 
                                     type="button"
-                                    className="btn btn-sm btn-outline-warning rounded-pill px-3 fw-semibold"
+                                    className="btn btn-sm btn-secondary px-3 fw-semibold"
                                     onClick={() => {
                                         if (this.props.onNavigateToTable) this.props.onNavigateToTable('fetchRegisters');
                                         else if (window.switchToAdminTable) window.switchToAdminTable('fetchRegisters');
@@ -647,7 +646,7 @@ export default class Dashboard extends React.Component {
                             )}
                         </div>
                         <div className="small text-muted">
-                            <i className="fa-solid fa-arrow-right text-primary me-1"></i> Open dedicated table view
+                            <i className="fa-solid fa-arrow-right text-main me-1"></i> Open dedicated table view
                         </div>
                     </div>
                 </div>

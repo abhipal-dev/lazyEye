@@ -9,14 +9,14 @@ export default class Navbar extends React.Component {
             <nav className="navbar navbar-expand-lg navbar-modern">
                 <div className="container">
                     <a className="navbar-brand d-flex align-items-center gap-2" href="/">
-                        <img src="/images/lazyeye-icon.svg" alt="LazyEye Logo" style={{ width: '36px', height: '36px' }} />
-                        <span className="brand-text fw-bold">Lazy<span className="text-primary">Eye</span></span>
+                        <img src="/images/lazyeye-icon.svg" alt="LazyEye Logo" style={{ width: '30px', height: '30px' }} />
+                        <span className="brand-text fw-bold text-main" style={{ letterSpacing: '-0.02em' }}>LazyEye</span>
                     </a>
                     
                     <div className="d-flex align-items-center gap-2 d-lg-none">
                         <ThemeToggle />
                         <button 
-                            className="navbar-toggler border-0 shadow-none" 
+                            className="navbar-toggler border-0 shadow-none text-main" 
                             type="button" 
                             data-bs-toggle="collapse" 
                             data-bs-target="#navbarSupportedContent" 
@@ -51,10 +51,10 @@ export default class Navbar extends React.Component {
                             <div className="d-none d-lg-block">
                                 <ThemeToggle />
                             </div>
-                            <a href="/Login_view" className="btn-modern-outline">
-                                <i className="fa-solid fa-right-to-bracket me-1"></i> Login
+                            <a href="/Login_view" className="btn btn-secondary btn-sm px-3">
+                                <i className="fa-solid fa-right-to-bracket me-1"></i> Sign In
                             </a>
-                            <a href="/Register_view" className="btn-modern-primary">
+                            <a href="/Register_view" className="btn btn-primary btn-sm px-3">
                                 <i className="fa-solid fa-user-plus me-1"></i> Register
                             </a>
                         </div>
