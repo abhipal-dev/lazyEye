@@ -7,7 +7,7 @@ export const GAMES_CONFIG = [
   {
     id: 'Snake',
     aliases: ['snake', 'game1snake'],
-    title: 'Dichoptic Snake',
+    title: 'Snake',
     route: '/game1snake',
     icon: '/images/snake-mascot.svg',
     tag: 'Binocular Fusion',
@@ -22,7 +22,7 @@ export const GAMES_CONFIG = [
   {
     id: 'Flappy Bird',
     aliases: ['flappy bird', 'flappybird', 'flappy', 'game2flappybird'],
-    title: 'Altitude Flight',
+    title: 'Flappy Bird',
     route: '/game2flappybird',
     icon: '/images/flappy-mascot.svg',
     tag: 'Visual Timing',
@@ -37,7 +37,7 @@ export const GAMES_CONFIG = [
   {
     id: 'Sticky Holds',
     aliases: ['sticky holds', 'stickyholds', 'stick hero', 'stickhero', 'game11stickyholds'],
-    title: 'Stick Hero Bridge',
+    title: 'Sticky Holds',
     route: '/game11stickyholds',
     icon: '/images/stickyholds-mascot.svg',
     tag: 'Distance & Depth Estimation',
@@ -52,7 +52,7 @@ export const GAMES_CONFIG = [
   {
     id: 'Menja',
     aliases: ['menja', 'game12menja'],
-    title: '3D Spatial Slicer',
+    title: 'Menja',
     route: '/game12menja',
     icon: '/images/menja-mascot.svg',
     tag: 'Visual Reflexes',
@@ -67,7 +67,7 @@ export const GAMES_CONFIG = [
   {
     id: 'Tetris',
     aliases: ['tetris', 'game8tetris'],
-    title: 'Block Fusion',
+    title: 'Tetris',
     route: '/game8tetris',
     icon: '/images/tetris-mascot.svg',
     tag: 'Pattern Synthesis',
@@ -82,7 +82,7 @@ export const GAMES_CONFIG = [
   {
     id: 'Bubble Shooter',
     aliases: ['bubble shooter', 'bubbleshooter', 'bubble', 'game9bubbleshooter'],
-    title: 'Bubble Target Aim',
+    title: 'Bubble Shooter',
     route: '/game9bubbleshooter',
     icon: '/images/bubbles-mascot.svg',
     tag: 'Spatial Targeting',
@@ -97,7 +97,7 @@ export const GAMES_CONFIG = [
   {
     id: 'Ping Pong',
     aliases: ['ping pong', 'pingpong', 'game10pingpong'],
-    title: 'Table Rally 3D',
+    title: 'Ping Pong',
     route: '/game10pingpong',
     icon: '/images/pingpong-mascot.svg',
     tag: 'Speed Tracking',
@@ -112,7 +112,7 @@ export const GAMES_CONFIG = [
   {
     id: 'Maze',
     aliases: ['maze', 'game5maze'],
-    title: 'Labyrinth Search',
+    title: 'Maze',
     route: '/game5maze',
     icon: '/images/maze-mascot.svg',
     tag: 'Spatial Search',
@@ -127,7 +127,7 @@ export const GAMES_CONFIG = [
   {
     id: 'Ball Catcher',
     aliases: ['ball catcher', 'ballcatcher', 'game3ballcatcher'],
-    title: 'Target Catcher',
+    title: 'Ball Catcher',
     route: '/game3ballcatcher',
     icon: '/images/ballcatcher-mascot.svg',
     tag: 'Hand-Eye Sync',
@@ -142,7 +142,7 @@ export const GAMES_CONFIG = [
   {
     id: 'Bouncing Ball',
     aliases: ['bouncing ball', 'bouncingball', 'game7test'],
-    title: 'Rebound Ball',
+    title: 'Bouncing Ball',
     route: '/game7test',
     icon: '/images/bouncingball-mascot.svg',
     tag: 'Trajectory Tracking',
@@ -189,3 +189,4 @@ export function getAllGames() {
 }
 
 export default GAMES_CONFIG;
+

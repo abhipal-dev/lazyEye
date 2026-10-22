@@ -19,7 +19,7 @@ export default class Home extends React.Component {
         const allGames = [
             { 
                 id: 'tetris',
-                name: 'Block Fusion (Tetris)', 
+                name: 'Tetris', 
                 category: 'spatial',
                 icon: '/images/tetris-mascot.svg', 
                 tag: 'Spatial Fusion', 
@@ -29,7 +29,7 @@ export default class Home extends React.Component {
             },
             { 
                 id: 'snake',
-                name: 'Dichoptic Snake', 
+                name: 'Snake', 
                 category: 'tracking',
                 icon: '/images/snake-mascot.svg', 
                 tag: 'Pursuit Tracking', 
@@ -39,7 +39,7 @@ export default class Home extends React.Component {
             },
             { 
                 id: 'flappy',
-                name: 'Altitude Flight', 
+                name: 'Flappy Bird', 
                 category: 'tracking',
                 icon: '/images/flappy-mascot.svg', 
                 tag: 'Visual Timing', 
@@ -49,7 +49,7 @@ export default class Home extends React.Component {
             },
             { 
                 id: 'pingpong',
-                name: 'Table Rally 3D', 
+                name: 'Ping Pong', 
                 category: 'tracking',
                 icon: '/images/pingpong-mascot.svg', 
                 tag: 'Depth Perception', 
@@ -59,7 +59,7 @@ export default class Home extends React.Component {
             },
             { 
                 id: 'bubble',
-                name: 'Bubble Target Aim', 
+                name: 'Bubble Shooter', 
                 category: 'fixation',
                 icon: '/images/bubbles-mascot.svg', 
                 tag: 'Foveal Fixation', 
@@ -69,11 +69,11 @@ export default class Home extends React.Component {
             },
             { 
                 id: 'climber',
-                name: 'Climber Holds', 
+                name: 'Sticky Holds', 
                 category: 'spatial',
                 icon: '/images/stickyholds-mascot.svg', 
                 tag: 'Motor Coordination', 
-                desc: 'Hand-eye coordination targets across climbing holds, exercising spatial judgment and motor response.',
+                desc: 'Hold down to stretch out a bridge stick across pillars to advance the hero safely to the next platform.',
                 target: 'Hand-Eye Precision',
                 input: 'Keyboard / Touch'
             }

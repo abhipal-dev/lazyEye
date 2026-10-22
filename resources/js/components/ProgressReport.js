@@ -98,7 +98,7 @@ export default class ProgressReport extends React.Component {
     Object.keys(gameFrequency).forEach(g => {
       if (gameFrequency[g] > topCount) {
         topCount = gameFrequency[g];
-        topGame = g;
+        topGame = getGameConfig(g)?.title || g;
       }
     });
 

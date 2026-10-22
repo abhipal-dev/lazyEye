@@ -112,16 +112,16 @@ export default class Dashboard extends React.Component {
 
         // Game standardized name mapping
         const GAME_DISPLAY_NAMES = {
-            'Snake': 'Dichoptic Snake',
-            'Flappy Bird': 'Altitude Flight',
-            'Sticky Holds': 'Climber Holds',
-            'Menja': '3D Spatial Slicer',
-            'Tetris': 'Block Fusion',
-            'Bubble Shooter': 'Bubble Target Aim',
-            'Ping Pong': 'Table Rally 3D',
-            'Maze': 'Labyrinth Search',
-            'Ball Catcher': 'Target Catcher',
-            'Bouncing Ball': 'Rebound Ball'
+            'Snake': 'Snake',
+            'Flappy Bird': 'Flappy Bird',
+            'Sticky Holds': 'Sticky Holds',
+            'Menja': 'Menja',
+            'Tetris': 'Tetris',
+            'Bubble Shooter': 'Bubble Shooter',
+            'Ping Pong': 'Ping Pong',
+            'Maze': 'Maze',
+            'Ball Catcher': 'Ball Catcher',
+            'Bouncing Ball': 'Bouncing Ball'
         };
 
         // Game distribution list - strictly sorted descending by plays
