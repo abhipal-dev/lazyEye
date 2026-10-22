@@ -73,7 +73,7 @@ export default class UserDetailsModal extends React.Component {
                                         <div className="card-body p-2 d-flex flex-column align-items-center text-center">
                                             <div className="position-relative mb-3">
                                                 <img 
-                                                    src={(data.image_address) ? `/storage/images/${data.image_address}` : '/images/lazyeye-icon.svg'} 
+                                                    src={(data.image_address) ? encodeURI(`/storage/images/${data.image_address}`) : '/images/lazyeye-icon.svg'} 
                                                     alt="Avatar" 
                                                     className="rounded-circle border p-1 shadow-sm" 
                                                     width="120" 

@@ -299,8 +299,17 @@ export default class UserDashboard extends React.Component {
                         <ul className="navbar-nav">
                             <li className="nav-item dropdown">
                                 <a className="nav-link dropdown-toggle d-flex align-items-center gap-2 px-2 py-1" id="navbarDropdown" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">
-                                    <div className="rounded-circle text-main d-flex align-items-center justify-content-center fw-bold border" style={{ width: 32, height: 32, minWidth: 32, backgroundColor: 'var(--bg-surface-secondary)', borderColor: 'var(--border-color)', fontSize: '0.85rem' }}>
-                                        {(this.state.fullname ? this.state.fullname.charAt(0) : 'P').toUpperCase()}
+                                    <div className="rounded-circle text-main d-flex align-items-center justify-content-center fw-bold border position-relative overflow-hidden" style={{ width: 34, height: 34, minWidth: 34, backgroundColor: 'var(--bg-surface-secondary)', borderColor: 'var(--border-color)', fontSize: '0.85rem' }}>
+                                        <span>{(this.state.fullname ? this.state.fullname.charAt(0) : 'P').toUpperCase()}</span>
+                                        {this.state.userProfileImage && !this.state.userProfileImage.includes('default') && (
+                                            <img 
+                                                src={encodeURI(`/${this.state.userProfileImage}`)} 
+                                                alt="" 
+                                                className="position-absolute top-0 start-0 w-100 h-100 rounded-circle" 
+                                                style={{ objectFit: 'cover' }} 
+                                                onError={(e) => { e.currentTarget.style.display = 'none'; }}
+                                            />
+                                        )}
                                     </div>
                                     <div className="d-none d-md-flex flex-column text-start me-1 lh-sm">
                                         <span className="fw-semibold text-main" style={{ fontSize: '0.86rem' }}>{this.state.fullname || 'Patient'}</span>
@@ -310,8 +319,17 @@ export default class UserDashboard extends React.Component {
                                 <ul className="dropdown-menu dropdown-menu-end shadow" aria-labelledby="navbarDropdown">
                                     <li className="user-dropdown-header">
                                         <div className="d-flex align-items-center gap-2">
-                                            <div className="rounded-circle text-main d-flex align-items-center justify-content-center fw-bold border" style={{ width: 40, height: 40, minWidth: 40, backgroundColor: 'var(--bg-surface-secondary)', borderColor: 'var(--border-color)', fontSize: '0.95rem' }}>
-                                                {(this.state.fullname ? this.state.fullname.charAt(0) : 'P').toUpperCase()}
+                                            <div className="rounded-circle text-main d-flex align-items-center justify-content-center fw-bold border position-relative overflow-hidden" style={{ width: 40, height: 40, minWidth: 40, backgroundColor: 'var(--bg-surface-secondary)', borderColor: 'var(--border-color)', fontSize: '0.95rem' }}>
+                                                <span>{(this.state.fullname ? this.state.fullname.charAt(0) : 'P').toUpperCase()}</span>
+                                                {this.state.userProfileImage && !this.state.userProfileImage.includes('default') && (
+                                                    <img 
+                                                        src={encodeURI(`/${this.state.userProfileImage}`)} 
+                                                        alt="" 
+                                                        className="position-absolute top-0 start-0 w-100 h-100 rounded-circle" 
+                                                        style={{ objectFit: 'cover' }} 
+                                                        onError={(e) => { e.currentTarget.style.display = 'none'; }}
+                                                    />
+                                                )}
                                             </div>
                                             <div className="text-truncate">
                                                 <strong className="d-block text-main text-truncate" style={{ fontSize: '0.92rem' }}>{this.state.fullname || 'Patient'}</strong>

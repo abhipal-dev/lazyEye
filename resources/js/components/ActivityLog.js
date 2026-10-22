@@ -77,6 +77,12 @@ export default class ActivityLog extends React.Component {
     const today = new Date();
     const formattedMap = this.parseRecordsObject();
     const activeDates = Object.keys(formattedMap);
+    // Sort chronologically to always pick the true latest session date
+    activeDates.sort((a, b) => {
+      const mA = moment(a, 'DD/MM/YYYY').valueOf();
+      const mB = moment(b, 'DD/MM/YYYY').valueOf();
+      return mA - mB;
+    });
 
     // If no date selected yet, default to most recent activity date if present
     const currentSelectedDate = this.state.selectedDate || (activeDates.length > 0 ? activeDates[activeDates.length - 1] : moment().format('DD/MM/YYYY'));

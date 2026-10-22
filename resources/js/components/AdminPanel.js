@@ -130,7 +130,7 @@ export default class AdminDashboard extends React.Component {
                                         <span>{(this.state.fullname ? this.state.fullname.charAt(0) : (isDoctor ? 'D' : 'A')).toUpperCase()}</span>
                                         {this.state.userProfileImage && !this.state.userProfileImage.includes('default') && (
                                             <img 
-                                                src={`/${this.state.userProfileImage}`} 
+                                                src={encodeURI(`/${this.state.userProfileImage}`)} 
                                                 alt="" 
                                                 className="position-absolute top-0 start-0 w-100 h-100 rounded-circle" 
                                                 style={{ objectFit: 'cover' }} 
@@ -146,8 +146,17 @@ export default class AdminDashboard extends React.Component {
                                 <ul className="dropdown-menu dropdown-menu-end shadow" aria-labelledby="navbarDropdown">
                                     <li className="user-dropdown-header">
                                         <div className="d-flex align-items-center gap-2">
-                                            <div className="rounded-circle text-main d-flex align-items-center justify-content-center fw-bold border" style={{ width: 40, height: 40, minWidth: 40, backgroundColor: 'var(--bg-surface-secondary)', borderColor: 'var(--border-color)', fontSize: '0.95rem' }}>
-                                                {(this.state.fullname ? this.state.fullname.charAt(0) : 'A').toUpperCase()}
+                                            <div className="rounded-circle text-main d-flex align-items-center justify-content-center fw-bold border position-relative overflow-hidden" style={{ width: 40, height: 40, minWidth: 40, backgroundColor: 'var(--bg-surface-secondary)', borderColor: 'var(--border-color)', fontSize: '0.95rem' }}>
+                                                <span>{(this.state.fullname ? this.state.fullname.charAt(0) : 'A').toUpperCase()}</span>
+                                                {this.state.userProfileImage && !this.state.userProfileImage.includes('default') && (
+                                                    <img 
+                                                        src={encodeURI(`/${this.state.userProfileImage}`)} 
+                                                        alt="" 
+                                                        className="position-absolute top-0 start-0 w-100 h-100 rounded-circle" 
+                                                        style={{ objectFit: 'cover' }} 
+                                                        onError={(e) => { e.currentTarget.style.display = 'none'; }}
+                                                    />
+                                                )}
                                             </div>
                                             <div className="text-truncate">
                                                 <strong className="d-block text-main text-truncate" style={{ fontSize: '0.92rem' }}>{this.state.fullname || 'Administrator'}</strong>

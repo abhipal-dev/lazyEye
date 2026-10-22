@@ -65,51 +65,112 @@ export default class ProgressReport extends React.Component {
   }
 
   printReport = (data) => {
-    $('tbody').text('')
+    const $tbody = $('#datatablesSimple tbody');
+    $tbody.empty();
+    $('#report-summary-cards').empty();
+
     let dates = Object.keys(data || {});
     let totalSessionsFound = 0;
+    let totalScoreSum = 0;
+    let scoreCount = 0;
+    let gameFrequency = {};
+
     dates.forEach(d => {
-      if (data[d] && Object.keys(data[d]).length > 0) totalSessionsFound++;
+      const dayGames = data[d] || {};
+      const gameKeys = Object.keys(dayGames);
+      if (gameKeys.length > 0) {
+        totalSessionsFound++;
+        gameKeys.forEach(g => {
+          const s = +dayGames[g];
+          if (!isNaN(s) && s > 0) {
+            totalScoreSum += s;
+            scoreCount++;
+            gameFrequency[g] = (gameFrequency[g] || 0) + 1;
+          }
+        });
+      }
     });
 
     if (totalSessionsFound === 0) {
-      $('tbody').append(`
+      $tbody.append(`
         <tr>
           <td colspan="3" class="text-center py-5 text-muted">
             <i class="fa-solid fa-file-circle-question fa-3x mb-3 text-secondary opacity-50 d-block"></i>
             <h5 class="fw-semibold text-main mb-1">No Therapy Records in Selected Period</h5>
-            <small class="text-sub">Select another date range or play therapy games to generate progress metrics.</small>
+            <small class="text-sub">Select another date range or launch a therapy game to generate progress metrics.</small>
           </td>
         </tr>
       `);
       return;
     }
 
+    // Determine top game
+    let topGame = 'N/A';
+    let topCount = 0;
+    Object.keys(gameFrequency).forEach(g => {
+      if (gameFrequency[g] > topCount) {
+        topCount = gameFrequency[g];
+        topGame = g;
+      }
+    });
+
+    const avgScore = scoreCount > 0 ? Math.round(totalScoreSum / scoreCount) : 0;
+
+    // Render summary KPI cards
+    $('#report-summary-cards').html(`
+      <div class="row g-3 mb-4">
+        <div class="col-6 col-md-3">
+          <div class="p-3 rounded-3 border" style="background-color: var(--bg-card); border-color: var(--border-color);">
+            <div class="text-sub small font-mono text-uppercase">Active Periods</div>
+            <div class="h3 fw-bold text-main mb-0 font-mono">${totalSessionsFound}</div>
+          </div>
+        </div>
+        <div class="col-6 col-md-3">
+          <div class="p-3 rounded-3 border" style="background-color: var(--bg-card); border-color: var(--border-color);">
+            <div class="text-sub small font-mono text-uppercase">Total Games</div>
+            <div class="h3 fw-bold text-main mb-0 font-mono">${scoreCount}</div>
+          </div>
+        </div>
+        <div class="col-6 col-md-3">
+          <div class="p-3 rounded-3 border" style="background-color: var(--bg-card); border-color: var(--border-color);">
+            <div class="text-sub small font-mono text-uppercase">Avg Score</div>
+            <div class="h3 fw-bold text-main mb-0 font-mono">${avgScore} <small class="fs-6 fw-normal text-muted">pts</small></div>
+          </div>
+        </div>
+        <div class="col-6 col-md-3">
+          <div class="p-3 rounded-3 border" style="background-color: var(--bg-card); border-color: var(--border-color);">
+            <div class="text-sub small font-mono text-uppercase">Top Modality</div>
+            <div class="h4 fw-bold text-main mb-0 text-truncate font-mono">${topGame}</div>
+          </div>
+        </div>
+      </div>
+    `);
+
     for (let i = 0; i < dates.length; i++) {
       let game_data = Object.keys(data[dates[i]] || {});
-      if (!game_data.length) continue; // Skip empty days to keep the report clean and readable
+      if (!game_data.length) continue; // Skip empty periods
 
-      $('tbody').append(`
-        <tr class="table-light">
-          <td colspan="3" class="py-2 px-3 fw-bold text-main font-mono">
-            <i className="fa-solid fa-calendar-day me-2"></i>${dates[i]}
+      $tbody.append(`
+        <tr style="background-color: var(--bg-surface-secondary);">
+          <td colspan="3" class="py-2 px-3 fw-bold text-main font-mono small border-bottom" style="border-color: var(--border-color);">
+            <i class="fa-solid fa-calendar-check text-primary me-2"></i>Period: ${dates[i]}
           </td>
         </tr>
       `);
       for (let j = 0; j < game_data.length; j++) {
         let game_icon = this.findGameIconAddress(game_data[j]);
-        let score = data[dates[i]][game_data[j]];
-        $('tbody').append(`
+        let score = Math.round(+data[dates[i]][game_data[j]]);
+        $tbody.append(`
           <tr>
-            <td style="width: 70px;">
-              <img src="${game_icon}" style="width: 2rem; height: 2rem; object-fit: contain;">
+            <td style="width: 60px;">
+              <img src="${game_icon}" style="width: 2.2rem; height: 2.2rem; object-fit: contain;">
             </td>
             <td>
               <strong class="text-main">${game_data[j]}</strong>
-              <small class="d-block text-muted">Vision Therapy Exercise</small>
+              <small class="d-block text-muted">Dichoptic Amblyopia Therapy</small>
             </td>
-            <td>
-              <span class="badge border font-mono small px-3 py-1 fw-bold" style="background-color: var(--bg-surface-secondary); border-color: var(--border-color); color: var(--text-main); font-size: 0.86rem;">${score} pts</span>
+            <td class="text-end">
+              <span class="badge border font-mono px-3 py-1 fw-bold" style="background-color: var(--bg-surface-secondary); border-color: var(--border-color); color: var(--text-main); font-size: 0.88rem;">${score} pts</span>
             </td>
           </tr>
         `);
@@ -120,30 +181,25 @@ export default class ProgressReport extends React.Component {
   daily_report = (temp_date) => {
     let data = this.parseRecordsData();
     let startDate = this.getTimestamp(moment(temp_date[0]).format(this.props.date_format));
-    let endDate = this.getTimestamp(moment(temp_date[1]).format(this.props.date_format));
-    let dates = Object.keys(data)
-    console.log(endDate)
-    console.log(startDate)
+    let endDate = this.getTimestamp(moment(temp_date[1]).format(this.props.date_format)) + 86399999;
+    let dates = Object.keys(data);
     let start_temp_timestamp = startDate;
-    let daily_data = {}
-    let game_played_data = []
-    let start_temp_date = ''
+    let daily_data = {};
+    let start_temp_date = '';
     while (start_temp_timestamp <= endDate) {
-
-      start_temp_date = this.getDateFromTimestamp(start_temp_timestamp)
-      daily_data[`${start_temp_date}`] = {}
+      start_temp_date = this.getDateFromTimestamp(start_temp_timestamp);
+      daily_data[`${start_temp_date}`] = {};
       for (let i = 0; i < dates.length; i++) {
-        if (this.getDateFromTimestamp(+dates[i]) === this.getDateFromTimestamp(start_temp_timestamp)) {
-          game_played_data = Object.keys(data[dates[i]])
-          let score = 0
+        const ts = +dates[i];
+        if (this.getDateFromTimestamp(ts) === this.getDateFromTimestamp(start_temp_timestamp)) {
+          let game_played_data = Object.keys(data[dates[i]]);
           for (let j = 0; j < game_played_data.length; j++) {
-            score = +data[dates[i]][game_played_data[j]]
-            if (score != undefined && score != null) {
+            let score = +data[dates[i]][game_played_data[j]];
+            if (score !== undefined && score !== null && !isNaN(score)) {
               if (daily_data[`${start_temp_date}`].hasOwnProperty(game_played_data[j])) {
-                daily_data[`${start_temp_date}`][game_played_data[j]] = (score + (+daily_data[`${start_temp_date}`][game_played_data[j]])) / 2
-              }
-              else {
-                daily_data[`${start_temp_date}`][game_played_data[j]] = score
+                daily_data[`${start_temp_date}`][game_played_data[j]] = (score + (+daily_data[`${start_temp_date}`][game_played_data[j]])) / 2;
+              } else {
+                daily_data[`${start_temp_date}`][game_played_data[j]] = score;
               }
             }
           }
@@ -152,97 +208,46 @@ export default class ProgressReport extends React.Component {
       start_temp_timestamp = start_temp_timestamp + 24 * 60 * 60 * 1000;
     }
 
-    $('div#log').text('')
-    $('div#log').html(`<h3 class="mt-4">Progress Report from ${this.getDateFromTimestamp(startDate)} To ${this.getDateFromTimestamp(endDate)}</h3><hr/>`)
+    $('div#log').html(`
+      <div class="d-flex align-items-center justify-content-between flex-wrap gap-2 mb-3 mt-4">
+        <h4 class="fw-bold text-main mb-0">Daily Clinical Progress: ${this.getDateFromTimestamp(startDate)} &ndash; ${this.getDateFromTimestamp(endDate)}</h4>
+        <span class="badge border font-mono px-3 py-1" style="background-color: var(--bg-surface-secondary); color: var(--text-main);">Daily Resolution</span>
+      </div>
+    `);
     this.printReport(daily_data);
   }
-
-
-  // monthly_report = (temp_date) => {
-  //   let data = {}
-  //   if (this.props.data)
-  //     data = JSON.parse(this.props.data)
-  //   let startDate = this.getTimestamp(moment(temp_date[0]).format(this.props.date_format));
-  //   let endDate = this.getTimestamp(moment(temp_date[1]).format(this.props.date_format));
-  //   let dates = Object.keys(data)
-  //   console.log(endDate)
-  //   console.log(startDate)
-  //   let start_temp_timestamp = startDate;
-  //   let end_temp_timestamp = this.getTimestamp(moment(this.getDateFromTimestamp(start_temp_timestamp), this.props.date_format).add(1, 'months'));
-  //   let monthly_data = {}
-  //   let month_game_data = {}
-  //   let game_played_data = []
-  //   let start_temp_date = ''
-  //   let end_temp_date = ''
-  //   while (start_temp_timestamp <= endDate) {
-
-  //     if (end_temp_timestamp > endDate)
-  //       end_temp_timestamp = endDate;
-  //     start_temp_date = this.getDateFromTimestamp(start_temp_timestamp)
-  //     end_temp_date = this.getDateFromTimestamp(end_temp_timestamp)
-  //     monthly_data[`${start_temp_date}-${end_temp_date}`] = {}
-  //     for (let i = 0; i < dates.length; i++) {
-  //       month_game_data = {}
-  //       if (dates[i] >= start_temp_timestamp && dates[i] <= end_temp_timestamp) {
-  //         game_played_data = Object.keys(data[dates[i]])
-  //         let score = 0
-  //         for (let j = 0; j < game_played_data.length; j++) {
-  //           score = +data[dates[i]][game_played_data[j]]
-  //           if (score != undefined && score != null) {
-  //             if (monthly_data[`${start_temp_date}-${end_temp_date}`].hasOwnProperty(game_played_data[j])) {
-  //               monthly_data[`${start_temp_date}-${end_temp_date}`][game_played_data[j]] = (score + (+monthly_data[`${start_temp_date}-${end_temp_date}`][game_played_data[j]])) / 2
-  //             }
-  //             else {
-  //               monthly_data[`${start_temp_date}-${end_temp_date}`][game_played_data[j]] = score
-  //             }
-  //           }
-  //         }
-  //       }
-  //     }
-  //     start_temp_timestamp = this.getTimestamp(moment(this.getDateFromTimestamp(end_temp_timestamp), this.props.date_format).add(1, 'days'));
-  //     end_temp_timestamp = this.getTimestamp(moment(this.getDateFromTimestamp(start_temp_timestamp), this.props.date_format).add(1, 'months'));
-
-  //   }
-
-  //   $('div#log').text('')
-  //   $('div#log').html(`<h3 class="mt-4">Progress Report from ${this.getDateFromTimestamp(startDate)} To ${this.getDateFromTimestamp(endDate)}</h3><hr/>`)
-  //   this.printReport(monthly_data)
-  // }
 
   weekly_report = (temp_date) => {
     let data = this.parseRecordsData();
     let startDate = this.getTimestamp(moment(temp_date[0]).format(this.props.date_format));
-    let endDate = this.getTimestamp(moment(temp_date[1]).format(this.props.date_format))+86399999;
-    let dates = Object.keys(data)
-    console.log(endDate)
-    console.log(startDate)
+    let endDate = this.getTimestamp(moment(temp_date[1]).format(this.props.date_format)) + 86399999;
+    let dates = Object.keys(data);
     let start_temp_timestamp = startDate;
     let end_temp_timestamp = start_temp_timestamp + 6 * 24 * 60 * 60 * 1000;
-    let weekly_data = {}
-    let week_game_data = {}
-    let game_played_data = []
-    let start_temp_date = ''
-    let end_temp_date = ''
-    while (start_temp_timestamp <= endDate) {
+    let weekly_data = {};
+    let start_temp_date = '';
+    let end_temp_date = '';
 
-      if (end_temp_timestamp > endDate)
+    while (start_temp_timestamp <= endDate) {
+      if (end_temp_timestamp > endDate) {
         end_temp_timestamp = endDate;
-      start_temp_date = this.getDateFromTimestamp(start_temp_timestamp)
-      end_temp_date = this.getDateFromTimestamp(end_temp_timestamp)
-      weekly_data[`${start_temp_date}-${end_temp_date}`] = {}
+      }
+      start_temp_date = this.getDateFromTimestamp(start_temp_timestamp);
+      end_temp_date = this.getDateFromTimestamp(end_temp_timestamp);
+      weekly_data[`${start_temp_date} &ndash; ${end_temp_date}`] = {};
+
       for (let i = 0; i < dates.length; i++) {
-        week_game_data = {}
-        if (dates[i] >= start_temp_timestamp && dates[i] <= end_temp_timestamp) {
-          game_played_data = Object.keys(data[dates[i]])
-          let score = 0
+        const ts = +dates[i];
+        if (ts >= start_temp_timestamp && ts <= end_temp_timestamp) {
+          let game_played_data = Object.keys(data[dates[i]]);
           for (let j = 0; j < game_played_data.length; j++) {
-            score = +data[dates[i]][game_played_data[j]]
-            if (score != undefined && score != null) {
-              if (weekly_data[`${start_temp_date}-${end_temp_date}`].hasOwnProperty(game_played_data[j])) {
-                weekly_data[`${start_temp_date}-${end_temp_date}`][game_played_data[j]] = (score + (+weekly_data[`${start_temp_date}-${end_temp_date}`][game_played_data[j]])) / 2
-              }
-              else {
-                weekly_data[`${start_temp_date}-${end_temp_date}`][game_played_data[j]] = score
+            let score = +data[dates[i]][game_played_data[j]];
+            if (score !== undefined && score !== null && !isNaN(score)) {
+              const weekKey = `${start_temp_date} &ndash; ${end_temp_date}`;
+              if (weekly_data[weekKey].hasOwnProperty(game_played_data[j])) {
+                weekly_data[weekKey][game_played_data[j]] = (score + (+weekly_data[weekKey][game_played_data[j]])) / 2;
+              } else {
+                weekly_data[weekKey][game_played_data[j]] = score;
               }
             }
           }
@@ -251,45 +256,47 @@ export default class ProgressReport extends React.Component {
       start_temp_timestamp = end_temp_timestamp + 24 * 60 * 60 * 1000;
       end_temp_timestamp = end_temp_timestamp + 7 * 24 * 60 * 60 * 1000;
     }
-    $('div#log').text('')
-    $('div#log').html(`<h3 class="mt-4">Progress Report from ${this.getDateFromTimestamp(startDate)} To ${this.getDateFromTimestamp(endDate)}</h3><hr/>`)
-    this.printReport(weekly_data)
+
+    $('div#log').html(`
+      <div class="d-flex align-items-center justify-content-between flex-wrap gap-2 mb-3 mt-4">
+        <h4 class="fw-bold text-main mb-0">Weekly Rollup: ${this.getDateFromTimestamp(startDate)} &ndash; ${this.getDateFromTimestamp(endDate)}</h4>
+        <span class="badge border font-mono px-3 py-1" style="background-color: var(--bg-surface-secondary); color: var(--text-main);">7-Day Cohort</span>
+      </div>
+    `);
+    this.printReport(weekly_data);
   }
 
   monthly_report = (temp_date) => {
     let data = this.parseRecordsData();
     let startDate = this.getTimestamp(moment(temp_date[0]).format(this.props.date_format));
-    let endDate = this.getTimestamp(moment(temp_date[1]).format(this.props.date_format))+86399999;
-    let dates = Object.keys(data)
-    console.log(endDate)
-    console.log(startDate)
+    let endDate = this.getTimestamp(moment(temp_date[1]).format(this.props.date_format)) + 86399999;
+    let dates = Object.keys(data);
     let start_temp_timestamp = startDate;
     let end_temp_timestamp = this.getTimestamp(moment(this.getDateFromTimestamp(start_temp_timestamp), this.props.date_format).add(1, 'months'));
-    let monthly_data = {}
-    let month_game_data = {}
-    let game_played_data = []
-    let start_temp_date = ''
-    let end_temp_date = ''
-    while (start_temp_timestamp < endDate) {
+    let monthly_data = {};
+    let start_temp_date = '';
+    let end_temp_date = '';
 
-      if (end_temp_timestamp > endDate)
+    while (start_temp_timestamp < endDate) {
+      if (end_temp_timestamp > endDate) {
         end_temp_timestamp = endDate;
-      start_temp_date = this.getDateFromTimestamp(start_temp_timestamp)
-      end_temp_date = this.getDateFromTimestamp(end_temp_timestamp)
-      monthly_data[`${start_temp_date}-${end_temp_date}`] = {}
+      }
+      start_temp_date = this.getDateFromTimestamp(start_temp_timestamp);
+      end_temp_date = this.getDateFromTimestamp(end_temp_timestamp);
+      const monthKey = `${start_temp_date} &ndash; ${end_temp_date}`;
+      monthly_data[monthKey] = {};
+
       for (let i = 0; i < dates.length; i++) {
-        month_game_data = {}
-        if (dates[i] >= start_temp_timestamp && dates[i] <= end_temp_timestamp) {
-          game_played_data = Object.keys(data[dates[i]])
-          let score = 0
+        const ts = +dates[i];
+        if (ts >= start_temp_timestamp && ts <= end_temp_timestamp) {
+          let game_played_data = Object.keys(data[dates[i]]);
           for (let j = 0; j < game_played_data.length; j++) {
-            score = +data[dates[i]][game_played_data[j]]
-            if (score != undefined && score != null) {
-              if (monthly_data[`${start_temp_date}-${end_temp_date}`].hasOwnProperty(game_played_data[j])) {
-                monthly_data[`${start_temp_date}-${end_temp_date}`][game_played_data[j]] = (score + (+monthly_data[`${start_temp_date}-${end_temp_date}`][game_played_data[j]])) / 2
-              }
-              else {
-                monthly_data[`${start_temp_date}-${end_temp_date}`][game_played_data[j]] = score
+            let score = +data[dates[i]][game_played_data[j]];
+            if (score !== undefined && score !== null && !isNaN(score)) {
+              if (monthly_data[monthKey].hasOwnProperty(game_played_data[j])) {
+                monthly_data[monthKey][game_played_data[j]] = (score + (+monthly_data[monthKey][game_played_data[j]])) / 2;
+              } else {
+                monthly_data[monthKey][game_played_data[j]] = score;
               }
             }
           }
@@ -297,69 +304,102 @@ export default class ProgressReport extends React.Component {
       }
       start_temp_timestamp = this.getTimestamp(moment(this.getDateFromTimestamp(end_temp_timestamp), this.props.date_format).add(1, 'days'));
       end_temp_timestamp = this.getTimestamp(moment(this.getDateFromTimestamp(start_temp_timestamp), this.props.date_format).add(1, 'months'));
-
     }
-    $('div#log').text('')
-    $('div#log').html(`<h3 class="mt-4">Progress Report from ${this.getDateFromTimestamp(startDate)} To ${this.getDateFromTimestamp(endDate)}</h3><hr/>`)
-    this.printReport(monthly_data)
-  }
 
+    $('div#log').html(`
+      <div class="d-flex align-items-center justify-content-between flex-wrap gap-2 mb-3 mt-4">
+        <h4 class="fw-bold text-main mb-0">Monthly Rollup: ${this.getDateFromTimestamp(startDate)} &ndash; ${this.getDateFromTimestamp(endDate)}</h4>
+        <span class="badge border font-mono px-3 py-1" style="background-color: var(--bg-surface-secondary); color: var(--text-main);">Monthly Cohort</span>
+      </div>
+    `);
+    this.printReport(monthly_data);
+  }
 
   getCurrentDateRecord = (temp_date) => {
-    let report_timeperiod_type = $('select#report_timeperiod_type').val()
-    let timeperiod_type = '', add_timeperiod = 0;
-    console.log("report_timeperiod_type : " + report_timeperiod_type)
-    if (report_timeperiod_type == 'Daily') {
-      this.daily_report(temp_date)
-    } else if (report_timeperiod_type == 'Monthly') {
-      this.monthly_report(temp_date)
+    if (!temp_date || !temp_date[0] || !temp_date[1]) return;
+    this.currentDateRange = temp_date;
+    let report_timeperiod_type = $('select#report_timeperiod_type').val() || 'Weekly';
+    if (report_timeperiod_type === 'Daily') {
+      this.daily_report(temp_date);
+    } else if (report_timeperiod_type === 'Monthly') {
+      this.monthly_report(temp_date);
+    } else {
+      this.weekly_report(temp_date);
     }
-    else {
-      this.weekly_report(temp_date)
-    }
-
   }
-  render() {
 
+  render() {
     return (
-      <div>
-        <h1 className="mt-4">Progress Report</h1>
-        <ol className="breadcrumb mb-4">
-          <li className="breadcrumb-item active">Progress Report</li>
-        </ol>
-        <div className="card border-0 shadow-sm p-4 mb-4" style={{ backgroundColor: 'var(--bg-card)', borderRadius: '10px', border: '1px solid var(--border-color)', maxWidth: '750px' }}>
-          <h5 className="fw-bold mb-3 text-main"><i className="fa-solid fa-chart-line text-main me-2"></i>Filter Date & Period</h5>
+      <div className="py-2">
+        <div className="d-flex align-items-center justify-content-between flex-wrap gap-2 mb-3">
+          <div>
+            <h3 className="fw-bold mb-1 text-main d-flex align-items-center gap-2">
+              <i className="fa-solid fa-chart-line text-primary"></i>
+              Visual Therapy Progress Report
+            </h3>
+            <p className="text-muted small mb-0">
+              Aggregated binocular performance, session frequencies, and score trajectories.
+            </p>
+          </div>
+        </div>
+
+        {/* Filter Card */}
+        <div className="card border-0 shadow-sm p-4 mb-4" style={{ backgroundColor: 'var(--bg-card)', borderRadius: '12px', border: '1px solid var(--border-color)', maxWidth: '850px' }}>
+          <h6 className="fw-bold mb-3 text-main"><i className="fa-solid fa-sliders text-primary me-2"></i>Filter Date & Period Resolution</h6>
           <div className="row g-3 align-items-center">
             <div className="col-12 col-sm-7">
-              <DateRangePicker block onChange={value => this.getCurrentDateRecord(value)} format="dd/MM/yyyy"/>
+              <DateRangePicker 
+                block 
+                onChange={value => this.getCurrentDateRecord(value)} 
+                format="dd/MM/yyyy"
+                placeholder="Select date range"
+              />
             </div>
             <div className="col-12 col-sm-5">
-              <select id='report_timeperiod_type' className="form-select w-100" >
-                <option value="Weekly">Weekly Report</option>
-                <option value="Daily">Daily Report</option>
-                <option value="Monthly">Monthly Report</option>
+              <select 
+                id='report_timeperiod_type' 
+                className="form-select w-100"
+                onChange={() => {
+                  if (this.currentDateRange) {
+                    this.getCurrentDateRecord(this.currentDateRange);
+                  }
+                }}
+              >
+                <option value="Weekly">Weekly Rollup</option>
+                <option value="Daily">Daily Breakdown</option>
+                <option value="Monthly">Monthly Rollup</option>
               </select>
             </div>
           </div>
         </div>
-        <div id='log'></div>
-        <div className="card border-0 shadow-sm mb-4" style={{ backgroundColor: 'var(--bg-card)', borderRadius: '10px', border: '1px solid var(--border-color)', maxWidth: '750px' }}>
-          <div className="card-header bg-transparent border-bottom" style={{ borderColor: 'var(--border-color)' }}>
-            <i className="fas fa-table me-2 text-main"></i><span className="fw-semibold">Progress Metrics</span>
-          </div>
-          <div className="card-body table-responsive">
-            <table id="datatablesSimple" className='table table-hover table-striped mb-0' >
-              <thead className='thead-info'>
 
+        {/* Dynamic Summary Cards Target */}
+        <div id="report-summary-cards" style={{ maxWidth: '850px' }}></div>
+
+        {/* Log Title Target */}
+        <div id='log' style={{ maxWidth: '850px' }}></div>
+
+        {/* Progress Metrics Table */}
+        <div className="card border-0 shadow-sm mb-4" style={{ backgroundColor: 'var(--bg-card)', borderRadius: '12px', border: '1px solid var(--border-color)', maxWidth: '850px' }}>
+          <div className="card-header bg-transparent border-bottom d-flex align-items-center justify-content-between py-3" style={{ borderColor: 'var(--border-color)' }}>
+            <span className="fw-semibold text-main"><i className="fas fa-table me-2 text-primary"></i>Prescribed Therapy Sessions</span>
+            <span className="badge border font-mono small" style={{ backgroundColor: 'var(--bg-surface-secondary)', color: 'var(--text-sub)' }}>Normalized Audit</span>
+          </div>
+          <div className="card-body table-responsive p-0">
+            <table id="datatablesSimple" className='table table-hover mb-0 align-middle' >
+              <thead>
+                <tr className="border-bottom" style={{ borderColor: 'var(--border-color)', backgroundColor: 'var(--bg-surface-secondary)', fontSize: '0.8rem' }}>
+                  <th style={{ width: '60px' }} className="py-2 px-3 text-sub font-mono text-uppercase">Game</th>
+                  <th className="py-2 text-sub font-mono text-uppercase">Exercise Title</th>
+                  <th className="py-2 px-3 text-end text-sub font-mono text-uppercase">Clinical Score</th>
+                </tr>
               </thead>
               <tbody>
-
               </tbody>
             </table>
           </div>
         </div>
       </div>
-
-    )
+    );
   }
 }

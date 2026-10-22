@@ -61,7 +61,7 @@ export default class Table extends React.Component{
                                         else if (window.switchToAdminTable) window.switchToAdminTable('fetchUsers');
                                     }}
                                 >
-                                    <i className="fa-solid fa-users me-1 text-main"></i>{isDoctor ? 'My Patients' : 'Patients'}
+                                    <i className="fa-solid fa-users me-1"></i>{isDoctor ? 'My Patients' : 'Patients'}
                                 </button>
                                 {!isDoctor && (
                                     <button 
@@ -74,7 +74,7 @@ export default class Table extends React.Component{
                                             else if (window.switchToAdminTable) window.switchToAdminTable('fetchDoctors');
                                         }}
                                     >
-                                        <i className="fa-solid fa-user-doctor me-1 text-main"></i>Doctors
+                                        <i className="fa-solid fa-user-doctor me-1"></i>Doctors
                                     </button>
                                 )}
                                 <button 
@@ -87,7 +87,7 @@ export default class Table extends React.Component{
                                         else if (window.switchToAdminTable) window.switchToAdminTable('fetchConsultations');
                                     }}
                                 >
-                                    <i className="fa-solid fa-stethoscope me-1 text-main"></i>{isDoctor ? 'My Reviews' : 'Clinical Reviews'}
+                                    <i className="fa-solid fa-stethoscope me-1"></i>{isDoctor ? 'My Reviews' : 'Clinical Reviews'}
                                 </button>
                                 {!isDoctor && (
                                     <button 
@@ -100,7 +100,7 @@ export default class Table extends React.Component{
                                             else if (window.switchToAdminTable) window.switchToAdminTable('fetchAdmins');
                                         }}
                                     >
-                                        <i className="fa-solid fa-user-shield me-1 text-main"></i>Admins
+                                        <i className="fa-solid fa-user-shield me-1"></i>Admins
                                     </button>
                                 )}
                                 {!isDoctor && (
@@ -114,7 +114,7 @@ export default class Table extends React.Component{
                                             else if (window.switchToAdminTable) window.switchToAdminTable('fetchRegisters');
                                         }}
                                     >
-                                        <i className="fa-solid fa-user-plus me-1 text-main"></i>Pending
+                                        <i className="fa-solid fa-user-plus me-1"></i>Pending
                                     </button>
                                 )}
                             </div>
