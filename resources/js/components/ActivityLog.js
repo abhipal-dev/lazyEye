@@ -65,7 +65,7 @@ export default class ActivityLog extends React.Component {
 
   handleCellClick = (value, formattedMap) => {
     if (!value || !value.date) return;
-    const dateFormatted = this.convert(value.date);
+    const dateFormatted = moment(value.date).format('DD/MM/YYYY');
     const recordsForDay = formattedMap[dateFormatted] || {};
     this.setState({
       selectedDate: dateFormatted,
@@ -77,24 +77,43 @@ export default class ActivityLog extends React.Component {
     const today = new Date();
     const formattedMap = this.parseRecordsObject();
     const activeDates = Object.keys(formattedMap);
-    // Sort chronologically to always pick the true latest session date
+    
+    // Sort chronologically ascending
     activeDates.sort((a, b) => {
       const mA = moment(a, 'DD/MM/YYYY').valueOf();
       const mB = moment(b, 'DD/MM/YYYY').valueOf();
       return mA - mB;
     });
 
-    // If no date selected yet, default to most recent activity date if present
-    const currentSelectedDate = this.state.selectedDate || (activeDates.length > 0 ? activeDates[activeDates.length - 1] : moment().format('DD/MM/YYYY'));
+    const todayFormatted = moment(today).format('DD/MM/YYYY');
+    const nowMs = moment(today).endOf('day').valueOf();
+    
+    // Filter out future dates from selecting by default
+    const validPastActiveDates = activeDates.filter(d => moment(d, 'DD/MM/YYYY').valueOf() <= nowMs);
+
+    // If no date clicked yet: pick today if active, otherwise the latest valid past session date
+    let currentSelectedDate = this.state.selectedDate;
+    if (!currentSelectedDate) {
+      if (formattedMap[todayFormatted]) {
+        currentSelectedDate = todayFormatted;
+      } else if (validPastActiveDates.length > 0) {
+        currentSelectedDate = validPastActiveDates[validPastActiveDates.length - 1];
+      } else {
+        currentSelectedDate = todayFormatted;
+      }
+    }
+
     const currentRecords = this.state.selectedDate ? this.state.selectedRecords : (formattedMap[currentSelectedDate] || {});
     const sessionKeys = Object.keys(currentRecords);
 
+    // 180 days ending today, formatted as standard YYYY-MM-DD for react-calendar-heatmap
     const heatmapValues = Array.from({ length: 180 }, (_, i) => {
-      const date = this.shiftDate(today, -i);
-      const dateStr = this.convert(date);
-      const dayData = formattedMap[dateStr];
+      const dateObj = this.shiftDate(today, -i);
+      const displayDateStr = moment(dateObj).format('DD/MM/YYYY');
+      const isoDateStr = moment(dateObj).format('YYYY-MM-DD');
+      const dayData = formattedMap[displayDateStr];
       return {
-        date: date,
+        date: isoDateStr,
         count: dayData ? Object.keys(dayData).length : 0
       };
     });
@@ -137,20 +156,22 @@ export default class ActivityLog extends React.Component {
 
           <div className="overflow-auto pb-2" style={{ minHeight: '140px' }}>
             <CalendarHeatmap
-              startDate={this.shiftDate(today, -180)}
-              endDate={today}
+              startDate={moment(this.shiftDate(today, -180)).format('YYYY-MM-DD')}
+              endDate={moment(today).format('YYYY-MM-DD')}
               values={heatmapValues}
               classForValue={value => {
-                if (!value || value.count === 0) return 'color-empty';
+                if (!value || !value.count || value.count === 0) return 'color-empty';
                 if (value.count === 1) return 'color-github-1';
                 if (value.count === 2) return 'color-github-2';
                 if (value.count === 3) return 'color-github-3';
                 return 'color-github-4';
               }}
               tooltipDataAttrs={value => {
+                if (!value || !value.date) return {};
+                const displayD = moment(value.date).format('DD/MM/YYYY');
                 return {
                   'data-tooltip-id': `activity-tooltip`,
-                  'data-tooltip-content': `${this.convert(value.date)}: ${value.count} activity session(s)`,
+                  'data-tooltip-content': `${displayD}: ${value.count || 0} therapy game session(s)`,
                   'data-tooltip-place': 'top',
                 };
               }}

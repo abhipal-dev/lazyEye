@@ -251,18 +251,7 @@ export default class UserDashboard extends React.Component {
                 <p id="score_history" style={{ 'display': "none" }}>{this.state.data.user_game_records}</p>
                 <span id="time" style={{ display: "none" }}>{this.state.data?.user_playing_time || 20}</span>
 
-                {/* Admin Mode Floating Banner */}
-                {isAdmin && (
-                    <div className="border-bottom py-2 px-3 d-flex align-items-center justify-content-between flex-wrap gap-2 small shadow-sm position-relative" style={{ zIndex: 1050, backgroundColor: 'var(--btn-primary-bg)', color: 'var(--btn-primary-text)' }}>
-                        <div className="d-flex align-items-center gap-2">
-                            <span className="badge bg-surface-secondary text-main border font-mono small text-uppercase">Admin Simulator</span>
-                            <span>You are currently in <strong>Patient Therapy View</strong> as an Administrator.</span>
-                        </div>
-                        <a href="/admin" className="btn btn-sm btn-secondary px-3 py-1 d-flex align-items-center gap-1">
-                            <i className="fa-solid fa-arrow-left"></i> Return to Admin Panel
-                        </a>
-                    </div>
-                )}
+
 
                 <nav className="sb-topnav navbar navbar-expand dashboard-topbar">
                     {/* <!-- Navbar Brand--> */}
@@ -303,11 +292,19 @@ export default class UserDashboard extends React.Component {
                                         <span>{(this.state.fullname ? this.state.fullname.charAt(0) : 'P').toUpperCase()}</span>
                                         {this.state.userProfileImage && !this.state.userProfileImage.includes('default') && (
                                             <img 
-                                                src={encodeURI(`/${this.state.userProfileImage}`)} 
+                                                src={encodeURI(`/${this.state.userProfileImage}?v=${this.state.id || 4}`)} 
                                                 alt="" 
                                                 className="position-absolute top-0 start-0 w-100 h-100 rounded-circle" 
                                                 style={{ objectFit: 'cover' }} 
-                                                onError={(e) => { e.currentTarget.style.display = 'none'; }}
+                                                onError={(e) => {
+                                                    if (!e.currentTarget.dataset.retried) {
+                                                        e.currentTarget.dataset.retried = '1';
+                                                        const imgName = this.state.data?.image_address || 'user_4_avatar.png';
+                                                        e.currentTarget.src = `/images/${encodeURIComponent(imgName)}`;
+                                                    } else {
+                                                        e.currentTarget.style.display = 'none';
+                                                    }
+                                                }}
                                             />
                                         )}
                                     </div>
@@ -323,11 +320,19 @@ export default class UserDashboard extends React.Component {
                                                 <span>{(this.state.fullname ? this.state.fullname.charAt(0) : 'P').toUpperCase()}</span>
                                                 {this.state.userProfileImage && !this.state.userProfileImage.includes('default') && (
                                                     <img 
-                                                        src={encodeURI(`/${this.state.userProfileImage}`)} 
+                                                        src={encodeURI(`/${this.state.userProfileImage}?v=${this.state.id || 4}`)} 
                                                         alt="" 
                                                         className="position-absolute top-0 start-0 w-100 h-100 rounded-circle" 
                                                         style={{ objectFit: 'cover' }} 
-                                                        onError={(e) => { e.currentTarget.style.display = 'none'; }}
+                                                        onError={(e) => {
+                                                            if (!e.currentTarget.dataset.retried) {
+                                                                e.currentTarget.dataset.retried = '1';
+                                                                const imgName = this.state.data?.image_address || 'user_4_avatar.png';
+                                                                e.currentTarget.src = `/images/${encodeURIComponent(imgName)}`;
+                                                            } else {
+                                                                e.currentTarget.style.display = 'none';
+                                                            }
+                                                        }}
                                                     />
                                                 )}
                                             </div>

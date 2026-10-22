@@ -229,21 +229,19 @@ export default class ProgressReport extends React.Component {
     let end_temp_date = '';
 
     while (start_temp_timestamp <= endDate) {
-      if (end_temp_timestamp > endDate) {
-        end_temp_timestamp = endDate;
-      }
+      let current_end_timestamp = Math.min(start_temp_timestamp + (7 * 86400000) - 1, endDate);
       start_temp_date = this.getDateFromTimestamp(start_temp_timestamp);
-      end_temp_date = this.getDateFromTimestamp(end_temp_timestamp);
-      weekly_data[`${start_temp_date} &ndash; ${end_temp_date}`] = {};
+      end_temp_date = this.getDateFromTimestamp(current_end_timestamp);
+      const weekKey = `${start_temp_date} &ndash; ${end_temp_date}`;
+      weekly_data[weekKey] = {};
 
       for (let i = 0; i < dates.length; i++) {
         const ts = +dates[i];
-        if (ts >= start_temp_timestamp && ts <= end_temp_timestamp) {
+        if (ts >= start_temp_timestamp && ts <= current_end_timestamp) {
           let game_played_data = Object.keys(data[dates[i]]);
           for (let j = 0; j < game_played_data.length; j++) {
             let score = +data[dates[i]][game_played_data[j]];
             if (score !== undefined && score !== null && !isNaN(score)) {
-              const weekKey = `${start_temp_date} &ndash; ${end_temp_date}`;
               if (weekly_data[weekKey].hasOwnProperty(game_played_data[j])) {
                 weekly_data[weekKey][game_played_data[j]] = (score + (+weekly_data[weekKey][game_played_data[j]])) / 2;
               } else {
@@ -253,8 +251,7 @@ export default class ProgressReport extends React.Component {
           }
         }
       }
-      start_temp_timestamp = end_temp_timestamp + 24 * 60 * 60 * 1000;
-      end_temp_timestamp = end_temp_timestamp + 7 * 24 * 60 * 60 * 1000;
+      start_temp_timestamp = current_end_timestamp + 1;
     }
 
     $('div#log').html(`
