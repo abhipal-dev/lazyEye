@@ -6,6 +6,7 @@ import 'react-tooltip/dist/react-tooltip.css';
 import CalendarHeatmap from 'react-calendar-heatmap';
 import { Tooltip as ReactTooltip } from 'react-tooltip';
 import moment from "moment";
+import { getGameIcon, getGameConfig } from '../gameConfig';
 
 export default class ActivityLog extends React.Component {
   constructor(props) {
@@ -15,20 +16,6 @@ export default class ActivityLog extends React.Component {
       selectedRecords: {}
     };
   }
-
-  findGameIconAddress = (game_name) => {
-    if (game_name === 'Snake') return '/images/Snake-icon-1.png';
-    if (game_name === 'Flappy Bird') return '/images/Flappy-Square.png';
-    if (game_name === 'Sticky Holds') return '/images/Sticky-Holds.png';
-    if (game_name === 'Menja') return '/images/Menja-icon.png';
-    if (game_name === 'Tetris') return '/images/Tetris.png';
-    if (game_name === 'Bubble Shooter') return '/images/Bubble.png';
-    if (game_name === 'Ping Pong') return '/images/Ping-Pong.png';
-    if (game_name === 'Maze') return '/images/Maze.png';
-    if (game_name === 'Ball Catcher') return '/images/ballcatcher.jpeg';
-    if (game_name === 'Bouncing Ball') return '/images/bouncing-ball.png';
-    return '/images/lazyeye-icon.svg';
-  };
 
   convert = (dateObj) => {
     if (!dateObj) return '';
@@ -214,16 +201,19 @@ export default class ActivityLog extends React.Component {
                 </thead>
                 <tbody>
                   {sessionKeys.map((gameName, idx) => {
-                    const icon = this.findGameIconAddress(gameName);
+                    const icon = getGameIcon(gameName);
+                    const gameInfo = getGameConfig(gameName);
                     const score = currentRecords[gameName];
+                    const displayTitle = gameInfo ? gameInfo.title : gameName;
+                    const clinicalType = gameInfo ? gameInfo.clinicalType : 'Dichoptic Therapy';
                     return (
                       <tr key={idx}>
                         <td>
-                          <img src={icon} alt="" style={{ width: '30px', height: '30px', objectFit: 'contain' }} />
+                          <img src={icon} alt="" style={{ width: '32px', height: '32px', objectFit: 'contain' }} />
                         </td>
                         <td>
-                          <strong className="text-main">{gameName}</strong>
-                          <small className="d-block text-muted">Binocular Suppression Therapy</small>
+                          <strong className="text-main">{displayTitle}</strong>
+                          <small className="d-block text-muted">{clinicalType}</small>
                         </td>
                         <td>
                           <span className="badge border font-mono small px-3 py-1 fw-bold" style={{ backgroundColor: 'var(--bg-surface-secondary)', borderColor: 'var(--border-color)', color: 'var(--text-main)', fontSize: '0.86rem' }}>

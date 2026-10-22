@@ -1357,16 +1357,18 @@ $(document).on('click', '#layoutSidenav_content', function (e) {
 // ==========================================
 
 function findGameIconAddress(game_name) {
-    if (game_name == 'Snake') return '/images/Snake-icon-1.png';
-    if (game_name == 'Flappy Bird') return '/images/Flappy-Square.png';
-    if (game_name == 'Sticky Holds') return '/images/Sticky-Holds.png';
-    if (game_name == 'Menja') return '/images/Menja-icon.png';
-    if (game_name == 'Tetris') return '/images/Tetris.png';
-    if (game_name == 'Bubble Shooter') return '/images/Bubble.png';
-    if (game_name == 'Ping Pong') return '/images/Ping-Pong.png';
-    if (game_name == 'Maze') return '/images/Maze.png';
-    if (game_name == 'Ball Catcher') return '/images/ballcatcher.jpeg';
-    if (game_name == 'Bouncing Ball') return '/images/bouncing-ball.png';
+    if (!game_name) return '/images/lazyeye-icon.svg';
+    const g = String(game_name).toLowerCase().trim();
+    if (g.includes('snake')) return '/images/snake-mascot.svg';
+    if (g.includes('flappy')) return '/images/flappy-mascot.svg';
+    if (g.includes('sticky') || g.includes('stick')) return '/images/stickyholds-mascot.svg';
+    if (g.includes('menja')) return '/images/menja-mascot.svg';
+    if (g.includes('tetris')) return '/images/tetris-mascot.svg';
+    if (g.includes('bubble')) return '/images/bubbles-mascot.svg';
+    if (g.includes('ping') || g.includes('pong')) return '/images/pingpong-mascot.svg';
+    if (g.includes('maze')) return '/images/maze-mascot.svg';
+    if (g.includes('catcher')) return '/images/ballcatcher-mascot.svg';
+    if (g.includes('bouncing') || g.includes('rebound')) return '/images/bouncingball-mascot.svg';
     return '/images/lazyeye-icon.svg';
 }
 

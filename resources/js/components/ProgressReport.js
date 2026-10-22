@@ -6,6 +6,7 @@ import "rsuite/dist/rsuite.min.css";
 import moment from "moment";
 import Moment from 'react-moment';
 import 'moment-timezone';
+import { getGameIcon, getGameConfig } from '../gameConfig';
 export default class ProgressReport extends React.Component {
   constructor(props) {
     super(props);
@@ -38,19 +39,6 @@ export default class ProgressReport extends React.Component {
     return moment(timestamp).format(this.props.date_format);
   }
 
-  findGameIconAddress(game_name){
-    if (game_name == 'Snake') return '/images/Snake-icon-1.png';
-    if (game_name == 'Flappy Bird') return '/images/Flappy-Square.png';
-    if (game_name == 'Sticky Holds') return '/images/Sticky-Holds.png';
-    if (game_name == 'Menja') return '/images/Menja-icon.png';
-    if (game_name == 'Tetris') return '/images/Tetris.png';
-    if (game_name == 'Bubble Shooter') return '/images/Bubble.png';
-    if (game_name == 'Ping Pong') return '/images/Ping-Pong.png';
-    if (game_name == 'Maze') return '/images/Maze.png';
-    if (game_name == 'Ball Catcher') return '/images/ballcatcher.jpeg';
-    if (game_name == 'Bouncing Ball') return '/images/bouncing-ball.png';
-    return '/images/lazyeye-icon.svg';
-  }
   parseRecordsData = () => {
     let data = {};
     if (this.props.data) {
@@ -158,16 +146,20 @@ export default class ProgressReport extends React.Component {
         </tr>
       `);
       for (let j = 0; j < game_data.length; j++) {
-        let game_icon = this.findGameIconAddress(game_data[j]);
-        let score = Math.round(+data[dates[i]][game_data[j]]);
+        let gameName = game_data[j];
+        let game_icon = getGameIcon(gameName);
+        let gameInfo = getGameConfig(gameName);
+        let displayTitle = gameInfo ? gameInfo.title : gameName;
+        let clinicalType = gameInfo ? gameInfo.clinicalType : 'Dichoptic Therapy';
+        let score = Math.round(+data[dates[i]][gameName]);
         $tbody.append(`
           <tr>
             <td style="width: 60px;">
               <img src="${game_icon}" style="width: 2.2rem; height: 2.2rem; object-fit: contain;">
             </td>
             <td>
-              <strong class="text-main">${game_data[j]}</strong>
-              <small class="d-block text-muted">Dichoptic Amblyopia Therapy</small>
+              <strong class="text-main">${displayTitle}</strong>
+              <small class="d-block text-muted">${clinicalType}</small>
             </td>
             <td class="text-end">
               <span class="badge border font-mono px-3 py-1 fw-bold" style="background-color: var(--bg-surface-secondary); border-color: var(--border-color); color: var(--text-main); font-size: 0.88rem;">${score} pts</span>

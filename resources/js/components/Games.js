@@ -1,6 +1,7 @@
 import React from 'react';
 import ReactDOM from 'react-dom';
 import $ from "jquery";
+import { GAMES_CONFIG } from '../gameConfig';
 
 export default class Games extends React.Component {
     constructor(props) {
@@ -11,231 +12,31 @@ export default class Games extends React.Component {
         };
         this.timer = null;
 
-        this.carouselSlides = [
-            {
-                tag: 'Binocular Fusion',
-                tagIcon: 'fa-eye',
-                title: 'Dichoptic Snake',
-                desc: 'Guide the snake to hunt moving targets. Red and cyan filtering splits the snake and food between eyes, stimulating binocular cortical fusion and reducing amblyopic suppression.',
-                mascot: '/images/snake-mascot.svg',
-                route: '/game1snake',
-                bg: 'linear-gradient(135deg, #064e3b 0%, #047857 50%, #0f766e 100%)',
-                time: '20 mins',
-                gameKey: 'Snake'
-            },
-            {
-                tag: 'Visual Timing',
-                tagIcon: 'fa-plane-departure',
-                title: 'Altitude Flight',
-                desc: 'Navigate altitude obstacles requiring rapid saccadic eye movements. Color separation ensures both eyes coordinate in real time to judge clearances.',
-                mascot: '/images/flappy-mascot.svg',
-                route: '/game2flappybird',
-                bg: 'linear-gradient(135deg, #075985 0%, #0284c7 50%, #0369a1 100%)',
-                time: '15 mins',
-                gameKey: 'Flappy Bird'
-            },
-            {
-                tag: 'Visual Reflexes',
-                tagIcon: 'fa-bolt',
-                title: '3D Spatial Slicer',
-                desc: 'Slice dynamic 3D blocks in rapid succession as they fly toward you. Sharpens reaction velocity, stereoscopic depth judgment, and contrast sensitivity.',
-                mascot: '/images/menja-mascot.svg',
-                route: '/game12menja',
-                bg: 'linear-gradient(135deg, #1e1b4b 0%, #312e81 50%, #1e40af 100%)',
-                time: '20 mins',
-                gameKey: 'Menja'
-            },
-            {
-                tag: 'Pattern Synthesis',
-                tagIcon: 'fa-cubes',
-                title: 'Block Fusion',
-                desc: 'Rotate and place color-filtered falling tetrominoes. Board boundaries and falling shapes are split between eyes, demanding simultaneous cortical vision.',
-                mascot: '/images/tetris-mascot.svg',
-                route: '/game8tetris',
-                bg: 'linear-gradient(135deg, #3b0764 0%, #6b21a8 50%, #7e22ce 100%)',
-                time: '20 mins',
-                gameKey: 'Tetris'
-            },
-            {
-                tag: 'Spatial Targeting',
-                tagIcon: 'fa-bullseye',
-                title: 'Bubble Target Aim',
-                desc: 'Aim and pop matching bubble clusters to stimulate foveal fixation, peripheral vision, and active engagement in the amblyopic eye.',
-                mascot: '/images/bubbles-mascot.svg',
-                route: '/game9bubbleshooter',
-                bg: 'linear-gradient(135deg, #7c2d12 0%, #c2410c 50%, #ea580c 100%)',
-                time: '15 mins',
-                gameKey: 'Bubble Shooter'
-            },
-            {
-                tag: 'Speed Tracking',
-                tagIcon: 'fa-table-tennis-paddle-ball',
-                title: 'Table Rally 3D',
-                desc: 'Defend your table with rapid paddle tracking. High-velocity returns challenge binocular alignment and dynamic stereoscopic motion tracking.',
-                mascot: '/images/pingpong-mascot.svg',
-                route: '/game10pingpong',
-                bg: 'linear-gradient(135deg, #042f2e 0%, #0f766e 50%, #0d9488 100%)',
-                time: '15 mins',
-                gameKey: 'Ping Pong'
-            },
-            {
-                tag: 'Agility Fixation',
-                tagIcon: 'fa-mountain',
-                title: 'Climber Holds',
-                desc: 'Agility challenge demanding sustained visual fixation, depth processing, and bilateral coordination to navigate to the top hold.',
-                mascot: '/images/stickyholds-mascot.svg',
-                route: '/game11stickyholds',
-                bg: 'linear-gradient(135deg, #1e293b 0%, #334155 50%, #475569 100%)',
-                time: '15 mins',
-                gameKey: 'Sticky Holds'
-            },
-            {
-                tag: 'Spatial Search',
-                tagIcon: 'fa-route',
-                title: 'Labyrinth Search',
-                desc: 'Solve intricate labyrinths with split visual cues, boosting visual search efficiency, spatial mapping, and neuro-visual pathway activation.',
-                mascot: '/images/maze.png',
-                route: '/game5maze',
-                bg: 'linear-gradient(135deg, #451a03 0%, #854d0e 50%, #b45309 100%)',
-                time: '15 mins',
-                gameKey: 'Maze'
-            },
-            {
-                tag: 'Hand-Eye Sync',
-                tagIcon: 'fa-bullseye',
-                title: 'Target Catcher',
-                desc: 'Track and catch falling targets across visual fields to improve saccadic eye movements and visual-motor integration.',
-                mascot: '/images/ballcatcher-mascot.svg',
-                route: '/game3ballcatcher',
-                bg: 'linear-gradient(135deg, #4c0519 0%, #9f1239 50%, #e11d48 100%)',
-                time: '15 mins',
-                gameKey: 'Ball Catcher'
-            },
-            {
-                tag: 'Trajectory Tracking',
-                tagIcon: 'fa-arrows-spin',
-                title: 'Rebound Ball',
-                desc: 'Anticipate dynamic rebounds and speed variations under dichoptic viewing to enhance depth perception and tracking agility.',
-                mascot: '/images/bouncingball-mascot.svg',
-                route: '/game7test',
-                bg: 'linear-gradient(135deg, #172554 0%, #1d4ed8 50%, #2563eb 100%)',
-                time: '15 mins',
-                gameKey: 'Bouncing Ball'
-            }
-        ];
+        // Derived directly from the single source of truth: GAMES_CONFIG
+        this.carouselSlides = GAMES_CONFIG.map(g => ({
+            tag: g.tag,
+            tagIcon: g.tagIcon,
+            title: g.title,
+            desc: g.desc,
+            mascot: g.icon,
+            route: g.route,
+            bg: g.bg,
+            time: g.time,
+            gameKey: g.id
+        }));
 
-        this.allGames = [
-            {
-                id: 'Snake',
-                name: 'Dichoptic Snake',
-                route: '/game1snake',
-                badge: 'Binocular Focus',
-                badgeClass: 'badge-emerald',
-                art: '/images/snake-mascot.svg',
-                bannerBg: 'linear-gradient(135deg, rgba(16, 185, 129, 0.16) 0%, rgba(5, 150, 105, 0.28) 100%)',
-                desc: 'Guide the snake to hunt targets. Red-cyan color separation splits the snake and food between eyes, actively training binocular fusion and breaking suppression.',
-                time: '20 mins'
-            },
-            {
-                id: 'FlappyBird',
-                name: 'Altitude Flight',
-                route: '/game2flappybird',
-                badge: 'Depth Perception',
-                badgeClass: 'badge-sky',
-                art: '/images/flappy-mascot.svg',
-                bannerBg: 'linear-gradient(135deg, rgba(14, 165, 233, 0.16) 0%, rgba(2, 132, 199, 0.28) 100%)',
-                desc: 'Navigate flight obstacles with precise timing. Suppressed visual elements encourage both eyes to coordinate simultaneously to judge altitude.',
-                time: '15 mins'
-            },
-            {
-                id: 'Menja',
-                name: '3D Spatial Slicer',
-                route: '/game12menja',
-                badge: 'Spatial Reflex',
-                badgeClass: 'badge-indigo',
-                art: '/images/menja-mascot.svg',
-                bannerBg: 'linear-gradient(135deg, rgba(99, 102, 241, 0.16) 0%, rgba(79, 70, 229, 0.28) 100%)',
-                desc: 'Dynamic 3D block slicing challenge that exercises rapid cortical processing, stereoscopic depth judgment, and contrast sensitivity.',
-                time: '20 mins'
-            },
-            {
-                id: 'Tetris',
-                name: 'Block Fusion',
-                route: '/game8tetris',
-                badge: 'Pattern Synthesis',
-                badgeClass: 'badge-purple',
-                art: '/images/tetris-mascot.svg',
-                bannerBg: 'linear-gradient(135deg, rgba(168, 85, 247, 0.16) 0%, rgba(147, 51, 234, 0.28) 100%)',
-                desc: 'Falling-block puzzle adapted for vision therapy. Color-filtered tetrominoes train spatial orientation, hand-eye coordination, and binocular alignment.',
-                time: '20 mins'
-            },
-            {
-                id: 'BubbleShooter',
-                name: 'Bubble Target Aim',
-                route: '/game9bubbleshooter',
-                badge: 'Foveal Targeting',
-                badgeClass: 'badge-amber',
-                art: '/images/bubbles-mascot.svg',
-                bannerBg: 'linear-gradient(135deg, rgba(249, 115, 22, 0.16) 0%, rgba(234, 88, 12, 0.28) 100%)',
-                desc: 'Aim and match color-separated bubbles to stimulate peripheral stereoscopic vision and promote active visual processing in the amblyopic eye.',
-                time: '15 mins'
-            },
-            {
-                id: 'PingPong',
-                name: 'Table Rally 3D',
-                route: '/game10pingpong',
-                badge: 'Speed Tracking',
-                badgeClass: 'badge-teal',
-                art: '/images/pingpong-mascot.svg',
-                bannerBg: 'linear-gradient(135deg, rgba(20, 184, 166, 0.16) 0%, rgba(13, 148, 136, 0.28) 100%)',
-                desc: 'Rapid dichoptic paddle response game that sharpens reaction velocity, spatial tracking, and dynamic binocular depth judgment.',
-                time: '15 mins'
-            },
-            {
-                id: 'StickyHolds',
-                name: 'Climber Holds',
-                route: '/game11stickyholds',
-                badge: 'Agility Fixation',
-                badgeClass: 'badge-slate',
-                art: '/images/stickyholds-mascot.svg',
-                bannerBg: 'linear-gradient(135deg, rgba(100, 116, 139, 0.16) 0%, rgba(71, 85, 105, 0.28) 100%)',
-                desc: 'Rock climbing agility puzzle demanding sustained visual fixation, depth processing, and bilateral coordination to reach the top hold.',
-                time: '15 mins'
-            },
-            {
-                id: 'Maze',
-                name: 'Labyrinth Search',
-                route: '/game5maze',
-                badge: 'Spatial Search',
-                badgeClass: 'badge-yellow',
-                art: '/images/maze.png',
-                bannerBg: 'linear-gradient(135deg, rgba(234, 179, 8, 0.16) 0%, rgba(202, 138, 4, 0.28) 100%)',
-                desc: 'Solve intricate labyrinths with split visual cues, boosting visual search efficiency, spatial mapping, and neuro-visual pathway activation.',
-                time: '15 mins'
-            },
-            {
-                id: 'BallCatcher',
-                name: 'Target Catcher',
-                route: '/game3ballcatcher',
-                badge: 'Hand-Eye Sync',
-                badgeClass: 'badge-rose',
-                art: '/images/ballcatcher-mascot.svg',
-                bannerBg: 'linear-gradient(135deg, rgba(244, 63, 94, 0.16) 0%, rgba(225, 29, 72, 0.28) 100%)',
-                desc: 'Track and catch falling targets across visual fields to improve saccadic eye movements and visual-motor integration.',
-                time: '15 mins'
-            },
-            {
-                id: 'BouncingBall',
-                name: 'Rebound Ball',
-                route: '/game7test',
-                badge: 'Trajectory Tracking',
-                badgeClass: 'badge-blue',
-                art: '/images/bouncingball-mascot.svg',
-                bannerBg: 'linear-gradient(135deg, rgba(59, 130, 246, 0.16) 0%, rgba(37, 99, 235, 0.28) 100%)',
-                desc: 'Anticipate dynamic rebounds and speed variations under dichoptic viewing to enhance depth perception and tracking agility.',
-                time: '15 mins'
-            }
-        ];
+        this.allGames = GAMES_CONFIG.map(g => ({
+            id: g.id.replace(/\s+/g, ''),
+            name: g.title,
+            route: g.route,
+            badge: g.tag,
+            badgeClass: g.badgeClass,
+            art: g.icon,
+            bannerBg: g.bannerBg,
+            desc: g.desc,
+            time: g.time,
+            gameKey: g.id
+        }));
     }
 
     componentDidMount() {
