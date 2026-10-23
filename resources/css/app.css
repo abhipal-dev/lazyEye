@@ -401,3 +401,60 @@ form#register_form span{
   font-weight: 400;
   font-size: 1.3rem;
 }
+
+/* =========================================================
+   CLINICAL REPORT & PDF PRINT STYLES
+   ========================================================= */
+@media print {
+  /* Hide non-printable UI navigation, topbars, sidebars, and actions */
+  #layoutSidenav_nav,
+  .sb-topnav,
+  .dashboard-topbar,
+  footer,
+  .d-print-none,
+  .btn,
+  button,
+  .modal,
+  .modal-backdrop {
+    display: none !important;
+  }
+
+  /* Reset layout constraints for A4 paper */
+  #layoutSidenav #layoutSidenav_content {
+    margin-left: 0 !important;
+    padding: 0 !important;
+    width: 100% !important;
+  }
+
+  body {
+    background-color: #ffffff !important;
+    color: #0f172a !important;
+    font-size: 11pt !important;
+    -webkit-print-color-adjust: exact !important;
+    print-color-adjust: exact !important;
+  }
+
+  .clinical-print-sheet {
+    box-shadow: none !important;
+    border: 1px solid #cbd5e1 !important;
+    margin: 0 auto !important;
+    padding: 20px !important;
+    max-width: 100% !important;
+    width: 100% !important;
+    page-break-inside: avoid;
+  }
+
+  table {
+    page-break-inside: auto;
+  }
+
+  tr {
+    page-break-inside: avoid;
+    page-break-after: auto;
+  }
+
+  @page {
+    size: A4;
+    margin: 12mm 15mm;
+  }
+}
