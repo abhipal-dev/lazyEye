@@ -24,36 +24,25 @@ The application is deployed and live at:
 
 ---
 
-## 📚 Complete Project Documentation
+## 🏛️ System Architecture & Clinical Science
 
-Detailed technical and deployment guides have been compiled in the [`docs/`](docs/) directory:
-
-1. 📖 [**Project Architecture, Structure & User Levels**](docs/PROJECT_STRUCTURE_AND_USER_LEVELS.md)
-   - Complete file-by-file directory explanation.
-   - Comprehensive **5-tier role system**: `root` Superadmin, `admin` Clinic Administrator, `doctor` Optometrist / Vision Therapist, `user` Enrolled Patient, and `Unpaid User`.
-   - Feature permission matrix and database ER diagrams.
-   - Clinical lifecycle sequence flow from registration to therapy completion.
-
-2. 🚀 [**Build, Release & Render Deployment Guide**](docs/BUILD_AND_DEPLOYMENT_GUIDE.md)
-   - Local asset build pipeline (`npm run dev` / `npm run prod`).
-   - Git push and version control workflow.
-   - Step-by-step Render configuration (Docker runtime, environment variables, Apache DocumentRoot).
-   - HTTPS proxy termination and mixed-content troubleshooting.
+For in-depth technical specifications, clinical mechanics of dichoptic separation, role permission matrices, and data flow diagrams, refer to:  
+👉 [**ARCHITECTURE.md**](ARCHITECTURE.md)
 
 ---
 
-## 🎮 Therapy Games Included
+## 🎮 Prescribed Clinical Therapy Engines
 
-The platform includes **10 interactive HTML5/Canvas dichoptic vision therapy games**:
-- **Snake Game** (`/game1snake`): Non-dominant eye macular fixation and dual-channel fusion.
+The platform features **10 interactive dichoptic vision therapy engines** built with HTML5 Canvas and React:
+- **Snake** (`/game1snake`): Non-dominant eye macular fixation and dual-channel fusion.
 - **Flappy Bird** (`/game2flappybird`): High-frequency saccades and altitude depth judgment.
-- **Menja 3D** (`/game12menja`): Dynamic 3D block slicing challenge stimulating visual reflexes.
-- **Tetris Fusion** (`/game8tetris`): Dichoptic pattern alignment and spatial orientation.
+- **Sticky Holds** (`/game11stickyholds`): Stereoscopic distance estimation and visual-motor timing.
+- **Menja** (`/game12menja`): Dynamic 3D block slicing challenge stimulating visual reaction speed.
+- **Tetris** (`/game8tetris`): Dichoptic pattern alignment and cortical spatial synthesis.
 - **Bubble Shooter** (`/game9bubbleshooter`): Foveal aiming and peripheral stereoscopic acuity.
-- **Ping-Pong 3D** (`/game10pingpong`): Dynamic velocity tracking and reaction agility.
-- **Sticky Holds** (`/game11stickyholds`): Rock climbing agility puzzle demanding sustained binocular fusion.
-- **Maze Labyrinth** (`/game5maze`): Split-cue maze navigation.
-- **Ball Catcher** (`/game3ballcatcher`): Hand-eye motor coordination.
+- **Ping Pong** (`/game10pingpong`): Dynamic velocity tracking and reaction agility.
+- **Maze** (`/game5maze`): Split-cue spatial search and neuro-visual pathway mapping.
+- **Ball Catcher** (`/game3ballcatcher`): Hand-eye motor coordination and saccadic targeting.
 - **Bouncing Ball** (`/game7test`): Dynamic trajectory prediction under dichoptic viewing.
 
 ---

@@ -56,3 +56,4 @@ jobs:
           test -f public/js/app.js || { echo "public/js/app.js is missing"; exit 1; }
           test -f public/css/app.css || { echo "public/css/app.css is missing"; exit 1; }
           echo "Asset compilation verified successfully."
+
