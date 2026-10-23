@@ -588,17 +588,8 @@ export default class UserDashboard extends React.Component {
         )
     }
 }
-// if (document.getElementById('user')) {
-//   ReactDOM.render(<UserDashboard />, document.getElementById('user'))
-// }
-if (document.getElementById('user')) {
-    // find element by id
-    const element = document.getElementById('user')
-
-    // create new props object with element's data-attributes
-    // result: {tsId: "1241"}
-    const props = Object.assign({}, element.dataset)
-
-    // render element with props (using spread)
-    ReactDOM.render(<UserDashboard {...props} />, element);
+const userRoot = document.getElementById('user');
+if (userRoot) {
+    const props = Object.assign({}, userRoot.dataset);
+    ReactDOM.render(<UserDashboard {...props} />, userRoot);
 }

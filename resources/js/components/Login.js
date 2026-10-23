@@ -127,7 +127,7 @@ export default class Login extends React.Component {
                                         </ul>
                                     </div>
 
-                                    {/* Quick Test Demo Credentials for Recruiters */}
+                                    {/* Evaluation accounts switcher */}
                                     <div className="p-3 rounded-3" style={{ background: 'var(--bg-card)', border: '1px solid var(--border-color)' }}>
                                         <div className="d-flex align-items-center justify-content-between mb-2">
                                             <span className="small fw-bold text-main" style={{ fontSize: '0.78rem' }}>
