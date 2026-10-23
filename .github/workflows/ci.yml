@@ -1,0 +1,58 @@
+name: CI Pipeline
+
+on:
+  push:
+    branches: [ main, master ]
+  pull_request:
+    branches: [ main, master ]
+  workflow_dispatch:
+
+jobs:
+  build-and-verify:
+    name: Build & Lint Check
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout Source Code
+        uses: actions/checkout@v4
+
+      - name: Setup PHP Environment
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: '8.1'
+          extensions: mbstring, xml, ctype, iconv, mysql, pdo_mysql, sqlite3, bcmath
+          coverage: none
+
+      - name: Setup Node.js Environment
+        uses: actions/setup-node@v4
+        with:
+          node-version: 18
+          cache: 'npm'
+
+      - name: Validate Composer Configuration
+        run: composer validate --strict --no-check-publish
+
+      - name: Install PHP Dependencies
+        run: composer install --prefer-dist --no-interaction --no-progress --optimize-autoloader
+
+      - name: Verify Environment Configuration
+        run: |
+          cp -n .env.example .env || true
+          php artisan key:generate --ansi || true
+
+      - name: PHP Syntax Check
+        run: |
+          find app/ -name "*.php" -print0 | xargs -0 -n1 -P4 php -l
+          find routes/ -name "*.php" -print0 | xargs -0 -n1 -P4 php -l
+
+      - name: Install Frontend Dependencies
+        run: npm ci || npm install
+
+      - name: Compile Production Assets
+        run: npm run production
+
+      - name: Verify Webpack Build Artifacts
+        run: |
+          test -f public/js/app.js || { echo "public/js/app.js is missing"; exit 1; }
+          test -f public/css/app.css || { echo "public/css/app.css is missing"; exit 1; }
+          echo "Asset compilation verified successfully."

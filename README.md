@@ -8,6 +8,7 @@
 
 <p align="center">
   <a href="https://lazyeye.onrender.com" target="_blank"><img src="https://img.shields.io/badge/Live%20Demo-Render-blue?style=for-the-badge&logo=render" alt="Live Demo"></a>
+  <a href="https://github.com/abhipal-dev/lazyEye/actions/workflows/ci.yml"><img src="https://github.com/abhipal-dev/lazyEye/actions/workflows/ci.yml/badge.svg" alt="CI Pipeline"></a>
   <img src="https://img.shields.io/badge/Laravel-8.75-red?style=for-the-badge&logo=laravel" alt="Laravel 8">
   <img src="https://img.shields.io/badge/React-18.2-61DAFB?style=for-the-badge&logo=react" alt="React 18">
   <img src="https://img.shields.io/badge/PHP-8.1-777BB4?style=for-the-badge&logo=php" alt="PHP 8.1">
