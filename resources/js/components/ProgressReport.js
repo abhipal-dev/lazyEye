@@ -330,6 +330,17 @@ export default class ProgressReport extends React.Component {
               Aggregated binocular performance, session frequencies, and score trajectories.
             </p>
           </div>
+          <div className="d-flex align-items-center gap-2 d-print-none">
+            <button 
+              type="button" 
+              className="btn btn-primary d-flex align-items-center gap-2 fw-semibold shadow-sm px-3 py-2"
+              onClick={() => window.print()}
+              title="Print or export current filtered report to PDF"
+            >
+              <i className="fa-solid fa-file-pdf"></i>
+              <span>Print / Export PDF</span>
+            </button>
+          </div>
         </div>
 
         {/* Filter Card */}
