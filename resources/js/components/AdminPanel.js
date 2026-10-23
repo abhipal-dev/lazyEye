@@ -789,7 +789,7 @@ export default class AdminDashboard extends React.Component {
                     </div>
                 </div>
 
-                {/* Clinical Record & Dossier Inspection Modal (Recruiter & Doctor Friendly) */}
+                {/* Patient Clinical Dossier Modal */}
                 <div className="modal fade" id="recordDetailsModal" tabIndex={-1} aria-labelledby="recordDetailsModalLabel" aria-hidden="true">
                     <div className="modal-dialog modal-dialog-centered modal-lg modal-dialog-scrollable">
                         <div className="modal-content" style={{ backgroundColor: 'var(--bg-card)', borderColor: 'var(--border-color)', borderRadius: '1rem' }}>
@@ -829,14 +829,8 @@ export default class AdminDashboard extends React.Component {
 
 
 
-if (document.getElementById('admin')) {
-    // find element by id
-    const element = document.getElementById('admin')
-
-    // create new props object with element's data-attributes
-    // result: {tsId: "1241"}
-    const props = Object.assign({}, element.dataset)
-
-    // render element with props (using spread)
-    ReactDOM.render(<AdminDashboard {...props} />, element);
+const adminRoot = document.getElementById('admin');
+if (adminRoot) {
+    const props = Object.assign({}, adminRoot.dataset);
+    ReactDOM.render(<AdminDashboard {...props} />, adminRoot);
 }

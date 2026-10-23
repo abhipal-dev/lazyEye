@@ -65,7 +65,6 @@ export default class ActivityLog extends React.Component {
     const formattedMap = this.parseRecordsObject();
     const activeDates = Object.keys(formattedMap);
     
-    // Sort chronologically ascending
     activeDates.sort((a, b) => {
       const mA = moment(a, 'DD/MM/YYYY').valueOf();
       const mB = moment(b, 'DD/MM/YYYY').valueOf();
@@ -75,10 +74,9 @@ export default class ActivityLog extends React.Component {
     const todayFormatted = moment(today).format('DD/MM/YYYY');
     const nowMs = moment(today).endOf('day').valueOf();
     
-    // Filter out future dates from selecting by default
+    // Ignore any client clock skew entries dated in the future
     const validPastActiveDates = activeDates.filter(d => moment(d, 'DD/MM/YYYY').valueOf() <= nowMs);
 
-    // If no date clicked yet: pick today if active, otherwise the latest valid past session date
     let currentSelectedDate = this.state.selectedDate;
     if (!currentSelectedDate) {
       if (formattedMap[todayFormatted]) {
@@ -93,7 +91,7 @@ export default class ActivityLog extends React.Component {
     const currentRecords = this.state.selectedDate ? this.state.selectedRecords : (formattedMap[currentSelectedDate] || {});
     const sessionKeys = Object.keys(currentRecords);
 
-    // 180 days ending today, formatted as standard YYYY-MM-DD for react-calendar-heatmap
+    // 180-day rolling activity window for calendar heatmap
     const heatmapValues = Array.from({ length: 180 }, (_, i) => {
       const dateObj = this.shiftDate(today, -i);
       const displayDateStr = moment(dateObj).format('DD/MM/YYYY');
