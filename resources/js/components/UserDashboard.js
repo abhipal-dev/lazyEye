@@ -12,6 +12,8 @@ import ProgressReport from './ProgressReport';
 import VisualAcuityTest from './VisualAcuityTest';
 import ClinicalReport from './ClinicalReport';
 import ThemeToggle from './ThemeToggle';
+import GameSessionHUD from './GameSessionHUD';
+import moment from 'moment';
 
 
 var frameRef = React.createRef(null);
@@ -107,9 +109,86 @@ export default class UserDashboard extends React.Component {
             data: {},
             userProfileImage: '',
             current_component: 'user',
-            date_format:"DD/MM/YYYY"
+            date_format: "DD/MM/YYYY",
+            activeSession: null
         }
     }
+    
+    handleStartSession = (game) => {
+        this.setState({ activeSession: game });
+    };
+
+    getTodayCompletedSeconds = () => {
+        const raw = this.state.data?.user_game_records;
+        if (!raw) return 0;
+        try {
+            const records = typeof raw === 'string' ? JSON.parse(raw) : raw;
+            const todayStr = moment().format('DD/MM/YYYY');
+            let todaySessionsCount = 0;
+            
+            Object.keys(records).forEach(ts => {
+                const dateStr = moment(Number(ts)).format('DD/MM/YYYY');
+                if (dateStr === todayStr) {
+                    const games = records[ts];
+                    if (games && typeof games === 'object') {
+                        todaySessionsCount += Object.keys(games).length;
+                    }
+                }
+            });
+            return todaySessionsCount * 300;
+        } catch (e) {
+            return 0;
+        }
+    };
+
+    handleSessionCompleted = (result) => {
+        const current_date_timestamp = Date.now();
+        let existingRecords = {};
+        try {
+            const raw = this.state.data?.user_game_records;
+            if (raw) existingRecords = typeof raw === 'string' ? JSON.parse(raw) : raw;
+        } catch (e) {
+            existingRecords = {};
+        }
+
+        const todayKey = String(current_date_timestamp);
+        if (!existingRecords[todayKey]) existingRecords[todayKey] = {};
+        existingRecords[todayKey][result.gameName] = result.score;
+        const stringScore = JSON.stringify(existingRecords);
+
+        let token = $('meta[name="csrf-token"]').attr('content');
+        $.ajax({
+            url: "/SaveGameRecords",
+            type: "post",
+            headers: { 'X-CSRF-TOKEN': token },
+            data: {
+                id: this.state.id,
+                score: existingRecords,
+                string_score: stringScore,
+                game_name: result.gameName,
+                game_score: result.score,
+                duration: result.durationSeconds
+            },
+            success: (data) => {
+                this.setState({ activeSession: null });
+                this.fetchUserData();
+
+                if (typeof Swal !== 'undefined') {
+                    Swal.fire({
+                        title: 'Therapy Session Logged!',
+                        html: `You completed <strong>${result.elapsedFormatted}</strong> of dichoptic training in <strong>${result.gameName}</strong>.<br><br><span class="badge bg-primary fs-6">${result.score} pts</span>`,
+                        icon: 'success',
+                        confirmButtonColor: '#2563eb'
+                    });
+                }
+            },
+            error: () => {
+                this.setState({ activeSession: null });
+                this.fetchUserData();
+            }
+        });
+    };
+
     fetchUserData = () => {
         let token = $('meta[name="csrf-token"]').attr('content');
         const userId = this.props.id || this.state.id;
@@ -283,6 +362,17 @@ export default class UserDashboard extends React.Component {
                             <a href="/admin" className="btn btn-sm btn-secondary px-3 py-1 fw-semibold d-none d-sm-flex align-items-center gap-1">
                                 <i className="fa-solid fa-arrow-left"></i> Admin Panel
                             </a>
+                        )}
+                        {!isAdmin && (
+                            <div className="d-none d-sm-flex align-items-center gap-2 px-3 py-1 rounded-pill border font-mono small" style={{ backgroundColor: 'var(--bg-surface-secondary)', borderColor: 'var(--border-color)', color: 'var(--text-main)', fontSize: '0.8rem' }}>
+                                <i className="fa-solid fa-stopwatch text-primary"></i>
+                                <span>Prescription: <strong>{Math.round(this.getTodayCompletedSeconds() / 60)} / {this.state.data?.user_playing_time || 20}m</strong></span>
+                                {this.getTodayCompletedSeconds() >= (this.state.data?.user_playing_time || 20) * 60 ? (
+                                    <span className="badge bg-success text-white" style={{ fontSize: '0.65rem' }}>Goal Met 🎉</span>
+                                ) : (
+                                    <span className="badge bg-primary-subtle text-primary" style={{ fontSize: '0.65rem' }}>{Math.max(0, (this.state.data?.user_playing_time || 20) - Math.round(this.getTodayCompletedSeconds() / 60))}m left</span>
+                                )}
+                            </div>
                         )}
                         <ThemeToggle />
                         <ul className="navbar-nav">
@@ -480,7 +570,7 @@ export default class UserDashboard extends React.Component {
                         <main>
                             <div className="container-fluid px-2 px-sm-3 px-md-4">
 
-                                {(this.state.current_component == 'user') ? <Games data={this.state.data.user_game_records} date_format={this.state.date_format}/> : ''}
+                                {(this.state.current_component == 'user') ? <Games data={this.state.data.user_game_records} date_format={this.state.date_format} onStartSession={this.handleStartSession}/> : ''}
 
                                 {(this.state.current_component == 'acuitytest') ? <VisualAcuityTest patient={this.state.data} /> : ''}
 
@@ -508,6 +598,16 @@ export default class UserDashboard extends React.Component {
                                 </div>
                             </div>
                         </footer>
+
+                {this.state.activeSession && (
+                    <GameSessionHUD 
+                        game={this.state.activeSession}
+                        prescribedMinutes={this.state.data?.user_playing_time || 20}
+                        alreadyPlayedSecondsToday={this.getTodayCompletedSeconds()}
+                        onSessionCompleted={this.handleSessionCompleted}
+                    />
+                )}
+
                     </div>
                 </div>
 

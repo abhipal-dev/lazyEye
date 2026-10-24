@@ -131,9 +131,12 @@ export default class Games extends React.Component {
         }
     }
 
-    // Launch game in fullscreen iframe
-    changesrc = (framesrc) => {
-        console.log('Starting game session:', framesrc);
+    // Launch game in fullscreen session with clinical HUD
+    changesrc = (framesrc, gameObj) => {
+        if (this.props.onStartSession) {
+            this.props.onStartSession(gameObj || { route: framesrc });
+            return;
+        }
         var elem = document.getElementById('iframe');
         if (elem) {
             elem.src = framesrc;
@@ -232,7 +235,7 @@ export default class Games extends React.Component {
                             <button 
                                 type="button"
                                 className="therapy-hero-btn"
-                                onClick={() => this.changesrc(current.route)}
+                                onClick={() => this.changesrc(current.route, current)}
                             >
                                 <i className="fa-solid fa-circle-play text-primary me-1"></i>
                                 <span>Start Session</span>
@@ -311,7 +314,7 @@ export default class Games extends React.Component {
                                     <button 
                                         type="button"
                                         className="game-play-btn openGame" 
-                                        onClick={() => this.changesrc(game.route)}
+                                        onClick={() => this.changesrc(game.route, game)}
                                     >
                                         <i className="fa-solid fa-play me-2"></i>
                                         Launch Exercise
