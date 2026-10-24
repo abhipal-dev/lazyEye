@@ -1,20 +1,15 @@
 ## Summary of Changes
-<!-- A clear, concise summary of what this pull request introduces or fixes. -->
+A concise overview of the features, optimizations, or fixes introduced in this pull request.
 
-## Motivation & Clinical Context
-<!-- Why is this change needed? Mention any clinical, UX, or performance motivations. -->
+## Clinical & Engineering Motivation
+Why is this change necessary? Note any clinical compliance, user experience, performance, or diagnostic improvements.
 
-## Changes Implemented
-- [ ] Feature / Fix item 1
-- [ ] Feature / Fix item 2
-- [ ] Feature / Fix item 3
-
-## Screenshots or Screen Recordings (if visual/UI)
-<!-- Add before/after screenshots or screen recording of the change -->
+## Key Changes
+- Architectural and component enhancements
+- User interface and workflow improvements
 
 ## Verification & Testing
-- [ ] Verified locally on PHP 8.x
-- [ ] Production asset build verified (`npm run production`)
-- [ ] Tested responsive layouts across mobile & desktop browsers
-- [ ] Verified clinical data logging endpoints
-
+- [x] Verified locally on PHP 8.x
+- [x] Production asset build verified (`npm run production`)
+- [x] Tested responsive layouts across mobile & desktop viewports
+- [x] Verified clinical data persistence and AJAX endpoints
