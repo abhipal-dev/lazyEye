@@ -333,33 +333,33 @@ export default class GameSessionHUD extends React.Component {
                 {/* 1. Pre-Game Launch & Briefing Modal */}
                 {sessionStage === 'briefing' && (
                     <div className="position-fixed top-0 start-0 w-100 h-100 d-flex align-items-center justify-content-center p-3" style={{ backgroundColor: 'rgba(2, 6, 23, 0.92)', zIndex: 100000, backdropFilter: 'blur(8px)' }}>
-                        <div className="card border shadow-2xl p-4 text-center" style={{ maxWidth: 500, width: '100%', backgroundColor: '#0f172a', borderColor: '#334155', color: '#f8fafc', borderRadius: 20 }}>
+                        <div className="card border shadow-2xl px-4 pt-3 pb-3 text-center" style={{ maxWidth: 480, width: '100%', maxHeight: '92vh', overflowY: 'auto', backgroundColor: '#0f172a', borderColor: '#334155', color: '#f8fafc', borderRadius: 16 }}>
                             {/* Constrained Mascot Artwork Badge */}
-                            <div className="mb-3">
-                                <div className="d-inline-flex p-3 rounded-circle shadow-lg" style={{ width: 104, height: 104, backgroundColor: '#1e293b', border: '2px solid rgba(56, 189, 248, 0.4)' }}>
+                            <div className="mb-2">
+                                <div className="d-inline-flex p-2 rounded-circle shadow-lg" style={{ width: 76, height: 76, backgroundColor: '#1e293b', border: '2px solid rgba(56, 189, 248, 0.4)' }}>
                                     <img src={icon} alt={title} style={{ width: '100%', height: '100%', objectFit: 'contain' }} />
                                 </div>
                             </div>
 
-                            <h4 className="fw-bold mb-1 text-white">{title}</h4>
-                            <p className="text-secondary small mb-3">{clinicalType}</p>
+                            <h5 className="fw-bold mb-1 text-white">{title}</h5>
+                            <p className="text-secondary small mb-2">{clinicalType}</p>
 
                             {/* 3D Glasses Check Banner */}
-                            <div className="d-flex align-items-center justify-content-center gap-3 p-2 rounded border mb-3" style={{ backgroundColor: 'rgba(15, 23, 42, 0.8)', borderColor: '#334155' }}>
+                            <div className="d-flex align-items-center justify-content-center gap-3 py-1.5 px-3 rounded border mb-2" style={{ backgroundColor: 'rgba(15, 23, 42, 0.8)', borderColor: '#334155' }}>
                                 <div className="d-flex align-items-center gap-2 small font-mono">
-                                    <span className="badge rounded-circle p-1" style={{ backgroundColor: '#ef4444', width: 16, height: 16 }}> </span>
+                                    <span className="badge rounded-circle p-1" style={{ backgroundColor: '#ef4444', width: 14, height: 14 }}> </span>
                                     <span>Left Eye: <strong>RED</strong></span>
                                 </div>
                                 <span className="text-secondary">|</span>
                                 <div className="d-flex align-items-center gap-2 small font-mono">
-                                    <span className="badge rounded-circle p-1" style={{ backgroundColor: '#06b6d4', width: 16, height: 16 }}> </span>
+                                    <span className="badge rounded-circle p-1" style={{ backgroundColor: '#06b6d4', width: 14, height: 14 }}> </span>
                                     <span>Right Eye: <strong>CYAN</strong></span>
                                 </div>
                             </div>
 
                             {/* Speed & Difficulty Mode Selection */}
-                            <div className="mb-4 text-start">
-                                <label className="form-label small fw-semibold text-secondary d-flex justify-content-between align-items-center">
+                            <div className="mb-2 text-start">
+                                <label className="form-label small fw-semibold text-secondary d-flex justify-content-between align-items-center mb-1">
                                     <span>Therapy Speed &amp; Tracking Velocity</span>
                                     <span className="text-primary font-mono">{SPEED_LABELS[speedMode]?.label}</span>
                                 </label>
@@ -368,7 +368,7 @@ export default class GameSessionHUD extends React.Component {
                                         <div key={key} className="col-6">
                                             <button 
                                                 type="button" 
-                                                className={`btn btn-sm w-100 py-2 px-2 text-start border d-flex align-items-center gap-2 ${speedMode === key ? 'btn-primary' : 'btn-outline-secondary'}`}
+                                                className={`btn btn-sm w-100 py-1.5 px-2 text-start border d-flex align-items-center gap-2 ${speedMode === key ? 'btn-primary' : 'btn-outline-secondary'}`}
                                                 style={{ borderRadius: 10, fontSize: '0.8rem' }}
                                                 onClick={() => this.handleSelectSpeed(key)}
                                             >
@@ -380,26 +380,30 @@ export default class GameSessionHUD extends React.Component {
                                         </div>
                                     ))}
                                 </div>
-                                <small className="text-secondary d-block mt-2 font-mono" style={{ fontSize: '0.74rem' }}>
+                                <small className="text-secondary d-block mt-1 mb-0 font-mono" style={{ fontSize: '0.72rem' }}>
                                     <i className="fa-solid fa-circle-info text-info me-1"></i> {SPEED_LABELS[speedMode]?.desc}
                                 </small>
                             </div>
 
                             {/* Action Buttons */}
-                            <div className="d-flex gap-2">
+                            <div className="d-flex gap-2 mt-2 pt-2 border-top border-secondary border-opacity-25">
                                 <button 
                                     type="button" 
-                                    className="btn btn-outline-light px-3 py-2 fw-semibold w-50"
+                                    className="btn btn-outline-light py-2 px-3 fw-semibold flex-fill d-flex align-items-center justify-content-center gap-2"
+                                    style={{ borderRadius: 10, fontSize: '0.88rem' }}
                                     onClick={this.handleCancelBriefing}
                                 >
-                                    Cancel
+                                    <i className="fa-solid fa-xmark"></i>
+                                    <span>Cancel</span>
                                 </button>
                                 <button 
                                     type="button" 
-                                    className="btn btn-success px-3 py-2 fw-bold w-50 shadow-lg d-flex align-items-center justify-content-center gap-2"
+                                    className="btn btn-success py-2 px-3 fw-bold flex-fill shadow-lg d-flex align-items-center justify-content-center gap-2"
+                                    style={{ borderRadius: 10, fontSize: '0.88rem' }}
                                     onClick={this.handleStartCountdown}
                                 >
-                                    <i className="fa-solid fa-play"></i> Start Session
+                                    <i className="fa-solid fa-play"></i>
+                                    <span>Start Session</span>
                                 </button>
                             </div>
                         </div>
@@ -423,30 +427,33 @@ export default class GameSessionHUD extends React.Component {
 
                 {/* 3. Premature Exit / Finish Confirmation Modal */}
                 {showExitConfirm && (
-                    <div className="position-fixed top-0 start-0 w-100 h-100 d-flex align-items-center justify-content-center" style={{ backgroundColor: 'rgba(0,0,0,0.75)', zIndex: 100000 }}>
-                        <div className="card border shadow-lg p-4 text-center" style={{ maxWidth: 440, backgroundColor: '#0f172a', borderColor: '#334155', color: '#f8fafc', borderRadius: 16 }}>
-                            <div className="rounded-circle bg-primary-subtle text-primary mx-auto mb-3 d-flex align-items-center justify-content-center" style={{ width: 56, height: 56 }}>
-                                <i className="fa-solid fa-stopwatch fa-xl"></i>
+                    <div className="position-fixed top-0 start-0 w-100 h-100 d-flex align-items-center justify-content-center p-3" style={{ backgroundColor: 'rgba(0,0,0,0.75)', zIndex: 100000 }}>
+                        <div className="card border shadow-lg px-4 pt-3 pb-3 text-center" style={{ maxWidth: 420, backgroundColor: '#0f172a', borderColor: '#334155', color: '#f8fafc', borderRadius: 16 }}>
+                            <div className="rounded-circle bg-primary-subtle text-primary mx-auto mb-2 d-flex align-items-center justify-content-center" style={{ width: 48, height: 48 }}>
+                                <i className="fa-solid fa-stopwatch fa-lg"></i>
                             </div>
                             <h5 className="fw-bold mb-1">Save Active Therapy Progress?</h5>
                             <p className="text-secondary small mb-3">
                                 You trained for <strong>{this.formatTime(elapsedSeconds)}</strong> with a current score of <strong>{currentScore} pts</strong>.
                                 Your duration will be credited to today's prescription.
                             </p>
-                            <div className="d-flex gap-2 justify-content-center">
+                            <div className="d-flex gap-2 justify-content-center mt-1">
                                 <button 
                                     type="button" 
-                                    className="btn btn-outline-light px-3 py-2 fw-semibold"
+                                    className="btn btn-outline-light py-2 px-3 fw-semibold flex-fill"
+                                    style={{ borderRadius: 10 }}
                                     onClick={this.cancelExit}
                                 >
                                     Keep Playing
                                 </button>
                                 <button 
                                     type="button" 
-                                    className="btn btn-success px-4 py-2 fw-semibold shadow-sm"
+                                    className="btn btn-success py-2 px-3 fw-semibold shadow-sm flex-fill d-flex align-items-center justify-content-center gap-1"
+                                    style={{ borderRadius: 10 }}
                                     onClick={() => this.finishSession()}
                                 >
-                                    <i className="fa-solid fa-check me-1"></i> Save &amp; Exit
+                                    <i className="fa-solid fa-check me-1"></i>
+                                    <span>Save &amp; Exit</span>
                                 </button>
                             </div>
                         </div>
