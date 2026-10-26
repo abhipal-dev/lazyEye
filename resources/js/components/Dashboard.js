@@ -419,6 +419,114 @@ export default class Dashboard extends React.Component {
                     </div>
                 </div>
 
+                {/* Cohort Adherence & Compliance Radar Widget */}
+                {stats.compliance_radar && (
+                    <div className="card border-0 shadow-sm mb-4" style={{ backgroundColor: 'var(--bg-card)', border: '1px solid var(--border-color)', borderRadius: '10px' }}>
+                        <div className="card-body p-3 p-md-4">
+                            <div className="d-flex align-items-center justify-content-between flex-wrap gap-2 mb-3">
+                                <div className="d-flex align-items-center gap-2">
+                                    <div className="rounded-2 p-2 d-flex align-items-center justify-content-center" style={{ width: 36, height: 36, backgroundColor: 'var(--bg-surface-secondary)', border: '1px solid var(--border-color)', color: 'var(--text-main)' }}>
+                                        <i className="fa-solid fa-radar text-primary"></i>
+                                    </div>
+                                    <div>
+                                        <h5 className="fw-bold mb-0 text-main">{isDoctor ? 'Clinical Compliance Radar' : 'Cohort Adherence Radar'}</h5>
+                                        <small className="text-sub">Real-time daily prescription compliance across active patients</small>
+                                    </div>
+                                </div>
+                                <div className="d-flex align-items-center gap-2">
+                                    <button 
+                                        type="button" 
+                                        className="btn btn-sm btn-outline-danger px-3 d-flex align-items-center gap-1 fw-semibold"
+                                        onClick={() => {
+                                            if (window.switchToAdminTable) window.switchToAdminTable('fetchUsers');
+                                            setTimeout(() => {
+                                                if (window.filterUsersByCompliance) window.filterUsersByCompliance('at_risk');
+                                            }, 100);
+                                        }}
+                                    >
+                                        <i className="fa-solid fa-triangle-exclamation"></i>
+                                        <span>Review At-Risk ({stats.compliance_radar.at_risk_count})</span>
+                                    </button>
+                                </div>
+                            </div>
+
+                            <div className="row g-3">
+                                <div className="col-12 col-md-4">
+                                    <div 
+                                        className="p-3 rounded-3 border h-100 cursor-pointer" 
+                                        style={{ backgroundColor: 'rgba(34, 197, 94, 0.06)', borderColor: 'rgba(34, 197, 94, 0.25)' }}
+                                        onClick={() => {
+                                            if (window.switchToAdminTable) window.switchToAdminTable('fetchUsers');
+                                            setTimeout(() => {
+                                                if (window.filterUsersByCompliance) window.filterUsersByCompliance('compliant');
+                                            }, 100);
+                                        }}
+                                    >
+                                        <div className="d-flex align-items-center justify-content-between mb-2">
+                                            <span className="small fw-semibold text-success font-mono">
+                                                <i className="fa-solid fa-circle-check me-1"></i>Compliant Cohort
+                                            </span>
+                                            <span className="badge bg-success-subtle text-success font-mono">
+                                                {Math.round((stats.compliance_radar.compliant_count / Math.max(1, stats.compliance_radar.total_cohort)) * 100)}%
+                                            </span>
+                                        </div>
+                                        <h3 className="fw-bold mb-1 text-main tabular-nums">{stats.compliance_radar.compliant_count}</h3>
+                                        <div className="small text-sub" style={{ fontSize: '0.78rem' }}>Active within 48h &middot; ≥4 sessions/wk</div>
+                                    </div>
+                                </div>
+
+                                <div className="col-12 col-md-4">
+                                    <div 
+                                        className="p-3 rounded-3 border h-100 cursor-pointer" 
+                                        style={{ backgroundColor: 'rgba(234, 179, 8, 0.06)', borderColor: 'rgba(234, 179, 8, 0.25)' }}
+                                        onClick={() => {
+                                            if (window.switchToAdminTable) window.switchToAdminTable('fetchUsers');
+                                            setTimeout(() => {
+                                                if (window.filterUsersByCompliance) window.filterUsersByCompliance('needs_review');
+                                            }, 100);
+                                        }}
+                                    >
+                                        <div className="d-flex align-items-center justify-content-between mb-2">
+                                            <span className="small fw-semibold text-warning font-mono">
+                                                <i className="fa-solid fa-clock-rotate-left me-1"></i>Needs Review
+                                            </span>
+                                            <span className="badge bg-warning-subtle text-warning font-mono">
+                                                {stats.compliance_radar.needs_review_count} Patients
+                                            </span>
+                                        </div>
+                                        <h3 className="fw-bold mb-1 text-main tabular-nums">{stats.compliance_radar.needs_review_count}</h3>
+                                        <div className="small text-sub" style={{ fontSize: '0.78rem' }}>Inactive 3–6 days &middot; Slipping adherence</div>
+                                    </div>
+                                </div>
+
+                                <div className="col-12 col-md-4">
+                                    <div 
+                                        className="p-3 rounded-3 border h-100 cursor-pointer" 
+                                        style={{ backgroundColor: 'rgba(239, 68, 68, 0.06)', borderColor: 'rgba(239, 68, 68, 0.25)' }}
+                                        onClick={() => {
+                                            if (window.switchToAdminTable) window.switchToAdminTable('fetchUsers');
+                                            setTimeout(() => {
+                                                if (window.filterUsersByCompliance) window.filterUsersByCompliance('at_risk');
+                                            }, 100);
+                                        }}
+                                    >
+                                        <div className="d-flex align-items-center justify-content-between mb-2">
+                                            <span className="small fw-semibold text-danger font-mono">
+                                                <i className="fa-solid fa-triangle-exclamation me-1"></i>At-Risk (Lapsed)
+                                            </span>
+                                            <span className="badge bg-danger-subtle text-danger font-mono">
+                                                Urgent Followup
+                                            </span>
+                                        </div>
+                                        <h3 className="fw-bold mb-1 text-main tabular-nums">{stats.compliance_radar.at_risk_count}</h3>
+                                        <div className="small text-sub" style={{ fontSize: '0.78rem' }}>Inactive &gt;7 days &middot; Clinical intervention needed</div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                )}
+
                 {/* Secondary Clinical Metrics Row */}
                 <div className="row g-3 mb-4">
                     <div className="col-12 col-md-4">

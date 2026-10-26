@@ -40,6 +40,7 @@ use App\Http\Controllers\UploadImageController;
 Route::post('/Register_req', [UserController::class, 'registerData']);
 
 Route::post('/Login_req', [AuthController::class, 'login']);
+Route::post('/ResetPassword', [AuthController::class, 'resetPassword']);
 
 Route::post('/uploadImage', [UploadImageController::class, 'upload']);
 
