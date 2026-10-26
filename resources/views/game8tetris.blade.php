@@ -434,8 +434,24 @@
     let level = 1;
     let gameOver = false;
     let rAF = null;
+    // Dichoptic Speed & Velocity Settings (Slow / Medium / Fast / Incremental)
+    const urlParams = new URLSearchParams(window.location.search);
+    let speedParam = urlParams.get('speed') || 'medium';
+    let baseDropInterval = (speedParam === 'slow') ? 55 : ((speedParam === 'fast') ? 25 : 40);
+    let isIncremental = (speedParam === 'incremental');
+
+    window.addEventListener('message', function(e) {
+      if (!e.data) return;
+      if (e.data.speedMode) {
+        speedParam = e.data.speedMode;
+        baseDropInterval = (speedParam === 'slow') ? 55 : ((speedParam === 'fast') ? 25 : 40);
+        isIncremental = (speedParam === 'incremental');
+        dropInterval = baseDropInterval;
+      }
+    });
+
     let dropCounter = 0;
-    let dropInterval = 40; // frames per drop
+    let dropInterval = baseDropInterval; // frames per drop
 
     // Dichoptic mapping: shapes alternate between Left and Right eye filters
     const pieceEyeMap = {
@@ -603,7 +619,7 @@
         const lineScores = [0, 100, 300, 500, 800];
         score += (lineScores[linesCleared] || 800) * level;
         level = Math.floor(lines / 10) + 1;
-        dropInterval = Math.max(12, 40 - (level - 1) * 3);
+        dropInterval = isIncremental ? Math.max(12, baseDropInterval - Math.floor(score / 40) * 3) : Math.max(12, baseDropInterval - (level - 1) * 3);
 
         document.getElementById('scoreDisplay').innerText = score;
         document.getElementById('linesDisplay').innerText = lines;
@@ -666,7 +682,7 @@
       lines = 0;
       level = 1;
       dropCounter = 0;
-      dropInterval = 40;
+      dropInterval = baseDropInterval;
       gameOver = false;
       document.getElementById('scoreDisplay').innerText = '0';
       document.getElementById('linesDisplay').innerText = '0';
