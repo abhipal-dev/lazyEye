@@ -4,8 +4,11 @@ import { getGameIcon, getGameConfig } from '../gameConfig';
 /**
  * GameSessionHUD
  * Clinical in-game heads-up display overlay for dichoptic therapy.
- * Tracks live elapsed seconds, daily prescribed remaining time, pause/resume state,
- * and records exact therapy duration upon completion or premature exit.
+ * Includes:
+ * - Pre-Game Briefing Modal with constrained mascot icon badge and clinical glasses reminder
+ * - Speed Settings Engine (Slow / Medium / Fast / Incremental Adaptive)
+ * - 3-2-1 Preparation Countdown
+ * - Real-time therapy countdown timer and duration logging
  */
 export default class GameSessionHUD extends React.Component {
     constructor(props) {
@@ -16,7 +19,12 @@ export default class GameSessionHUD extends React.Component {
         const totalPrescribedSeconds = prescribedMinutes * 60;
         const initialRemaining = Math.max(0, totalPrescribedSeconds - alreadyPlayedSeconds);
 
+        const savedSpeed = (typeof localStorage !== 'undefined') ? (localStorage.getItem('lazyeye_game_speed') || 'medium') : 'medium';
+
         this.state = {
+            sessionStage: 'briefing', // 'briefing' | 'countdown' | 'active'
+            countdown: 3,
+            speedMode: savedSpeed, // 'slow' | 'medium' | 'fast' | 'incremental'
             elapsedSeconds: 0,
             remainingSeconds: initialRemaining,
             totalPrescribedSeconds: totalPrescribedSeconds,
@@ -28,13 +36,30 @@ export default class GameSessionHUD extends React.Component {
         };
 
         this.timer = null;
+        this.countdownTimer = null;
         this.containerRef = React.createRef();
     }
 
     componentDidMount() {
-        this.startTimer();
         window.addEventListener('message', this.handleIframeMessage);
-        
+    }
+
+    componentWillUnmount() {
+        this.stopTimer();
+        this.stopCountdownTimer();
+        window.removeEventListener('message', this.handleIframeMessage);
+    }
+
+    handleSelectSpeed = (mode) => {
+        this.setState({ speedMode: mode });
+        if (typeof localStorage !== 'undefined') {
+            localStorage.setItem('lazyeye_game_speed', mode);
+        }
+    };
+
+    handleStartCountdown = () => {
+        this.setState({ sessionStage: 'countdown', countdown: 3 });
+
         // Request fullscreen on container if available
         const elem = this.containerRef.current;
         if (elem) {
@@ -42,17 +67,42 @@ export default class GameSessionHUD extends React.Component {
             else if (elem.webkitRequestFullscreen) elem.webkitRequestFullscreen();
             else if (elem.msRequestFullscreen) elem.msRequestFullscreen();
         }
-    }
 
-    componentWillUnmount() {
-        this.stopTimer();
-        window.removeEventListener('message', this.handleIframeMessage);
-    }
+        this.countdownTimer = setInterval(() => {
+            this.setState(prev => {
+                if (prev.countdown <= 1) {
+                    this.stopCountdownTimer();
+                    this.startActiveSession();
+                    return { sessionStage: 'active', countdown: 0 };
+                }
+                return { countdown: prev.countdown - 1 };
+            });
+        }, 900);
+    };
+
+    stopCountdownTimer = () => {
+        if (this.countdownTimer) {
+            clearInterval(this.countdownTimer);
+            this.countdownTimer = null;
+        }
+    };
+
+    startActiveSession = () => {
+        this.startTimer();
+        // Send speedMode to iframe
+        const iframe = document.getElementById('session-game-iframe');
+        if (iframe && iframe.contentWindow) {
+            iframe.contentWindow.postMessage({ 
+                msg: 'START_GAME',
+                speedMode: this.state.speedMode 
+            }, '*');
+        }
+    };
 
     startTimer = () => {
         this.stopTimer();
         this.timer = setInterval(() => {
-            if (!this.state.isPaused) {
+            if (!this.state.isPaused && this.state.sessionStage === 'active') {
                 this.setState(prev => {
                     const nextElapsed = prev.elapsedSeconds + 1;
                     const nextRemaining = Math.max(0, prev.remainingSeconds - 1);
@@ -110,8 +160,15 @@ export default class GameSessionHUD extends React.Component {
         this.setState({ isPaused: false, showExitConfirm: false });
     };
 
+    handleCancelBriefing = () => {
+        if (this.props.onSessionCompleted) {
+            this.props.onSessionCompleted(null);
+        }
+    };
+
     finishSession = (customScore = null) => {
         this.stopTimer();
+        this.stopCountdownTimer();
 
         // Exit fullscreen if active
         if (document.fullscreenElement) {
@@ -123,7 +180,7 @@ export default class GameSessionHUD extends React.Component {
 
         if (this.props.onSessionCompleted) {
             this.props.onSessionCompleted({
-                gameName: this.props.game?.title || this.props.game?.id || 'Therapy Game',
+                gameName: this.props.game?.title || this.props.game?.name || this.props.game?.id || 'Therapy Game',
                 score: scoreToSave,
                 durationSeconds: durationToSave,
                 elapsedFormatted: this.formatTime(durationToSave)
@@ -139,16 +196,39 @@ export default class GameSessionHUD extends React.Component {
 
     render() {
         const { game } = this.props;
-        const { elapsedSeconds, remainingSeconds, totalPrescribedSeconds, alreadyPlayedSeconds, isPaused, isGoalMet, currentScore, showExitConfirm } = this.state;
+        const { 
+            sessionStage, 
+            countdown, 
+            speedMode, 
+            elapsedSeconds, 
+            remainingSeconds, 
+            totalPrescribedSeconds, 
+            alreadyPlayedSeconds, 
+            isPaused, 
+            isGoalMet, 
+            currentScore, 
+            showExitConfirm 
+        } = this.state;
 
-        const gameConfig = getGameConfig(game?.id || game?.title) || game || {};
-        const icon = getGameIcon(game?.id || game?.title);
-        const title = gameConfig.title || game?.title || 'Therapy Session';
-        const clinicalType = gameConfig.clinicalType || 'Dichoptic Therapy';
+        const gameConfig = getGameConfig(game?.id || game?.title || game?.name) || game || {};
+        const icon = getGameIcon(game?.id || game?.title || game?.name);
+        const title = gameConfig.title || game?.title || game?.name || 'Therapy Session';
+        const clinicalType = gameConfig.clinicalType || 'Binocular Suppression Therapy';
+        const rawRoute = gameConfig.route || game?.route || '/game1snake';
+        
+        // Append speed parameter to route
+        const gameRoute = rawRoute + (rawRoute.includes('?') ? '&' : '?') + 'speed=' + speedMode;
 
         // Calculate total day progress percentage
         const totalDayCompletedSeconds = alreadyPlayedSeconds + elapsedSeconds;
         const progressPercent = Math.min(100, Math.round((totalDayCompletedSeconds / totalPrescribedSeconds) * 100));
+
+        const SPEED_LABELS = {
+            slow: { label: 'Slow (Rehab)', icon: 'fa-gauge-simple', desc: 'Extended dwell time for pediatric & severe amblyopia' },
+            medium: { label: 'Medium', icon: 'fa-gauge', desc: 'Standard clinical balance for active tracking' },
+            fast: { label: 'Fast (Agility)', icon: 'fa-gauge-high', desc: 'Rapid pursuit & reaction velocity challenge' },
+            incremental: { label: 'Adaptive', icon: 'fa-arrow-trend-up', desc: 'Speed accelerates automatically as score rises' }
+        };
 
         return (
             <div 
@@ -167,6 +247,12 @@ export default class GameSessionHUD extends React.Component {
                                 <span className="badge bg-danger text-white border border-danger-subtle font-mono" style={{ fontSize: '0.68rem', padding: '2px 6px' }}>
                                     Red/Cyan Dichoptic
                                 </span>
+                                {sessionStage === 'active' && (
+                                    <span className="badge bg-secondary font-mono d-none d-md-inline" style={{ fontSize: '0.68rem' }}>
+                                        <i className={`fa-solid ${SPEED_LABELS[speedMode]?.icon || 'fa-gauge'} me-1`}></i>
+                                        {SPEED_LABELS[speedMode]?.label || 'Standard'}
+                                    </span>
+                                )}
                             </div>
                             <small className="text-secondary d-none d-sm-inline" style={{ fontSize: '0.74rem' }}>
                                 {clinicalType}
@@ -202,26 +288,28 @@ export default class GameSessionHUD extends React.Component {
                             <strong className="fs-6 text-white">{currentScore}</strong>
                         </div>
 
-                        {/* Pause / Resume Button */}
-                        <button 
-                            type="button" 
-                            className={`btn btn-sm ${isPaused ? 'btn-success' : 'btn-outline-light'} px-3 d-flex align-items-center gap-1 fw-semibold`}
-                            onClick={this.togglePause}
-                            title={isPaused ? "Resume Session" : "Pause Session"}
-                        >
-                            <i className={`fa-solid ${isPaused ? 'fa-play' : 'fa-pause'}`}></i>
-                            <span className="d-none d-sm-inline">{isPaused ? 'Resume' : 'Pause'}</span>
-                        </button>
+                        {/* Pause / Resume Button (Active Stage Only) */}
+                        {sessionStage === 'active' && (
+                            <button 
+                                type="button" 
+                                className={`btn btn-sm ${isPaused ? 'btn-success' : 'btn-outline-light'} px-3 d-flex align-items-center gap-1 fw-semibold`}
+                                onClick={this.togglePause}
+                                title={isPaused ? "Resume Session" : "Pause Session"}
+                            >
+                                <i className={`fa-solid ${isPaused ? 'fa-play' : 'fa-pause'}`}></i>
+                                <span className="d-none d-sm-inline">{isPaused ? 'Resume' : 'Pause'}</span>
+                            </button>
+                        )}
 
                         {/* Finish & Save Session Button */}
                         <button 
                             type="button" 
                             className="btn btn-sm btn-danger px-3 d-flex align-items-center gap-1 fw-semibold shadow-sm"
-                            onClick={this.handleRequestExit}
-                            title="End session and record training duration"
+                            onClick={sessionStage === 'active' ? this.handleRequestExit : this.handleCancelBriefing}
+                            title="Exit session"
                         >
-                            <i className="fa-solid fa-flag-checkered"></i>
-                            <span>Finish &amp; Save</span>
+                            <i className="fa-solid fa-xmark me-1"></i>
+                            <span>{sessionStage === 'active' ? 'Finish & Save' : 'Exit'}</span>
                         </button>
                     </div>
                 </header>
@@ -236,13 +324,104 @@ export default class GameSessionHUD extends React.Component {
                 {/* Main Game Iframe Frame */}
                 <iframe 
                     id="session-game-iframe" 
-                    src={game?.route || '/game1snake'} 
+                    src={gameRoute} 
                     allow="fullscreen" 
                     className="session-hud-iframe"
                     title={title}
                 />
 
-                {/* Premature Exit / Finish Confirmation Modal */}
+                {/* 1. Pre-Game Launch & Briefing Modal */}
+                {sessionStage === 'briefing' && (
+                    <div className="position-fixed top-0 start-0 w-100 h-100 d-flex align-items-center justify-content-center p-3" style={{ backgroundColor: 'rgba(2, 6, 23, 0.92)', zIndex: 100000, backdropFilter: 'blur(8px)' }}>
+                        <div className="card border shadow-2xl p-4 text-center" style={{ maxWidth: 500, width: '100%', backgroundColor: '#0f172a', borderColor: '#334155', color: '#f8fafc', borderRadius: 20 }}>
+                            {/* Constrained Mascot Artwork Badge */}
+                            <div className="mb-3">
+                                <div className="d-inline-flex p-3 rounded-circle shadow-lg" style={{ width: 104, height: 104, backgroundColor: '#1e293b', border: '2px solid rgba(56, 189, 248, 0.4)' }}>
+                                    <img src={icon} alt={title} style={{ width: '100%', height: '100%', objectFit: 'contain' }} />
+                                </div>
+                            </div>
+
+                            <h4 className="fw-bold mb-1 text-white">{title}</h4>
+                            <p className="text-secondary small mb-3">{clinicalType}</p>
+
+                            {/* 3D Glasses Check Banner */}
+                            <div className="d-flex align-items-center justify-content-center gap-3 p-2 rounded border mb-3" style={{ backgroundColor: 'rgba(15, 23, 42, 0.8)', borderColor: '#334155' }}>
+                                <div className="d-flex align-items-center gap-2 small font-mono">
+                                    <span className="badge rounded-circle p-1" style={{ backgroundColor: '#ef4444', width: 16, height: 16 }}> </span>
+                                    <span>Left Eye: <strong>RED</strong></span>
+                                </div>
+                                <span className="text-secondary">|</span>
+                                <div className="d-flex align-items-center gap-2 small font-mono">
+                                    <span className="badge rounded-circle p-1" style={{ backgroundColor: '#06b6d4', width: 16, height: 16 }}> </span>
+                                    <span>Right Eye: <strong>CYAN</strong></span>
+                                </div>
+                            </div>
+
+                            {/* Speed & Difficulty Mode Selection */}
+                            <div className="mb-4 text-start">
+                                <label className="form-label small fw-semibold text-secondary d-flex justify-content-between align-items-center">
+                                    <span>Therapy Speed &amp; Tracking Velocity</span>
+                                    <span className="text-primary font-mono">{SPEED_LABELS[speedMode]?.label}</span>
+                                </label>
+                                <div className="row g-2">
+                                    {Object.entries(SPEED_LABELS).map(([key, item]) => (
+                                        <div key={key} className="col-6">
+                                            <button 
+                                                type="button" 
+                                                className={`btn btn-sm w-100 py-2 px-2 text-start border d-flex align-items-center gap-2 ${speedMode === key ? 'btn-primary' : 'btn-outline-secondary'}`}
+                                                style={{ borderRadius: 10, fontSize: '0.8rem' }}
+                                                onClick={() => this.handleSelectSpeed(key)}
+                                            >
+                                                <i className={`fa-solid ${item.icon} fs-6`}></i>
+                                                <div className="overflow-hidden">
+                                                    <div className="fw-bold text-truncate">{item.label}</div>
+                                                </div>
+                                            </button>
+                                        </div>
+                                    ))}
+                                </div>
+                                <small className="text-secondary d-block mt-2 font-mono" style={{ fontSize: '0.74rem' }}>
+                                    <i className="fa-solid fa-circle-info text-info me-1"></i> {SPEED_LABELS[speedMode]?.desc}
+                                </small>
+                            </div>
+
+                            {/* Action Buttons */}
+                            <div className="d-flex gap-2">
+                                <button 
+                                    type="button" 
+                                    className="btn btn-outline-light px-3 py-2 fw-semibold w-50"
+                                    onClick={this.handleCancelBriefing}
+                                >
+                                    Cancel
+                                </button>
+                                <button 
+                                    type="button" 
+                                    className="btn btn-success px-3 py-2 fw-bold w-50 shadow-lg d-flex align-items-center justify-content-center gap-2"
+                                    onClick={this.handleStartCountdown}
+                                >
+                                    <i className="fa-solid fa-play"></i> Start Session
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                )}
+
+                {/* 2. 3-2-1 Countdown Overlay */}
+                {sessionStage === 'countdown' && (
+                    <div className="position-fixed top-0 start-0 w-100 h-100 d-flex flex-column align-items-center justify-content-center" style={{ backgroundColor: 'rgba(2, 6, 23, 0.95)', zIndex: 100000 }}>
+                        <div className="text-secondary text-uppercase fw-semibold tracking-wider font-mono mb-2" style={{ letterSpacing: '0.2em' }}>
+                            Put on your glasses
+                        </div>
+                        <div className="display-1 fw-bold text-white mb-2" style={{ fontSize: '8rem', textShadow: '0 0 30px rgba(56, 189, 248, 0.8)' }}>
+                            {countdown > 0 ? countdown : 'GO!'}
+                        </div>
+                        <div className="text-info font-mono small">
+                            Focusing visual cortex on targets...
+                        </div>
+                    </div>
+                )}
+
+                {/* 3. Premature Exit / Finish Confirmation Modal */}
                 {showExitConfirm && (
                     <div className="position-fixed top-0 start-0 w-100 h-100 d-flex align-items-center justify-content-center" style={{ backgroundColor: 'rgba(0,0,0,0.75)', zIndex: 100000 }}>
                         <div className="card border shadow-lg p-4 text-center" style={{ maxWidth: 440, backgroundColor: '#0f172a', borderColor: '#334155', color: '#f8fafc', borderRadius: 16 }}>
@@ -277,4 +456,3 @@ export default class GameSessionHUD extends React.Component {
         );
     }
 }
-

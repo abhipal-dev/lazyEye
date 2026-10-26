@@ -241,6 +241,21 @@
       document.getElementById('appleEyeDot').style.background = appleColor;
     }
 
+    // Therapy Speed Settings (Slow / Medium / Fast / Incremental)
+    const urlParams = new URLSearchParams(window.location.search);
+    let speedParam = urlParams.get('speed') || 'medium';
+    let baseSpeedDivider = (speedParam === 'slow') ? 8 : ((speedParam === 'fast') ? 4 : 6);
+    let isIncremental = (speedParam === 'incremental');
+
+    window.addEventListener('message', function(e) {
+      if (!e.data) return;
+      if (e.data.speedMode) {
+        speedParam = e.data.speedMode;
+        baseSpeedDivider = (speedParam === 'slow') ? 8 : ((speedParam === 'fast') ? 4 : 6);
+        isIncremental = (speedParam === 'incremental');
+      }
+    });
+
     let count = 0;
     let score = 0;
 
@@ -278,8 +293,12 @@
     function loop() {
       requestAnimationFrame(loop);
 
-      // Control game speed (runs every 6 frames ~ 10 fps)
-      if (++count < 6) return;
+      // Control game speed dynamically based on selected therapy velocity
+      let currentDivider = baseSpeedDivider;
+      if (isIncremental) {
+        currentDivider = Math.max(3, 8 - Math.floor(score / 5));
+      }
+      if (++count < currentDivider) return;
       count = 0;
 
       context.clearRect(0, 0, canvas.width, canvas.height);
