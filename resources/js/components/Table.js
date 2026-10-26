@@ -36,7 +36,17 @@ export default class Table extends React.Component{
                             <small className="text-sub">Manage patients, clinical staff, and therapy records</small>
                         </div>
                     </div>
-                    <div className="d-flex align-items-center gap-2">
+                                            {(!this.props.activeCategory || this.props.activeCategory === 'fetchUsers') && (
+                            <div className="d-flex align-items-center gap-1 p-1 rounded border font-mono small mt-2 mt-md-0" style={{ backgroundColor: 'var(--bg-surface-secondary)', borderColor: 'var(--border-color)', fontSize: '0.78rem' }}>
+                                <span className="px-2 text-sub small fw-semibold">Radar:</span>
+                                <button type="button" className="btn btn-xs btn-outline-secondary compliance-filter-btn all active px-2 py-0" onClick={() => window.filterUsersByCompliance && window.filterUsersByCompliance('all')}>All</button>
+                                <button type="button" className="btn btn-xs btn-outline-success compliance-filter-btn compliant px-2 py-0" onClick={() => window.filterUsersByCompliance && window.filterUsersByCompliance('compliant')}><i className="fa-solid fa-circle-check me-1"></i>Compliant</button>
+                                <button type="button" className="btn btn-xs btn-outline-warning compliance-filter-btn needs_review px-2 py-0" onClick={() => window.filterUsersByCompliance && window.filterUsersByCompliance('needs_review')}><i className="fa-solid fa-clock-rotate-left me-1"></i>Review</button>
+                                <button type="button" className="btn btn-xs btn-outline-danger compliance-filter-btn at_risk px-2 py-0" onClick={() => window.filterUsersByCompliance && window.filterUsersByCompliance('at_risk')}><i className="fa-solid fa-triangle-exclamation me-1"></i>At-Risk</button>
+                            </div>
+                        )}
+
+                        <div className="d-flex align-items-center gap-2">
                         <span className="badge border font-mono small px-3 py-2 rounded-2" style={{ backgroundColor: 'var(--bg-surface-secondary)', borderColor: 'var(--border-color)', color: 'var(--text-main)' }}>
                             <i className="fa-solid fa-circle-info me-1"></i> Tip: Click any row to inspect complete clinical dossier
                         </span>

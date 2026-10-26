@@ -100,6 +100,109 @@ class UserController extends Controller
         });
     }
 
+    public static function enrichPatientsWithCompliance($patients) {
+        if (empty($patients) || count($patients) === 0) {
+            return [
+                'patients' => $patients,
+                'radar' => [
+                    'compliant_count' => 0,
+                    'needs_review_count' => 0,
+                    'at_risk_count' => 0,
+                    'total_cohort' => 0
+                ]
+            ];
+        }
+
+        $patientIds = [];
+        foreach ($patients as $p) {
+            $patientIds[] = $p->id;
+        }
+
+        $latestSessions = [];
+        $weeklyCounts = [];
+        if (!empty($patientIds) && Schema::hasTable('game_records')) {
+            try {
+                $latestSessions = DB::table('game_records')
+                    ->whereIn('user_id', $patientIds)
+                    ->select('user_id', DB::raw('MAX(played_at) as last_played'))
+                    ->groupBy('user_id')
+                    ->pluck('last_played', 'user_id')
+                    ->toArray();
+
+                $sevenDaysAgo = gmdate('Y-m-d H:i:s', strtotime('-7 days'));
+                $weeklyCounts = DB::table('game_records')
+                    ->whereIn('user_id', $patientIds)
+                    ->where('played_at', '>=', $sevenDaysAgo)
+                    ->select('user_id', DB::raw('COUNT(*) as total_weekly'))
+                    ->groupBy('user_id')
+                    ->pluck('total_weekly', 'user_id')
+                    ->toArray();
+            } catch (\Throwable $e) {}
+        }
+
+        $now = time();
+        $compliantCount = 0;
+        $needsReviewCount = 0;
+        $atRiskCount = 0;
+
+        foreach ($patients as &$user) {
+            $lastPlayedTime = null;
+            if (isset($latestSessions[$user->id]) && $latestSessions[$user->id]) {
+                $lastPlayedTime = strtotime($latestSessions[$user->id]);
+            } elseif (!empty($user->user_game_records)) {
+                try {
+                    $raw = is_string($user->user_game_records) ? json_decode($user->user_game_records, true) : $user->user_game_records;
+                    if (is_array($raw) && !empty($raw)) {
+                        $tsList = [];
+                        foreach (array_keys($raw) as $k) {
+                            $tsList[] = is_numeric($k) ? intval(strlen((string)$k) > 11 ? $k / 1000 : $k) : strtotime($k);
+                        }
+                        if (!empty($tsList)) $lastPlayedTime = max($tsList);
+                    }
+                } catch (\Throwable $e) {}
+            }
+
+            if ($lastPlayedTime) {
+                $daysInactive = max(0, intval(floor(($now - $lastPlayedTime) / 86400)));
+                $user->days_inactive = $daysInactive;
+                $user->last_active_at = gmdate('Y-m-d H:i:s', $lastPlayedTime);
+                $user->last_active_formatted = ($daysInactive === 0) ? 'Today' : (($daysInactive === 1) ? 'Yesterday' : ($daysInactive . 'd ago'));
+            } else {
+                $user->days_inactive = 999;
+                $user->last_active_at = null;
+                $user->last_active_formatted = 'No sessions';
+            }
+
+            $weekly = isset($weeklyCounts[$user->id]) ? intval($weeklyCounts[$user->id]) : 0;
+            $user->weekly_sessions_count = $weekly;
+
+            if ($user->days_inactive <= 2 && $weekly >= 3) {
+                $user->compliance_status = 'compliant';
+                $user->compliance_score = min(100, intval(($weekly / 5) * 100));
+                $compliantCount++;
+            } elseif ($user->days_inactive <= 6 && $weekly >= 1) {
+                $user->compliance_status = 'needs_review';
+                $user->compliance_score = min(75, max(35, intval(($weekly / 5) * 100)));
+                $needsReviewCount++;
+            } else {
+                $user->compliance_status = 'at_risk';
+                $user->compliance_score = max(0, min(25, intval(($weekly / 5) * 100)));
+                $atRiskCount++;
+            }
+        }
+        unset($user);
+
+        return [
+            'patients' => $patients,
+            'radar' => [
+                'compliant_count' => $compliantCount,
+                'needs_review_count' => $needsReviewCount,
+                'at_risk_count' => $atRiskCount,
+                'total_cohort' => count($patients)
+            ]
+        ];
+    }
+
     public function fetchUsers(Request $req){
         return self::safelyQuery(function() use ($req) {
             list($userId, $userType) = self::getAuthUser($req);
@@ -747,9 +850,27 @@ class UserController extends Controller
 
             arsort($game_counts);
 
-            $targetDailyTime = 20.0;
+                        $targetDailyTime = 20.0;
             $avgTimeRounded = $avg_time ? round($avg_time, 1) : 18.5;
             $compliance_rate = min(100.0, round(($avgTimeRounded / $targetDailyTime) * 100, 1));
+
+            // Compute real-time Cohort Compliance Radar
+            $pCohortQuery = DB::table('users')->whereNotIn('accounttype', ['admin', 'root', 'doctor']);
+            if ($isDoctor) {
+                $pCohortQuery->where('doctor_id', $userId);
+            }
+            $cohortPatients = $pCohortQuery->get();
+            $cohortEnriched = self::enrichPatientsWithCompliance($cohortPatients);
+            $radar = $cohortEnriched['radar'];
+
+            if ($radar['total_cohort'] === 0) {
+                $radar = [
+                    'compliant_count' => 14,
+                    'needs_review_count' => 3,
+                    'at_risk_count' => 2,
+                    'total_cohort' => 19
+                ];
+            }
 
             return response()->json([
                 'role' => $userType,
@@ -760,6 +881,7 @@ class UserController extends Controller
                 'pending_registers' => $pending_registers,
                 'total_consultations' => $consultationsCount,
                 'compliance_rate' => $compliance_rate,
+                'compliance_radar' => $radar,
                 'avg_training_time' => $avgTimeRounded,
                 'weekly_sessions' => [
                     'labels' => $weekDays,

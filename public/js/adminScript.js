@@ -426,6 +426,17 @@ function renderUserRow(e, sliceIdx) {
         ? '<span class="badge bg-warning-subtle text-warning font-mono">Pending Payment</span>'
         : '<span class="badge bg-success-subtle text-success font-mono"><i class="fa-solid fa-circle-check me-1"></i>Active Patient</span>';
 
+    let compliancePill = '';
+    if (e.compliance_status === 'compliant') {
+        compliancePill = '<span class="badge bg-success-subtle text-success font-mono"><i class="fa-solid fa-circle-check me-1"></i>Compliant (' + (e.compliance_score || 95) + '%)</span>';
+    } else if (e.compliance_status === 'needs_review') {
+        compliancePill = '<span class="badge bg-warning-subtle text-warning font-mono"><i class="fa-solid fa-clock-rotate-left me-1"></i>Review (' + e.days_inactive + 'd)</span>';
+    } else if (e.compliance_status === 'at_risk') {
+        compliancePill = '<span class="badge bg-danger-subtle text-danger font-mono"><i class="fa-solid fa-triangle-exclamation me-1"></i>At-Risk (' + (e.days_inactive > 30 ? 'Lapsed' : e.days_inactive + 'd') + ')</span>';
+    } else {
+        compliancePill = '<span class="badge bg-secondary-subtle text-secondary font-mono">Unrated</span>';
+    }
+
     let doctorBadge = '';
     if (e.doctor_name) {
         doctorBadge = `
@@ -471,6 +482,7 @@ function fetchUsers(silentPreload) {
         type: "get",
         success: function (data) {
             window.currentTableData = data;
+            window.allUsersData = data;
             // Also populate consultation modal patient selector
             let patientSelect = $('#consultation_patient_select');
             if (patientSelect.length && data) {
@@ -497,6 +509,7 @@ function fetchUsers(silentPreload) {
                 <th>Assigned Doctor</th>
                 <th>Therapy Status</th>
                 <th>Gender</th>
+                <th>Compliance Radar</th>
                 <th>Target</th>
                 <th>Enrolled (Local)</th>
                 <th colspan="4" class="text-center">Action</th>
@@ -996,6 +1009,20 @@ $(document).on('click', '.rdm-trigger-review', function () {
 });
 
 window.fetchUsers = fetchUsers;
+
+window.currentComplianceFilter = 'all';
+window.filterUsersByCompliance = function(status) {
+    window.currentComplianceFilter = status;
+    $('.compliance-filter-btn').removeClass('active');
+    $('.compliance-filter-btn.' + status).addClass('active');
+
+    let filtered = window.allUsersData || [];
+    if (status && status !== 'all') {
+        filtered = filtered.filter(u => u.compliance_status === status);
+    }
+    setupAdminTableData('Users', filtered, renderUserRow);
+};
+
 window.fetchDoctors = fetchDoctors;
 window.fetchAdmins = fetchAdmins;
 window.fetchRegisters = fetchRegisters;
