@@ -123,4 +123,45 @@ class AuthController extends Controller
             return view('welcome');
         }
     }
+
+    public function resetPassword(Request $request){
+        $validator = Validator::make($request->all(), [
+            'identifier' => 'required',
+            'new_password' => 'required|min:4'
+        ]);
+
+        if ($validator->fails()) {
+            return response()->json([
+                'status' => 400,
+                'message' => 'Please provide your registered username/email and a new password (min 4 characters).'
+            ]);
+        }
+
+        return \App\Http\Controllers\UserController::safelyQuery(function() use ($request) {
+            $identifier = trim($request->identifier);
+            $user = DB::table('users')
+                ->where('username', $identifier)
+                ->orWhere('email', $identifier)
+                ->first();
+
+            if (!$user) {
+                return response()->json([
+                    'status' => 404,
+                    'message' => 'No account found matching that username or email address.'
+                ]);
+            }
+
+            DB::table('users')->where('id', $user->id)->update([
+                'password' => $request->new_password,
+                'updated_at' => gmdate('Y-m-d H:i:s')
+            ]);
+
+            return response()->json([
+                'status' => 200,
+                'message' => 'Your password has been reset successfully. You can now sign in.',
+                'username' => $user->username
+            ]);
+        });
+    }
+
 }

@@ -335,6 +335,9 @@ export default class AdminDashboard extends React.Component {
                                                 <div className="form-group col-12 col-md-6">
                                                     <label className="form-label small fw-semibold text-secondary">Password <span className="text-muted fw-normal">(Optional)</span></label>
                                                     <input type="password" name="password" id="password" className="form-control" placeholder="Leave blank to keep current password" />
+                                                    <small className="text-success font-mono d-block mt-1" style={{ fontSize: '0.75rem' }}>
+                                                        <i className="fa-solid fa-shield-halved me-1"></i> Current password is encrypted &amp; active. Type here only to reset.
+                                                    </small>
                                                 </div>
                                                 <div className="form-group col-12 col-md-6">
                                                     <label className="form-label small fw-semibold text-secondary">Account Role</label>

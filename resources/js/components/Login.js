@@ -11,7 +11,14 @@ export default class Login extends React.Component {
             username: '',
             password: '',
             isSubmitting: false,
-            errorMessage: ''
+            errorMessage: '',
+            showForgotModal: false,
+            forgotIdentifier: '',
+            newPassword: '',
+            confirmPassword: '',
+            isResetting: false,
+            forgotError: '',
+            forgotSuccess: ''
         };
     }
 
@@ -38,6 +45,55 @@ export default class Login extends React.Component {
             errorMessage: ''
         });
     }
+
+    
+    handleResetPasswordSubmit = (e) => {
+        e.preventDefault();
+        const { forgotIdentifier, newPassword, confirmPassword } = this.state;
+        if (!forgotIdentifier.trim()) {
+            this.setState({ forgotError: 'Please enter your registered username or email.' });
+            return;
+        }
+        if (newPassword.length < 4) {
+            this.setState({ forgotError: 'New password must be at least 4 characters.' });
+            return;
+        }
+        if (newPassword !== confirmPassword) {
+            this.setState({ forgotError: 'Passwords do not match. Please re-enter.' });
+            return;
+        }
+
+        this.setState({ isResetting: true, forgotError: '', forgotSuccess: '' });
+        const token = $('meta[name="csrf-token"]').attr('content');
+
+        $.ajax({
+            url: '/ResetPassword',
+            type: 'POST',
+            headers: { 'X-CSRF-TOKEN': token },
+            data: {
+                identifier: forgotIdentifier.trim(),
+                new_password: newPassword
+            },
+            success: (res) => {
+                this.setState({ isResetting: false });
+                if (res && res.status === 200) {
+                    this.setState({
+                        forgotSuccess: res.message,
+                        username: res.username || forgotIdentifier,
+                        password: newPassword
+                    });
+                } else {
+                    this.setState({ forgotError: (res && res.message) || 'Account not found. Please verify your username or email.' });
+                }
+            },
+            error: (xhr) => {
+                this.setState({
+                    isResetting: false,
+                    forgotError: xhr.responseJSON?.message || 'Unable to reset password. Please check your details.'
+                });
+            }
+        });
+    };
 
     handleSubmit = (e) => {
         e.preventDefault();
