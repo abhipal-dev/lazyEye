@@ -241,18 +241,27 @@
       document.getElementById('appleEyeDot').style.background = appleColor;
     }
 
-    // Therapy Speed Settings (Slow / Medium / Fast / Incremental)
+    // Therapy Speed Settings (Doctor Prescribed: Progressive vs Fixed Levels 1-5)
     const urlParams = new URLSearchParams(window.location.search);
-    let speedParam = urlParams.get('speed') || 'medium';
-    let baseSpeedDivider = (speedParam === 'slow') ? 8 : ((speedParam === 'fast') ? 4 : 6);
-    let isIncremental = (speedParam === 'incremental');
+    let speedParam = urlParams.get('speed') || 'level-3';
+
+    function getDividerForSpeed(speed) {
+      if (speed === 'level-1' || speed === 'slow') return 10; // Level 1: Rehab / Very Slow
+      if (speed === 'level-2') return 8; // Level 2: Slow
+      if (speed === 'level-4' || speed === 'fast') return 4; // Level 4: Fast
+      if (speed === 'level-5') return 3; // Level 5: Agility
+      return 6; // Level 3: Normal / Standard default
+    }
+
+    let isIncremental = (speedParam === 'progressive' || speedParam === 'incremental');
+    let baseSpeedDivider = getDividerForSpeed(speedParam);
 
     window.addEventListener('message', function(e) {
       if (!e.data) return;
       if (e.data.speedMode) {
         speedParam = e.data.speedMode;
-        baseSpeedDivider = (speedParam === 'slow') ? 8 : ((speedParam === 'fast') ? 4 : 6);
-        isIncremental = (speedParam === 'incremental');
+        isIncremental = (speedParam === 'progressive' || speedParam === 'incremental');
+        baseSpeedDivider = getDividerForSpeed(speedParam);
       }
     });
 

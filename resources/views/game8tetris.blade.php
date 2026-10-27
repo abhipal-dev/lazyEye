@@ -434,18 +434,27 @@
     let level = 1;
     let gameOver = false;
     let rAF = null;
-    // Dichoptic Speed & Velocity Settings (Slow / Medium / Fast / Incremental)
+    // Dichoptic Speed & Velocity Settings (Doctor Prescribed: Progressive vs Fixed Levels 1-5)
     const urlParams = new URLSearchParams(window.location.search);
-    let speedParam = urlParams.get('speed') || 'medium';
-    let baseDropInterval = (speedParam === 'slow') ? 55 : ((speedParam === 'fast') ? 25 : 40);
-    let isIncremental = (speedParam === 'incremental');
+    let speedParam = urlParams.get('speed') || 'level-3';
+
+    function getDropIntervalForSpeed(speed) {
+      if (speed === 'level-1' || speed === 'slow') return 65; // Level 1: Rehab / Very Slow
+      if (speed === 'level-2') return 50; // Level 2: Slow
+      if (speed === 'level-4' || speed === 'fast') return 26; // Level 4: Fast
+      if (speed === 'level-5') return 18; // Level 5: Agility
+      return 38; // Level 3: Normal / Standard baseline
+    }
+
+    let isIncremental = (speedParam === 'progressive' || speedParam === 'incremental');
+    let baseDropInterval = getDropIntervalForSpeed(speedParam);
 
     window.addEventListener('message', function(e) {
       if (!e.data) return;
       if (e.data.speedMode) {
         speedParam = e.data.speedMode;
-        baseDropInterval = (speedParam === 'slow') ? 55 : ((speedParam === 'fast') ? 25 : 40);
-        isIncremental = (speedParam === 'incremental');
+        isIncremental = (speedParam === 'progressive' || speedParam === 'incremental');
+        baseDropInterval = getDropIntervalForSpeed(speedParam);
         dropInterval = baseDropInterval;
       }
     });
