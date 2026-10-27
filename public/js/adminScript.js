@@ -337,7 +337,7 @@ function renderDoctorRow(e, sliceIdx) {
         <td>`+ e.email + `</td>
         <td class="font-mono">`+ (e.user_playing_time || 20) + ` mins/day</td>
         <td class="font-mono small">`+ localJoined + `</td>
-        <td class="text-center"><button class="btn btn-sm btn-secondary px-2 py-1 edit" data-bs-toggle="modal" data-bs-target="#editModal" data-id="`+ e.id + `" data-fullname="`+ (e.fullname || '') + `" data-username="`+ (e.username || '') + `" data-email="`+ (e.email || '') + `" data-gender="`+ (e.gender || 'Male') + `" data-type="`+ (e.accounttype || 'doctor') + `" data-time="`+ (e.user_playing_time || 20) + `"><i class="fa-solid fa-pen-to-square me-1"></i>Edit</button></td>
+        <td class="text-center"><button class="btn btn-sm btn-secondary px-2 py-1 edit" data-bs-toggle="modal" data-bs-target="#editModal" data-id="`+ e.id + `" data-fullname="`+ (e.fullname || '') + `" data-username="`+ (e.username || '') + `" data-email="`+ (e.email || '') + `" data-gender="`+ (e.gender || 'Male') + `" data-type="`+ (e.accounttype || 'doctor') + `" data-time="`+ (e.user_playing_time || 20) + `" data-speed="`+ (e.game_speed || "level-3") + `"><i class="fa-solid fa-pen-to-square me-1"></i>Edit</button></td>
         <td class="text-center"><button class="btn btn-sm btn-outline-danger px-2 py-1" onclick="deleteData(`+ e.id + `,'doctors')"><i class="fa-solid fa-trash me-1"></i>Delete</button></td>
         </tr>`
     );
@@ -466,7 +466,7 @@ function renderUserRow(e, sliceIdx) {
         <td class="font-mono small">`+ localEnrolled + `</td>
         <td class="text-center"><button class="btn btn-sm btn-secondary px-2 py-1 view-activity-btn" data-patient-id="`+ e.id + `" data-patient-name="`+ (e.fullname || '') + `" title="View Patient Activity Report & Heatmap"><i class="fa-solid fa-fire text-danger me-1"></i>Activity</button></td>
         <td class="text-center"><button class="btn btn-sm btn-secondary px-2 py-1 log-review-btn" data-patient-id="`+ e.id + `" data-patient-name="`+ (e.fullname || '') + `" data-doctor-id="`+ (e.doctor_id || 23) + `" title="Log Clinical Review"><i class="fa-solid fa-stethoscope me-1"></i>Review</button></td>
-        <td class="text-center"><button class="btn btn-sm btn-secondary px-2 py-1 edit" data-bs-toggle="modal" data-bs-target="#editModal" data-id="`+ e.id + `" data-fullname="`+ (e.fullname || '') + `" data-username="`+ (e.username || '') + `" data-email="`+ (e.email || '') + `" data-gender="`+ (e.gender || 'Male') + `" data-type="`+ (e.accounttype || 'user') + `" data-time="`+ (e.user_playing_time || 20) + `" data-doctor="`+ (e.doctor_id || '') + `"><i class="fa-solid fa-pen-to-square me-1"></i>Edit</button></td>
+        <td class="text-center"><button class="btn btn-sm btn-secondary px-2 py-1 edit" data-bs-toggle="modal" data-bs-target="#editModal" data-id="`+ e.id + `" data-fullname="`+ (e.fullname || '') + `" data-username="`+ (e.username || '') + `" data-email="`+ (e.email || '') + `" data-gender="`+ (e.gender || 'Male') + `" data-type="`+ (e.accounttype || 'user') + `" data-time="`+ (e.user_playing_time || 20) + `" data-doctor="`+ (e.doctor_id || '') + `" data-speed="`+ (e.game_speed || 'level-3') + `"><i class="fa-solid fa-pen-to-square me-1"></i>Edit</button></td>
         <td class="text-center"><button class="btn btn-sm btn-outline-danger px-2 py-1" onclick="deleteData(`+ e.id + `,'users')"><i class="fa-solid fa-trash me-1"></i>Delete</button></td>
         </tr>`
     );
@@ -1166,6 +1166,7 @@ $(document).on('click', 'button.edit', function () {
     $('#editModal input[name="email"]').val(email);
     $('#editModal input[name="password"]').val('');
     $('#editModal input[name="allotted_time"]').val(allotted_time);
+    $('#edit_game_speed').val(btn.attr('data-speed') || 'level-3');
     $('#edit_accounttype').val(accounttype);
     $('#edit_doctor_id').val(doctor_id);
 

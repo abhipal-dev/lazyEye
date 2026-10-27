@@ -95,7 +95,9 @@ export default class GameSessionHUD extends React.Component {
 
         const gameConfig = getGameConfig(game?.id || game?.title || game?.name) || game || {};
         const title = gameConfig.title || game?.title || game?.name || 'Game';
-        const gameRoute = gameConfig.route || game?.route || '/game1snake';
+        const rawRoute = gameConfig.route || game?.route || '/game1snake';
+        const prescribedSpeed = this.props.gameSpeed || gameConfig.speed || game?.speed || 'level-3';
+        const gameRoute = rawRoute + (rawRoute.includes('?') ? '&' : '?') + 'speed=' + prescribedSpeed;
 
         return (
             <div 

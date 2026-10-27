@@ -161,8 +161,20 @@ export default class UserDashboard extends React.Component {
         const todayKey = String(current_date_timestamp);
         if (!existingRecords[todayKey]) existingRecords[todayKey] = {};
         const gameName = result.gameName || 'Therapy Game';
-        existingRecords[todayKey][gameName] = result.score || 0;
+        const prevBest = existingRecords[todayKey][gameName] || 0;
+        existingRecords[todayKey][gameName] = Math.max(prevBest, result.score || 0);
         const stringScore = JSON.stringify(existingRecords);
+
+        // Update local today_games_summary immediately
+        this.setState(prev => {
+            const currentSummary = { ...(prev.today_games_summary || {}) };
+            const prevEntry = currentSummary[gameName] || { duration_seconds: 0, best_score: 0 };
+            currentSummary[gameName] = {
+                duration_seconds: (prevEntry.duration_seconds || 0) + (result.durationSeconds || 0),
+                best_score: Math.max(prevEntry.best_score || 0, result.score || 0)
+            };
+            return { today_games_summary: currentSummary };
+        });
 
         let token = $('meta[name="csrf-token"]').attr('content');
         $.ajax({
@@ -212,6 +224,7 @@ export default class UserDashboard extends React.Component {
                         username: data[0].username,
                         data: data[0],
                         data2: data,
+                        today_games_summary: data[0].today_games_summary || {},
                         userProfileImage: `storage/images/${data[0].image_address}`
                     });
                     const leftDiv = document.querySelector('#leftColorTestDiv');
@@ -576,7 +589,7 @@ export default class UserDashboard extends React.Component {
                         <main>
                             <div className="container-fluid px-2 px-sm-3 px-md-4">
 
-                                {(this.state.current_component == 'user') ? <Games data={this.state.data.user_game_records} date_format={this.state.date_format} onStartSession={this.handleStartSession}/> : ''}
+                                {(this.state.current_component == 'user') ? <Games data={this.state.data.user_game_records} date_format={this.state.date_format} prescribedMinutes={this.state.data?.user_playing_time || 20} todayGameStats={this.state.today_games_summary || {}} onStartSession={this.handleStartSession}/> : ''}
 
                                 {(this.state.current_component == 'acuitytest') ? <VisualAcuityTest patient={this.state.data} /> : ''}
 
@@ -609,6 +622,7 @@ export default class UserDashboard extends React.Component {
                     <GameSessionHUD 
                         game={this.state.activeSession}
                         prescribedMinutes={this.state.data?.user_playing_time || 20}
+                        gameSpeed={this.state.data?.game_speed || 'level-3'}
                         alreadyPlayedSecondsToday={this.getTodayCompletedSeconds()}
                         onSessionCompleted={this.handleSessionCompleted}
                     />

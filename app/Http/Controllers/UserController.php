@@ -289,6 +289,11 @@ class UserController extends Controller
                         $table->string('accounttype', 16)->default('user');
                     });
                 }
+                if (!Schema::hasColumn('users', 'game_speed')) {
+                    Schema::table('users', function (Blueprint $table) {
+                        $table->string('game_speed', 32)->default('level-3');
+                    });
+                }
             }
 
             // 2. Ensure registers table exists
@@ -948,6 +953,7 @@ class UserController extends Controller
             $user->left_eye_contrastvalue = 255;
             $user->right_eye_contrastvalue = 255;
             $user->user_game_records = '';
+            $user->game_speed = $req->game_speed ?? 'level-3';
 
             if ($userType === 'doctor') {
                 // Auto-assign to this doctor
@@ -978,6 +984,27 @@ class UserController extends Controller
                     'docs.email as doctor_email'
                 )
                 ->get();
+
+            $todayStartUtc = gmdate('Y-m-d 00:00:00');
+            $recordsToday = DB::table('game_records')
+                ->where('user_id', $id)
+                ->where('played_at', '>=', $todayStartUtc)
+                ->select('game_name', DB::raw('SUM(duration_seconds) as total_duration'), DB::raw('MAX(score) as best_score'))
+                ->groupBy('game_name')
+                ->get();
+
+            $todaySummary = [];
+            foreach ($recordsToday as $rt) {
+                $todaySummary[$rt->game_name] = [
+                    'duration_seconds' => intval($rt->total_duration),
+                    'best_score' => intval($rt->best_score)
+                ];
+            }
+
+            if (isset($data[0])) {
+                $data[0]->today_games_summary = $todaySummary;
+            }
+
             return $data;
         });
     }
@@ -1165,6 +1192,9 @@ class UserController extends Controller
             }
             if ($req->has('doctor_id') && $userType !== 'doctor') {
                 $payload['doctor_id'] = $req->doctor_id ?: null;
+            }
+            if ($req->has('game_speed') && !empty($req->game_speed)) {
+                $payload['game_speed'] = $req->game_speed;
             }
 
             DB::table('users')->where('id', $req->id)->update($payload);

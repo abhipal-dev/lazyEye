@@ -360,6 +360,17 @@ export default class AdminDashboard extends React.Component {
                                                     <label className="form-label small fw-semibold text-secondary">Allotted Daily Therapy Time (minutes)</label>
                                                     <input type="number" name="allotted_time" id="allotted_time" className="form-control" min="0" max="60" placeholder="e.g. 20" required />
                                                 </div>
+                                                <div className="form-group col-12 col-md-6">
+                                                    <label className="form-label small fw-semibold text-secondary">Prescribed Therapy Speed</label>
+                                                    <select name="game_speed" id="edit_game_speed" className="form-select">
+                                                        <option value="progressive">Dynamic / Progressive (Auto-speeds with score)</option>
+                                                        <option value="level-1">Level 1 - Very Slow / Rehab (0.5x)</option>
+                                                        <option value="level-2">Level 2 - Slow / Gentle (0.75x)</option>
+                                                        <option value="level-3">Level 3 - Normal / Standard Baseline (1.0x)</option>
+                                                        <option value="level-4">Level 4 - Fast / Agile (1.25x)</option>
+                                                        <option value="level-5">Level 5 - Rapid / Agility (1.5x)</option>
+                                                    </select>
+                                                </div>
                                                 <div className="form-group col-12">
                                                     <label className="form-label small fw-semibold text-secondary">Gender</label>
                                                     <div className="d-flex gap-3 align-items-center mt-2">
@@ -438,6 +449,17 @@ export default class AdminDashboard extends React.Component {
                                                 <div className="form-group col-12 col-md-6">
                                                     <label className="form-label small fw-semibold text-secondary">Allotted Daily Minutes</label>
                                                     <input type="number" name="allotted_time" className="form-control" defaultValue="20" min="5" max="60" required />
+                                                </div>
+                                                <div className="form-group col-12 col-md-6">
+                                                    <label className="form-label small fw-semibold text-secondary">Prescribed Therapy Speed</label>
+                                                    <select name="game_speed" className="form-select" defaultValue="level-3">
+                                                        <option value="progressive">Dynamic / Progressive (Auto-speeds with score)</option>
+                                                        <option value="level-1">Level 1 - Very Slow / Rehab (0.5x)</option>
+                                                        <option value="level-2">Level 2 - Slow / Gentle (0.75x)</option>
+                                                        <option value="level-3">Level 3 - Normal / Standard Baseline (1.0x)</option>
+                                                        <option value="level-4">Level 4 - Fast / Agile (1.25x)</option>
+                                                        <option value="level-5">Level 5 - Rapid / Agility (1.5x)</option>
+                                                    </select>
                                                 </div>
                                                 <div className="form-group col-12">
                                                     <label className="form-label small fw-semibold text-secondary">Gender</label>
