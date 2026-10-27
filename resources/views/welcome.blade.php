@@ -115,7 +115,7 @@ window.addEventListener("scroll", webdevanim1);
 window.addEventListener("scroll", webdevanim2);
 </script>
 <script src="{{ asset('js/sweetAlert2.min.js') }}"></script>
-<script src="{{ asset('js/app.js') }}?v={{ file_exists(public_path('js/app.js')) ? filemtime(public_path('js/app.js')) : time() }}"></script>
+<script src="{{ asset('js/app.js') }}?v={{ time() }}"></script>
 <script src="{{ asset('js/frontendScript.js') }}"></script>
 </body>
 </html>

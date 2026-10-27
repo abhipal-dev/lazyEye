@@ -198,7 +198,7 @@
   <section id="user" data-id="{{$user_id}}" data-type="{{$user_type ?? ''}}"></section>
 
 
-  <script src="{{ asset('js/app.js') }}?v={{ file_exists(public_path('js/app.js')) ? filemtime(public_path('js/app.js')) : time() }}"></script>
+  <script src="{{ asset('js/app.js') }}?v={{ time() }}"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.8.0/Chart.min.js" crossorigin="anonymous"></script>
   <script src="{{ asset('js/userScript.js') }}?v={{ file_exists(public_path('js/userScript.js')) ? filemtime(public_path('js/userScript.js')) : time() }}"></script>
   <script src="{{asset('js/sweetAlert2.min.js')}}"></script>
