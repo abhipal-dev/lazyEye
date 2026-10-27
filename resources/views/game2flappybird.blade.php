@@ -356,7 +356,9 @@
         // Score increment on passing
         if (pipe.increase_score === '1' && pipeRect.right < birdRect.left) {
           score++;
+          window.score = score;
           scoreVal.innerText = score;
+          try { window.parent.postMessage({ score: score }, '*'); } catch (e) {}
           pipe.increase_score = '0';
         }
 

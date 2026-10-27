@@ -237,7 +237,10 @@
               dy = -dy;
               b.status = 0;
               score++;
+              window.score = score;
               document.getElementById('scoreVal').innerText = score;
+              try { window.parent.postMessage({ score: score }, '*'); } catch (e) {}
+
               if (score === brickRowCount * brickColumnCount) {
                 initBricks();
               }
@@ -349,7 +352,8 @@
       }, sessionDuration);
     });
 
-    $(document).ready(function() {
+    window.currentSession = { game: 'Bricks Breaker', getScore: function() { return score; } };
+$(document).ready(function() {
       $(window).focus();
       updateColors(leftColor, rightColor);
       requestAnimationFrame(loop);

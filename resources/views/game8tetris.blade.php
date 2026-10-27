@@ -627,6 +627,8 @@
         lines += linesCleared;
         const lineScores = [0, 100, 300, 500, 800];
         score += (lineScores[linesCleared] || 800) * level;
+        window.score = score;
+        try { window.parent.postMessage({ score: score }, '*'); } catch (e) {}
         level = Math.floor(lines / 10) + 1;
         dropInterval = isIncremental ? Math.max(12, baseDropInterval - Math.floor(score / 40) * 3) : Math.max(12, baseDropInterval - (level - 1) * 3);
 
@@ -812,7 +814,9 @@
       }
       currentTetromino.row = row;
       score += 1;
+      window.score = score;
       document.getElementById('scoreDisplay').innerText = score;
+      try { window.parent.postMessage({ score: score }, '*'); } catch (e) {}
     }
 
     function hardDrop() {
@@ -821,7 +825,9 @@
         currentTetromino.row++;
         score += 2;
       }
+      window.score = score;
       document.getElementById('scoreDisplay').innerText = score;
+      try { window.parent.postMessage({ score: score }, '*'); } catch (e) {}
       placeTetromino();
     }
 

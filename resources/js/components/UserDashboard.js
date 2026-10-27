@@ -119,26 +119,11 @@ export default class UserDashboard extends React.Component {
     };
 
     getTodayCompletedSeconds = () => {
-        const raw = this.state.data?.user_game_records;
-        if (!raw) return 0;
-        try {
-            const records = typeof raw === 'string' ? JSON.parse(raw) : raw;
-            const todayStr = moment().format('DD/MM/YYYY');
-            let todaySessionsCount = 0;
-            
-            Object.keys(records).forEach(ts => {
-                const dateStr = moment(Number(ts)).format('DD/MM/YYYY');
-                if (dateStr === todayStr) {
-                    const games = records[ts];
-                    if (games && typeof games === 'object') {
-                        todaySessionsCount += Object.keys(games).length;
-                    }
-                }
-            });
-            return todaySessionsCount * 300;
-        } catch (e) {
-            return 0;
+        const summary = this.state.today_games_summary;
+        if (summary && typeof summary === 'object' && Object.keys(summary).length > 0) {
+            return Object.values(summary).reduce((acc, curr) => acc + (Number(curr.duration_seconds) || 0), 0);
         }
+        return 0;
     };
 
     handleSessionCompleted = (result) => {
@@ -165,13 +150,15 @@ export default class UserDashboard extends React.Component {
         existingRecords[todayKey][gameName] = Math.max(prevBest, result.score || 0);
         const stringScore = JSON.stringify(existingRecords);
 
-        // Update local today_games_summary immediately
+        // Update local today_games_summary immediately with total score and duration accumulation
         this.setState(prev => {
             const currentSummary = { ...(prev.today_games_summary || {}) };
-            const prevEntry = currentSummary[gameName] || { duration_seconds: 0, best_score: 0 };
+            const prevEntry = currentSummary[gameName] || { duration_seconds: 0, total_score: 0, best_score: 0, sessions_count: 0 };
             currentSummary[gameName] = {
                 duration_seconds: (prevEntry.duration_seconds || 0) + (result.durationSeconds || 0),
-                best_score: Math.max(prevEntry.best_score || 0, result.score || 0)
+                total_score: (prevEntry.total_score || 0) + (result.score || 0),
+                best_score: Math.max(prevEntry.best_score || 0, result.score || 0),
+                sessions_count: (prevEntry.sessions_count || 0) + 1
             };
             return { today_games_summary: currentSummary };
         });
@@ -321,6 +308,7 @@ export default class UserDashboard extends React.Component {
         console.log(rightContrastColor)
 
         let token = $('meta[name="csrf-token"]').attr('content');
+        const speedVal = document.getElementById('userTherapySpeed')?.value || this.state.data?.game_speed || 'level-3';
         $.ajax({
             url: "/saveColorSettings",
             type: "post",
@@ -332,7 +320,8 @@ export default class UserDashboard extends React.Component {
                 left_eye_color: leftColor,
                 right_eye_color: rightColor,
                 left_eye_contrast_color: leftContrastColor,
-                right_eye_contrast_color: rightContrastColor
+                right_eye_contrast_color: rightContrastColor,
+                game_speed: speedVal
             },
             success: (data) => {
                 console.log(data)
@@ -382,17 +371,28 @@ export default class UserDashboard extends React.Component {
                                 <i className="fa-solid fa-arrow-left"></i> Admin Panel
                             </a>
                         )}
-                        {!isAdmin && (
-                            <div className="d-none d-sm-flex align-items-center gap-2 px-3 py-1 rounded-pill border font-mono small" style={{ backgroundColor: 'var(--bg-surface-secondary)', borderColor: 'var(--border-color)', color: 'var(--text-main)', fontSize: '0.8rem' }}>
-                                <i className="fa-solid fa-stopwatch text-primary"></i>
-                                <span>Prescription: <strong>{Math.round(this.getTodayCompletedSeconds() / 60)} / {this.state.data?.user_playing_time || 20}m</strong></span>
-                                {this.getTodayCompletedSeconds() >= (this.state.data?.user_playing_time || 20) * 60 ? (
-                                    <span className="badge bg-success text-white" style={{ fontSize: '0.65rem' }}>Goal Met 🎉</span>
-                                ) : (
-                                    <span className="badge bg-primary-subtle text-primary" style={{ fontSize: '0.65rem' }}>{Math.max(0, (this.state.data?.user_playing_time || 20) - Math.round(this.getTodayCompletedSeconds() / 60))}m left</span>
-                                )}
-                            </div>
-                        )}
+                        {!isAdmin && (() => {
+                            const totalPlayedSecs = this.getTodayCompletedSeconds();
+                            const totalPlayedMins = Math.floor(totalPlayedSecs / 60);
+                            const prescMins = Number(this.state.data?.user_playing_time || 20);
+                            const prescSecs = prescMins * 60;
+                            const isAllGoalMet = totalPlayedSecs >= prescSecs;
+                            const displayPlayed = isAllGoalMet 
+                                ? `${prescMins}m` 
+                                : (totalPlayedMins === 0 && totalPlayedSecs > 0 ? `${totalPlayedSecs}s` : `${totalPlayedMins}m`);
+
+                            return (
+                                <div className="d-none d-sm-flex align-items-center gap-2 px-3 py-1 rounded-pill border font-mono small" style={{ backgroundColor: 'var(--bg-surface-secondary)', borderColor: 'var(--border-color)', color: 'var(--text-main)', fontSize: '0.8rem' }}>
+                                    <i className="fa-solid fa-stopwatch text-primary"></i>
+                                    <span>Prescription: <strong>{displayPlayed} / {prescMins}m</strong></span>
+                                    {isAllGoalMet ? (
+                                        <span className="badge bg-success text-white" style={{ fontSize: '0.65rem' }}>Goal Met 🎉</span>
+                                    ) : (
+                                        <span className="badge bg-primary-subtle text-primary" style={{ fontSize: '0.65rem' }}>{Math.max(0, prescMins - totalPlayedMins)}m left</span>
+                                    )}
+                                </div>
+                            );
+                        })()}
                         <ThemeToggle />
                         <ul className="navbar-nav">
                             <li className="nav-item dropdown">
@@ -687,6 +687,30 @@ export default class UserDashboard extends React.Component {
                                                 <label className="form-label text-white small fw-semibold">Contrast Balance (0 - 255)</label>
                                                 <input type="range" min="0" max="255" id="rightColorContrastSlider" step="1" className="form-range" />
                                             </div>
+                                        </div>
+                                    </div>
+                                    <div className="col-12">
+                                        <div className="p-3 rounded-4" style={{ backgroundColor: "#0f172a", border: "1px solid #334155" }}>
+                                            <div className="d-flex align-items-center justify-content-between mb-2">
+                                                <span className="badge bg-primary px-3 py-2"><i className="fa-solid fa-gauge-high me-1"></i> Therapy Speed & Velocity</span>
+                                                <small className="text-white-50">Prescribed by Doctor / Clinic</small>
+                                            </div>
+                                            <select 
+                                                id="userTherapySpeed" 
+                                                className="form-select bg-dark text-white border-secondary"
+                                                defaultValue={this.state.data?.game_speed || 'level-3'}
+                                            >
+                                                <option value="progressive">Dynamic / Progressive (Auto-speeds with score)</option>
+                                                <option value="level-1">Level 1 - Very Slow / Rehab (0.5x)</option>
+                                                <option value="level-2">Level 2 - Slow / Gentle (0.75x)</option>
+                                                <option value="level-3">Level 3 - Normal / Baseline (1.0x)</option>
+                                                <option value="level-4">Level 4 - Fast / Agile (1.25x)</option>
+                                                <option value="level-5">Level 5 - Rapid / Agility (1.5x)</option>
+                                            </select>
+                                            <small className="text-white-50 d-block mt-2" style={{ fontSize: '0.8rem' }}>
+                                                <i className="fa-solid fa-circle-info text-info me-1"></i>
+                                                Controls game velocity in Snake and Tetris. Progressive automatically increases speed as your score climbs.
+                                            </small>
                                         </div>
                                     </div>
                                 </div>
