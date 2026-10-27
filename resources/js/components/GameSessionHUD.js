@@ -50,12 +50,15 @@ export default class GameSessionHUD extends React.Component {
 
         // Listen for live score updates from game engine
         if (event.data.score !== undefined && !isNaN(event.data.score)) {
-            this.setState({ currentScore: Number(event.data.score) });
+            const newScore = Number(event.data.score);
+            this.setState(prev => ({
+                currentScore: Math.max(prev.currentScore, newScore)
+            }));
         }
 
         // Listen for internal game-over or session finished
         if (event.data.msg === 'Game Ended') {
-            const finalScore = Number(event.data.score || this.state.currentScore || 0);
+            const finalScore = Number(event.data.score !== undefined ? event.data.score : this.state.currentScore || 0);
             this.handleExit(finalScore);
         }
     };
@@ -67,7 +70,36 @@ export default class GameSessionHUD extends React.Component {
             document.exitFullscreen().catch(() => {});
         }
 
-        const scoreToSave = customScore !== null && !isNaN(customScore) ? customScore : this.state.currentScore;
+        let liveScore = Number(this.state.currentScore || 0);
+        try {
+            const iframe = document.getElementById('session-game-iframe');
+            if (iframe && iframe.contentWindow) {
+                const cw = iframe.contentWindow;
+                if (typeof cw.currentSession?.getScore === 'function') {
+                    liveScore = Math.max(liveScore, Number(cw.currentSession.getScore()) || 0);
+                }
+                if (cw.score !== undefined && !isNaN(cw.score)) {
+                    liveScore = Math.max(liveScore, Number(cw.score) || 0);
+                }
+                if (cw.points !== undefined && !isNaN(cw.points)) {
+                    liveScore = Math.max(liveScore, Number(cw.points) || 0);
+                }
+                const doc = iframe.contentDocument || cw.document;
+                if (doc) {
+                    const scoreEl = doc.getElementById('scoreVal') || doc.getElementById('score') || doc.getElementById('scoreDisplay') || doc.querySelector('.score-val');
+                    if (scoreEl) {
+                        const parsed = parseInt(scoreEl.innerText || scoreEl.textContent, 10);
+                        if (!isNaN(parsed)) {
+                            liveScore = Math.max(liveScore, parsed);
+                        }
+                    }
+                }
+            }
+        } catch (e) {
+            console.warn('Could not inspect iframe live score:', e);
+        }
+
+        const scoreToSave = customScore !== null && !isNaN(customScore) ? Math.max(Number(customScore), liveScore) : liveScore;
         const durationToSave = Math.max(1, this.state.elapsedSeconds);
         const { game } = this.props;
         const gameConfig = getGameConfig(game?.id || game?.title || game?.name) || game || {};
@@ -179,7 +211,7 @@ export default class GameSessionHUD extends React.Component {
                         <span>{this.formatTime(elapsedSeconds)}</span>
                     </div>
 
-                    {/* Right: Exit Button */}
+                    {/* Right: Exit and Save Button */}
                     <button 
                         type="button" 
                         onClick={() => this.handleExit()}
@@ -199,10 +231,10 @@ export default class GameSessionHUD extends React.Component {
                         }}
                         onMouseEnter={(e) => e.currentTarget.style.backgroundColor = '#b91c1c'}
                         onMouseLeave={(e) => e.currentTarget.style.backgroundColor = '#dc2626'}
-                        title="Exit Game"
+                        title="Exit and Save Therapy Session"
                     >
-                        <i className="fa-solid fa-xmark"></i>
-                        <span>Exit</span>
+                        <i className="fa-solid fa-arrow-right-from-bracket"></i>
+                        <span>Exit & Save</span>
                     </button>
                 </header>
 

@@ -377,7 +377,9 @@
         if (cell.x === apple.x && cell.y === apple.y) {
           snake.maxCells++;
           score++;
+          window.score = score;
           document.getElementById('scoreVal').innerText = score;
+          try { window.parent.postMessage({ score: score }, '*'); } catch (e) {}
           respawnApple();
         }
 

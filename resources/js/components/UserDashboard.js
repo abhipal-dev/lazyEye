@@ -119,26 +119,11 @@ export default class UserDashboard extends React.Component {
     };
 
     getTodayCompletedSeconds = () => {
-        const raw = this.state.data?.user_game_records;
-        if (!raw) return 0;
-        try {
-            const records = typeof raw === 'string' ? JSON.parse(raw) : raw;
-            const todayStr = moment().format('DD/MM/YYYY');
-            let todaySessionsCount = 0;
-            
-            Object.keys(records).forEach(ts => {
-                const dateStr = moment(Number(ts)).format('DD/MM/YYYY');
-                if (dateStr === todayStr) {
-                    const games = records[ts];
-                    if (games && typeof games === 'object') {
-                        todaySessionsCount += Object.keys(games).length;
-                    }
-                }
-            });
-            return todaySessionsCount * 300;
-        } catch (e) {
-            return 0;
+        const summary = this.state.today_games_summary;
+        if (summary && typeof summary === 'object' && Object.keys(summary).length > 0) {
+            return Object.values(summary).reduce((acc, curr) => acc + (Number(curr.duration_seconds) || 0), 0);
         }
+        return 0;
     };
 
     handleSessionCompleted = (result) => {
@@ -386,17 +371,28 @@ export default class UserDashboard extends React.Component {
                                 <i className="fa-solid fa-arrow-left"></i> Admin Panel
                             </a>
                         )}
-                        {!isAdmin && (
-                            <div className="d-none d-sm-flex align-items-center gap-2 px-3 py-1 rounded-pill border font-mono small" style={{ backgroundColor: 'var(--bg-surface-secondary)', borderColor: 'var(--border-color)', color: 'var(--text-main)', fontSize: '0.8rem' }}>
-                                <i className="fa-solid fa-stopwatch text-primary"></i>
-                                <span>Prescription: <strong>{Math.round(this.getTodayCompletedSeconds() / 60)} / {this.state.data?.user_playing_time || 20}m</strong></span>
-                                {this.getTodayCompletedSeconds() >= (this.state.data?.user_playing_time || 20) * 60 ? (
-                                    <span className="badge bg-success text-white" style={{ fontSize: '0.65rem' }}>Goal Met 🎉</span>
-                                ) : (
-                                    <span className="badge bg-primary-subtle text-primary" style={{ fontSize: '0.65rem' }}>{Math.max(0, (this.state.data?.user_playing_time || 20) - Math.round(this.getTodayCompletedSeconds() / 60))}m left</span>
-                                )}
-                            </div>
-                        )}
+                        {!isAdmin && (() => {
+                            const totalPlayedSecs = this.getTodayCompletedSeconds();
+                            const totalPlayedMins = Math.floor(totalPlayedSecs / 60);
+                            const prescMins = Number(this.state.data?.user_playing_time || 20);
+                            const prescSecs = prescMins * 60;
+                            const isAllGoalMet = totalPlayedSecs >= prescSecs;
+                            const displayPlayed = isAllGoalMet 
+                                ? `${prescMins}m` 
+                                : (totalPlayedMins === 0 && totalPlayedSecs > 0 ? `${totalPlayedSecs}s` : `${totalPlayedMins}m`);
+
+                            return (
+                                <div className="d-none d-sm-flex align-items-center gap-2 px-3 py-1 rounded-pill border font-mono small" style={{ backgroundColor: 'var(--bg-surface-secondary)', borderColor: 'var(--border-color)', color: 'var(--text-main)', fontSize: '0.8rem' }}>
+                                    <i className="fa-solid fa-stopwatch text-primary"></i>
+                                    <span>Prescription: <strong>{displayPlayed} / {prescMins}m</strong></span>
+                                    {isAllGoalMet ? (
+                                        <span className="badge bg-success text-white" style={{ fontSize: '0.65rem' }}>Goal Met 🎉</span>
+                                    ) : (
+                                        <span className="badge bg-primary-subtle text-primary" style={{ fontSize: '0.65rem' }}>{Math.max(0, prescMins - totalPlayedMins)}m left</span>
+                                    )}
+                                </div>
+                            );
+                        })()}
                         <ThemeToggle />
                         <ul className="navbar-nav">
                             <li className="nav-item dropdown">

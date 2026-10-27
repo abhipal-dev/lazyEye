@@ -312,7 +312,9 @@
     function catchOrb(e) {
       e.stopPropagation();
       score++;
+      window.score = score;
       scoreDisplay.innerText = score;
+      try { window.parent.postMessage({ score: score }, '*'); } catch (e) {}
 
       // Pulse feedback
       orb.style.transform = 'translate(-50%, -50%) scale(1.3)';
@@ -362,7 +364,8 @@
       }, sessionDuration);
     });
 
-    $(document).ready(function() {
+    window.currentSession = { game: 'Ball Catcher', getScore: function() { return score; } };
+$(document).ready(function() {
       $(window).focus();
       updateColors(leftColor, rightColor);
       currentX = playArea.clientWidth / 2 || 150;

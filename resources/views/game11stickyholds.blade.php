@@ -398,7 +398,9 @@ const [nextPlatform, perfectHit] = thePlatformTheStickHits();
 if (nextPlatform) {
 // Increase score
 score += perfectHit ? 2 : 1;
+window.score = score;
 scoreElement.innerText = score;
+try { window.parent.postMessage({ score: score }, '*'); } catch (e) {}
 
 if (perfectHit) {
 perfectElement.style.opacity = 1;

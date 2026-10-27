@@ -96,43 +96,19 @@ export default class Games extends React.Component {
     }
 
     getGameTodayStats = (gameName) => {
-        if (this.props.todayGameStats && this.props.todayGameStats[gameName]) {
-            return this.props.todayGameStats[gameName];
-        }
-        // Fallback parser from this.props.data
-        if (this.props.data && typeof moment !== 'undefined') {
-            try {
-                const records = typeof this.props.data === 'string' ? JSON.parse(this.props.data) : this.props.data;
-                const todayStr = moment().format('DD/MM/YYYY');
-                let totalDuration = 0;
-                let totalScore = 0;
-                let bestScore = 0;
-                let sessionsCount = 0;
-                let played = false;
+        if (!gameName) return { duration_seconds: 0, total_score: 0, best_score: 0, sessions_count: 0 };
+        const cleanTarget = String(gameName).toLowerCase().trim().replace(/[-_]/g, ' ');
 
-                Object.keys(records).forEach(ts => {
-                    if (moment(Number(ts)).format('DD/MM/YYYY') === todayStr) {
-                        const dayGames = records[ts];
-                        if (dayGames && dayGames[gameName] !== undefined) {
-                            played = true;
-                            const score = Number(dayGames[gameName]) || 0;
-                            totalScore += score;
-                            bestScore = Math.max(bestScore, score);
-                            totalDuration += 300;
-                            sessionsCount += 1;
-                        }
-                    }
-                });
-
-                if (played) {
-                    return { 
-                        duration_seconds: totalDuration, 
-                        total_score: totalScore, 
-                        best_score: bestScore,
-                        sessions_count: sessionsCount 
-                    };
+        if (this.props.todayGameStats && typeof this.props.todayGameStats === 'object') {
+            if (this.props.todayGameStats[gameName]) {
+                return this.props.todayGameStats[gameName];
+            }
+            for (const key of Object.keys(this.props.todayGameStats)) {
+                const cleanKey = String(key).toLowerCase().trim().replace(/[-_]/g, ' ');
+                if (cleanKey === cleanTarget || cleanKey.includes(cleanTarget) || cleanTarget.includes(cleanKey)) {
+                    return this.props.todayGameStats[key];
                 }
-            } catch (e) {}
+            }
         }
         return { duration_seconds: 0, total_score: 0, best_score: 0, sessions_count: 0 };
     };
@@ -159,7 +135,8 @@ export default class Games extends React.Component {
         const heroStats = this.getGameTodayStats(current.title);
         const heroPlayedSeconds = Number(heroStats.duration_seconds || 0);
         const heroPlayedMinutes = Math.floor(heroPlayedSeconds / 60);
-        const heroRemainingMinutes = Math.max(0, prescribedMinutes - heroPlayedMinutes);
+        const heroRemainingSeconds = Math.max(0, prescribedSeconds - heroPlayedSeconds);
+        const heroRemainingMinutes = Math.ceil(heroRemainingSeconds / 60);
         const heroIsGoalMet = heroPlayedSeconds >= prescribedSeconds;
         const heroDisplayScore = Number(heroStats.total_score !== undefined ? heroStats.total_score : (heroStats.best_score || 0));
 
@@ -262,7 +239,7 @@ export default class Games extends React.Component {
                                     </span>
                                 ) : (
                                     <span className="therapy-chip text-warning border-warning">
-                                        <i className="fa-solid fa-hourglass-half text-warning me-1"></i> {heroPlayedMinutes}m done &middot; {heroRemainingMinutes}m left
+                                        <i className="fa-solid fa-hourglass-half text-warning me-1"></i> {heroPlayedMinutes === 0 ? `${heroPlayedSeconds}s` : `${heroPlayedMinutes}m`} done &middot; {heroRemainingMinutes > 0 ? `${heroRemainingMinutes}m left` : `${heroRemainingSeconds}s left`}
                                     </span>
                                 )}
 
@@ -289,7 +266,7 @@ export default class Games extends React.Component {
                                         ? 'Start Therapy' 
                                         : heroIsGoalMet 
                                             ? 'Practice Mode (Goal Met 🎉)' 
-                                            : `Continue Session (${heroRemainingMinutes}m left)`}
+                                            : `Continue Session (${heroRemainingMinutes > 0 ? `${heroRemainingMinutes}m left` : `${heroRemainingSeconds}s left`})`}
                                 </span>
                             </button>
                         </div>
@@ -299,6 +276,10 @@ export default class Games extends React.Component {
                             <img 
                                 src={current.art || current.mascot} 
                                 alt={current.title} 
+                                loading="lazy"
+                                onError={(e) => {
+                                    e.currentTarget.style.display = 'none';
+                                }}
                                 style={{ 
                                     maxHeight: '160px', 
                                     maxWidth: '180px', 
@@ -340,11 +321,16 @@ export default class Games extends React.Component {
                         const stats = this.getGameTodayStats(game.name);
                         const playedSeconds = Number(stats.duration_seconds || 0);
                         const playedMinutes = Math.floor(playedSeconds / 60);
-                        const remainingMinutes = Math.max(0, prescribedMinutes - playedMinutes);
+                        const remainingSeconds = Math.max(0, prescribedSeconds - playedSeconds);
+                        const remainingMinutes = Math.ceil(remainingSeconds / 60);
                         const isGoalMet = playedSeconds >= prescribedSeconds;
                         const progressPercent = Math.min(100, Math.round((playedSeconds / prescribedSeconds) * 100));
                         const displayScore = Number(stats.total_score !== undefined ? stats.total_score : (stats.best_score || 0));
-                        const displayMinutes = isGoalMet ? prescribedMinutes : playedMinutes;
+                        const durationText = isGoalMet 
+                            ? `${prescribedMinutes} / ${prescribedMinutes}m (100%)` 
+                            : (playedMinutes === 0 && playedSeconds > 0 
+                                ? `${playedSeconds}s / ${prescribedMinutes}m (${progressPercent}%)` 
+                                : `${playedMinutes} / ${prescribedMinutes}m (${progressPercent}%)`);
 
                         return (
                             <div key={game.id} className="col-12 col-md-6 col-xl-4">
@@ -377,6 +363,11 @@ export default class Games extends React.Component {
                                         <img 
                                             src={game.art} 
                                             alt={game.name} 
+                                            className="game-cover-icon"
+                                            loading="lazy"
+                                            onError={(e) => {
+                                                e.currentTarget.style.display = 'none';
+                                            }}
                                             style={{
                                                 maxHeight: '100px',
                                                 maxWidth: '130px',
@@ -399,7 +390,7 @@ export default class Games extends React.Component {
                                                 fontSize: '0.72rem' 
                                             }}
                                         >
-                                            {playedSeconds === 0 ? `Target: ${prescribedMinutes}m` : isGoalMet ? 'Goal Met 🎉' : `${remainingMinutes}m left`}
+                                            {playedSeconds === 0 ? `Target: ${prescribedMinutes}m` : isGoalMet ? 'Goal Met 🎉' : remainingMinutes > 0 ? `${remainingMinutes}m left` : `${remainingSeconds}s left`}
                                         </span>
                                     </div>
 
@@ -415,7 +406,7 @@ export default class Games extends React.Component {
                                             <div className="mb-3">
                                                 <div className="d-flex justify-content-between align-items-center small font-mono mb-1">
                                                     <span className={isGoalMet ? 'text-success fw-semibold' : 'text-info fw-semibold'}>
-                                                        {displayMinutes} / {prescribedMinutes}m ({progressPercent}%)
+                                                        {durationText}
                                                     </span>
                                                     {displayScore > 0 && (
                                                         <span className="text-warning fw-semibold">
@@ -463,7 +454,7 @@ export default class Games extends React.Component {
                                                         ? 'Start Therapy' 
                                                         : isGoalMet 
                                                             ? 'Practice Mode (Goal Met 🎉)' 
-                                                            : `Continue (${remainingMinutes}m left)`}
+                                                            : `Continue (${remainingMinutes > 0 ? `${remainingMinutes}m left` : `${remainingSeconds}s left`})`}
                                                 </span>
                                             </button>
                                         </div>
