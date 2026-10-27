@@ -176,6 +176,17 @@ export default class Games extends React.Component {
                             <i className="fa-solid fa-sliders"></i>
                             <span>Calibrate Glasses</span>
                         </button>
+                        {this.props.onResetToday && (
+                            <button 
+                                type="button" 
+                                className="btn btn-outline-danger btn-sm px-3 d-flex align-items-center gap-2"
+                                onClick={this.props.onResetToday}
+                                title="Reset today's test duration to 0m for fresh session testing"
+                            >
+                                <i className="fa-solid fa-rotate-left"></i>
+                                <span>Reset Today</span>
+                            </button>
+                        )}
                     </div>
                 </div>
 
@@ -223,7 +234,7 @@ export default class Games extends React.Component {
                     </div>
 
                     {/* Main Slide Content with Game Preview Artwork */}
-                    <div className="therapy-hero-body" style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: '20px' }}>
+                    <div className="therapy-hero-body d-flex flex-column-reverse flex-md-row align-items-center justify-content-between" style={{ gap: '20px' }}>
                         <div className="therapy-hero-text" style={{ flex: 1 }}>
                             <h2 className="therapy-hero-title text-white">{current.title}</h2>
                             <p className="therapy-hero-desc text-slate-300">{current.desc}</p>
@@ -272,7 +283,7 @@ export default class Games extends React.Component {
                         </div>
 
                         {/* Real Game Preview Image on Right */}
-                        <div className="therapy-hero-art d-none d-md-flex align-items-center justify-content-center p-3" style={{ flexShrink: 0 }}>
+                        <div className="therapy-hero-art d-flex align-items-center justify-content-center p-2 p-md-3" style={{ flexShrink: 0 }}>
                             <img 
                                 src={current.art || current.mascot} 
                                 alt={current.title} 

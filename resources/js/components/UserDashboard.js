@@ -126,6 +126,48 @@ export default class UserDashboard extends React.Component {
         return 0;
     };
 
+        handleResetToday = () => {
+        if (typeof Swal !== 'undefined') {
+            Swal.fire({
+                title: 'Reset Today\'s Progress?',
+                text: 'This will reset today\'s accumulated therapy time and score back to 0:00 for testing.',
+                icon: 'warning',
+                showCancelButton: true,
+                confirmButtonColor: '#dc2626',
+                cancelButtonColor: '#64748b',
+                confirmButtonText: 'Yes, Reset'
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    this.executeResetToday();
+                }
+            });
+        } else {
+            if (confirm('Reset today\'s therapy time back to 0:00?')) {
+                this.executeResetToday();
+            }
+        }
+    };
+
+    executeResetToday = () => {
+        let token = $('meta[name="csrf-token"]').attr('content');
+        this.setState({ today_games_summary: {} });
+        $.ajax({
+            url: "/resetTodayRecords",
+            type: "post",
+            headers: { 'X-CSRF-TOKEN': token },
+            data: { id: this.state.id },
+            success: () => {
+                this.fetchUserData();
+                if (typeof Swal !== 'undefined') {
+                    Swal.fire('Reset Complete', 'Today\'s therapy session progress has been reset to 0.', 'success');
+                }
+            },
+            error: () => {
+                this.fetchUserData();
+            }
+        });
+    };
+
     handleSessionCompleted = (result) => {
         // Immediately reset active session so games can be opened repeatedly without requiring page refresh
         this.setState({ activeSession: null });
@@ -589,7 +631,7 @@ export default class UserDashboard extends React.Component {
                         <main>
                             <div className="container-fluid px-2 px-sm-3 px-md-4">
 
-                                {(this.state.current_component == 'user') ? <Games data={this.state.data.user_game_records} date_format={this.state.date_format} prescribedMinutes={this.state.data?.user_playing_time || 20} todayGameStats={this.state.today_games_summary || {}} onStartSession={this.handleStartSession}/> : ''}
+                                {(this.state.current_component == 'user') ? <Games data={this.state.data.user_game_records} date_format={this.state.date_format} prescribedMinutes={this.state.data?.user_playing_time || 20} todayGameStats={this.state.today_games_summary || {}} onStartSession={this.handleStartSession} onResetToday={this.handleResetToday}/> : ''}
 
                                 {(this.state.current_component == 'acuitytest') ? <VisualAcuityTest patient={this.state.data} /> : ''}
 

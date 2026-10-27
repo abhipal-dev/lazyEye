@@ -986,6 +986,14 @@ class UserController extends Controller
                 ->get();
 
             $todayStartUtc = gmdate('Y-m-d 00:00:00');
+
+            // Self-heal legacy test records created with the old 1200s default bug
+            DB::table('game_records')
+                ->where('user_id', $id)
+                ->where('played_at', '>=', $todayStartUtc)
+                ->where('duration_seconds', 1200)
+                ->update(['duration_seconds' => 30]);
+
             $recordsToday = DB::table('game_records')
                 ->where('user_id', $id)
                 ->where('played_at', '>=', $todayStartUtc)
@@ -1225,6 +1233,20 @@ class UserController extends Controller
             }
             $data = DB::table('users')->where('id', $req->id)->update($payload);
             return $data;
+        });
+    }
+
+    public function resetTodayRecords(Request $req) {
+        return self::safelyQuery(function() use ($req) {
+            $id = $req->id ?: Auth::id();
+            $todayStartUtc = gmdate('Y-m-d 00:00:00');
+            if ($id) {
+                DB::table('game_records')
+                    ->where('user_id', $id)
+                    ->where('played_at', '>=', $todayStartUtc)
+                    ->delete();
+            }
+            return response()->json(['status' => 'success']);
         });
     }
 

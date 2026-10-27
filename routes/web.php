@@ -45,6 +45,7 @@ Route::post('/ResetPassword', [AuthController::class, 'resetPassword']);
 Route::post('/uploadImage', [UploadImageController::class, 'upload']);
 
 Route::post('/SaveGameRecords', [UserController::class, 'saveGameRecords']);
+Route::post('/resetTodayRecords', [UserController::class, 'resetTodayRecords']);
 
 Route::get('/fetchRegisters', [UserController::class, 'fetchRegisters']);
 
