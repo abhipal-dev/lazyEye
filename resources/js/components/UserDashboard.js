@@ -165,13 +165,15 @@ export default class UserDashboard extends React.Component {
         existingRecords[todayKey][gameName] = Math.max(prevBest, result.score || 0);
         const stringScore = JSON.stringify(existingRecords);
 
-        // Update local today_games_summary immediately
+        // Update local today_games_summary immediately with total score and duration accumulation
         this.setState(prev => {
             const currentSummary = { ...(prev.today_games_summary || {}) };
-            const prevEntry = currentSummary[gameName] || { duration_seconds: 0, best_score: 0 };
+            const prevEntry = currentSummary[gameName] || { duration_seconds: 0, total_score: 0, best_score: 0, sessions_count: 0 };
             currentSummary[gameName] = {
                 duration_seconds: (prevEntry.duration_seconds || 0) + (result.durationSeconds || 0),
-                best_score: Math.max(prevEntry.best_score || 0, result.score || 0)
+                total_score: (prevEntry.total_score || 0) + (result.score || 0),
+                best_score: Math.max(prevEntry.best_score || 0, result.score || 0),
+                sessions_count: (prevEntry.sessions_count || 0) + 1
             };
             return { today_games_summary: currentSummary };
         });
@@ -321,6 +323,7 @@ export default class UserDashboard extends React.Component {
         console.log(rightContrastColor)
 
         let token = $('meta[name="csrf-token"]').attr('content');
+        const speedVal = document.getElementById('userTherapySpeed')?.value || this.state.data?.game_speed || 'level-3';
         $.ajax({
             url: "/saveColorSettings",
             type: "post",
@@ -332,7 +335,8 @@ export default class UserDashboard extends React.Component {
                 left_eye_color: leftColor,
                 right_eye_color: rightColor,
                 left_eye_contrast_color: leftContrastColor,
-                right_eye_contrast_color: rightContrastColor
+                right_eye_contrast_color: rightContrastColor,
+                game_speed: speedVal
             },
             success: (data) => {
                 console.log(data)
@@ -687,6 +691,30 @@ export default class UserDashboard extends React.Component {
                                                 <label className="form-label text-white small fw-semibold">Contrast Balance (0 - 255)</label>
                                                 <input type="range" min="0" max="255" id="rightColorContrastSlider" step="1" className="form-range" />
                                             </div>
+                                        </div>
+                                    </div>
+                                    <div className="col-12">
+                                        <div className="p-3 rounded-4" style={{ backgroundColor: "#0f172a", border: "1px solid #334155" }}>
+                                            <div className="d-flex align-items-center justify-content-between mb-2">
+                                                <span className="badge bg-primary px-3 py-2"><i className="fa-solid fa-gauge-high me-1"></i> Therapy Speed & Velocity</span>
+                                                <small className="text-white-50">Prescribed by Doctor / Clinic</small>
+                                            </div>
+                                            <select 
+                                                id="userTherapySpeed" 
+                                                className="form-select bg-dark text-white border-secondary"
+                                                defaultValue={this.state.data?.game_speed || 'level-3'}
+                                            >
+                                                <option value="progressive">Dynamic / Progressive (Auto-speeds with score)</option>
+                                                <option value="level-1">Level 1 - Very Slow / Rehab (0.5x)</option>
+                                                <option value="level-2">Level 2 - Slow / Gentle (0.75x)</option>
+                                                <option value="level-3">Level 3 - Normal / Baseline (1.0x)</option>
+                                                <option value="level-4">Level 4 - Fast / Agile (1.25x)</option>
+                                                <option value="level-5">Level 5 - Rapid / Agility (1.5x)</option>
+                                            </select>
+                                            <small className="text-white-50 d-block mt-2" style={{ fontSize: '0.8rem' }}>
+                                                <i className="fa-solid fa-circle-info text-info me-1"></i>
+                                                Controls game velocity in Snake and Tetris. Progressive automatically increases speed as your score climbs.
+                                            </small>
                                         </div>
                                     </div>
                                 </div>

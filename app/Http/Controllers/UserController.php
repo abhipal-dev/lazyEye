@@ -989,7 +989,13 @@ class UserController extends Controller
             $recordsToday = DB::table('game_records')
                 ->where('user_id', $id)
                 ->where('played_at', '>=', $todayStartUtc)
-                ->select('game_name', DB::raw('SUM(duration_seconds) as total_duration'), DB::raw('MAX(score) as best_score'))
+                ->select(
+                    'game_name', 
+                    DB::raw('SUM(duration_seconds) as total_duration'), 
+                    DB::raw('SUM(score) as total_score'),
+                    DB::raw('MAX(score) as best_score'),
+                    DB::raw('COUNT(*) as sessions_count')
+                )
                 ->groupBy('game_name')
                 ->get();
 
@@ -997,7 +1003,9 @@ class UserController extends Controller
             foreach ($recordsToday as $rt) {
                 $todaySummary[$rt->game_name] = [
                     'duration_seconds' => intval($rt->total_duration),
-                    'best_score' => intval($rt->best_score)
+                    'total_score' => intval($rt->total_score),
+                    'best_score' => intval($rt->best_score),
+                    'sessions_count' => intval($rt->sessions_count)
                 ];
             }
 
@@ -1204,16 +1212,18 @@ class UserController extends Controller
 
     public function saveColorSettings(Request $req){
         return self::safelyQuery(function() use ($req) {
-            $data = DB::table('users')->updateOrInsert(
-                ['id'=>$req->id],
-                ['left_eye_color'=>$req->left_eye_color,
-                'right_eye_color'=>$req->right_eye_color,
-                'left_eye_contrastvalue'=>$req->left_eye_contrastvalue,
-                'right_eye_contrastvalue'=>$req->right_eye_contrastvalue,
-                'left_eye_contrast_color'=>$req->left_eye_contrast_color,
-                'right_eye_contrast_color'=>$req->right_eye_contrast_color
-                ] 
-            );
+            $payload = [
+                'left_eye_color' => $req->left_eye_color,
+                'right_eye_color' => $req->right_eye_color,
+                'left_eye_contrastvalue' => $req->left_eye_contrastvalue,
+                'right_eye_contrastvalue' => $req->right_eye_contrastvalue,
+                'left_eye_contrast_color' => $req->left_eye_contrast_color,
+                'right_eye_contrast_color' => $req->right_eye_contrast_color
+            ];
+            if ($req->has('game_speed') && !empty($req->game_speed)) {
+                $payload['game_speed'] = $req->game_speed;
+            }
+            $data = DB::table('users')->where('id', $req->id)->update($payload);
             return $data;
         });
     }
@@ -1230,7 +1240,7 @@ class UserController extends Controller
             // 2. High performance normalized insert into game_records in UTC
             $gameName = $req->game_name;
             $score = intval($req->game_score ?: 0);
-            $duration = intval($req->duration ?: 1200);
+            $duration = intval($req->duration !== null && $req->duration !== '' ? $req->duration : 0);
             $utcNow = gmdate('Y-m-d H:i:s');
 
             // Fallback: extract latest entry from score array if game_name wasn't passed directly
