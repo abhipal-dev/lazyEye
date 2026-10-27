@@ -142,6 +142,13 @@ export default class UserDashboard extends React.Component {
     };
 
     handleSessionCompleted = (result) => {
+        // Immediately reset active session so games can be opened repeatedly without requiring page refresh
+        this.setState({ activeSession: null });
+
+        if (!result || !result.gameName) {
+            return;
+        }
+
         const current_date_timestamp = Date.now();
         let existingRecords = {};
         try {
@@ -153,7 +160,8 @@ export default class UserDashboard extends React.Component {
 
         const todayKey = String(current_date_timestamp);
         if (!existingRecords[todayKey]) existingRecords[todayKey] = {};
-        existingRecords[todayKey][result.gameName] = result.score;
+        const gameName = result.gameName || 'Therapy Game';
+        existingRecords[todayKey][gameName] = result.score || 0;
         const stringScore = JSON.stringify(existingRecords);
 
         let token = $('meta[name="csrf-token"]').attr('content');
@@ -165,25 +173,23 @@ export default class UserDashboard extends React.Component {
                 id: this.state.id,
                 score: existingRecords,
                 string_score: stringScore,
-                game_name: result.gameName,
-                game_score: result.score,
-                duration: result.durationSeconds
+                game_name: gameName,
+                game_score: result.score || 0,
+                duration: result.durationSeconds || 0
             },
             success: (data) => {
-                this.setState({ activeSession: null });
                 this.fetchUserData();
 
-                if (typeof Swal !== 'undefined') {
+                if (typeof Swal !== 'undefined' && result.durationSeconds > 5) {
                     Swal.fire({
                         title: 'Therapy Session Logged!',
-                        html: `You completed <strong>${result.elapsedFormatted}</strong> of dichoptic training in <strong>${result.gameName}</strong>.<br><br><span class="badge bg-primary fs-6">${result.score} pts</span>`,
+                        html: `You completed <strong>${result.elapsedFormatted || '00:00'}</strong> in <strong>${gameName}</strong>.<br><br><span class="badge bg-primary fs-6">${result.score || 0} pts</span>`,
                         icon: 'success',
                         confirmButtonColor: '#2563eb'
                     });
                 }
             },
             error: () => {
-                this.setState({ activeSession: null });
                 this.fetchUserData();
             }
         });
