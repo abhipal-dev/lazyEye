@@ -481,13 +481,14 @@ function fetchUsers(silentPreload) {
         url: "/fetchUsers",
         type: "get",
         success: function (data) {
-            window.currentTableData = data;
-            window.allUsersData = data;
+            let userList = Array.isArray(data) ? data : (data.data || []);
+            window.currentTableData = userList;
+            window.allUsersData = userList;
             // Also populate consultation modal patient selector
             let patientSelect = $('#consultation_patient_select');
-            if (patientSelect.length && data) {
+            if (patientSelect.length && userList) {
                 patientSelect.html('<option value="">-- Select Patient --</option>');
-                data.forEach(p => {
+                userList.forEach(p => {
                     patientSelect.append(`<option value="${p.id}">${p.fullname} (@${p.username})</option>`);
                 });
             }
@@ -509,14 +510,13 @@ function fetchUsers(silentPreload) {
                 <th>Assigned Doctor</th>
                 <th>Therapy Status</th>
                 <th>Gender</th>
-                <th>Compliance Radar</th>
                 <th>Target</th>
                 <th>Enrolled (Local)</th>
                 <th colspan="4" class="text-center">Action</th>
                 </tr>
             `);
             $('div.card-header span.fw-semibold').text('Patients -> Active Therapy Patients');
-            setupAdminTableData('Users', data, renderUserRow);
+            setupAdminTableData('Users', userList, renderUserRow);
         }
     });
 }
