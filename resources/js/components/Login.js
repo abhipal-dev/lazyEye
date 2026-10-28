@@ -12,6 +12,7 @@ export default class Login extends React.Component {
             password: '',
             isSubmitting: false,
             errorMessage: '',
+            lockoutSeconds: 0,
             showForgotModal: false,
             forgotIdentifier: '',
             newPassword: '',
@@ -30,6 +31,36 @@ export default class Login extends React.Component {
             this.setState({ portalType: 'doctor' });
         }
     }
+
+    componentWillUnmount() {
+        if (this.lockoutInterval) {
+            clearInterval(this.lockoutInterval);
+        }
+    }
+
+    startLockoutTimer = (seconds) => {
+        if (this.lockoutInterval) {
+            clearInterval(this.lockoutInterval);
+        }
+        this.setState({
+            lockoutSeconds: seconds,
+            errorMessage: `Too many attempts. Locked for security. Try again in ${seconds}s.`
+        });
+
+        this.lockoutInterval = setInterval(() => {
+            this.setState((prev) => {
+                if (prev.lockoutSeconds <= 1) {
+                    clearInterval(this.lockoutInterval);
+                    return { lockoutSeconds: 0, errorMessage: '' };
+                }
+                const nextSec = prev.lockoutSeconds - 1;
+                return {
+                    lockoutSeconds: nextSec,
+                    errorMessage: `Too many attempts. Locked for security. Try again in ${nextSec}s.`
+                };
+            });
+        }, 1000);
+    };
 
     handleTabSwitch = (type) => {
         this.setState({ 
@@ -135,17 +166,21 @@ export default class Login extends React.Component {
                     }
                 }
             },
-            error: () => {
-                this.setState({ 
-                    isSubmitting: false,
-                    errorMessage: 'Server connection error. Please try again.'
-                });
+            error: (xhr) => {
+                this.setState({ isSubmitting: false });
+                if (xhr.status === 429) {
+                    const retrySeconds = (xhr.responseJSON && xhr.responseJSON.retry_after) || 60;
+                    this.startLockoutTimer(retrySeconds);
+                } else {
+                    const msg = (xhr.responseJSON && (xhr.responseJSON.message || xhr.responseJSON.messages)) || 'Server connection error. Please try again.';
+                    this.setState({ errorMessage: msg });
+                }
             }
         });
     }
 
     render() {
-        const { portalType, username, password, isSubmitting, errorMessage } = this.state;
+        const { portalType, username, password, isSubmitting, errorMessage, lockoutSeconds } = this.state;
         const isDoctor = portalType === 'doctor';
 
         return (
@@ -256,12 +291,19 @@ export default class Login extends React.Component {
                                         </p>
                                     </div>
 
-                                    {errorMessage && (
+                                    {lockoutSeconds > 0 ? (
+                                        <div className="alert alert-warning py-2 px-3 small rounded-3 mb-3 d-flex align-items-center gap-2">
+                                            <i className="fa-solid fa-clock-rotate-left fa-lg text-warning"></i>
+                                            <div>
+                                                <strong>Security Lockout:</strong> Too many attempts. Try again in <strong>{lockoutSeconds}s</strong>.
+                                            </div>
+                                        </div>
+                                    ) : errorMessage ? (
                                         <div className="alert alert-danger py-2 px-3 small rounded-3 mb-3 d-flex align-items-center gap-2">
                                             <i className="fa-solid fa-circle-exclamation"></i>
                                             <span>{errorMessage}</span>
                                         </div>
-                                    )}
+                                    ) : null}
 
                                     <form onSubmit={this.handleSubmit} noValidate>
                                         <div className="modern-input-group">
@@ -276,6 +318,7 @@ export default class Login extends React.Component {
                                                     placeholder={isDoctor ? "Doctor / Admin Username" : "Patient Username (e.g. abhicoder)"} 
                                                     required 
                                                     autoComplete="username"
+                                                    disabled={lockoutSeconds > 0}
                                                 />
                                             </div>
                                         </div>
@@ -292,6 +335,7 @@ export default class Login extends React.Component {
                                                     placeholder="Password" 
                                                     required 
                                                     autoComplete="current-password"
+                                                    disabled={lockoutSeconds > 0}
                                                 />
                                             </div>
                                         </div>
@@ -299,9 +343,11 @@ export default class Login extends React.Component {
                                         <button 
                                             type="submit" 
                                             className="btn-modern-primary w-100 py-3 justify-content-center fw-bold mt-2"
-                                            disabled={isSubmitting}
+                                            disabled={isSubmitting || lockoutSeconds > 0}
                                         >
-                                            {isSubmitting ? (
+                                            {lockoutSeconds > 0 ? (
+                                                <><i className="fa-solid fa-lock me-2"></i> Locked ({lockoutSeconds}s)</>
+                                            ) : isSubmitting ? (
                                                 <><i className="fa-solid fa-spinner fa-spin me-2"></i> Signing in...</>
                                             ) : (
                                                 <><i className="fa-solid fa-right-to-bracket me-2"></i> {isDoctor ? 'Access Clinical Console' : 'Launch Therapy Games'}</>
