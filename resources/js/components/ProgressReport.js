@@ -10,25 +10,79 @@ import { getGameIcon, getGameConfig } from '../gameConfig';
 export default class ProgressReport extends React.Component {
   constructor(props) {
     super(props);
-    this.state = {
-      data: {},
-    }
-  }
-
-  componentDidMount() {
     const end = new Date();
     const start = new Date();
     start.setDate(end.getDate() - 30);
-    this.getCurrentDateRecord([start, end]);
+    this.state = {
+      data: {},
+      selectedRange: [start, end],
+      activePreset: '30d'
+    };
+    this.currentDateRange = [start, end];
+  }
+
+  componentDidMount() {
+    this.applyPreset('30d');
   }
 
   componentDidUpdate(prevProps) {
     if (prevProps.data !== this.props.data) {
-      const end = new Date();
-      const start = new Date();
-      start.setDate(end.getDate() - 30);
-      this.getCurrentDateRecord([start, end]);
+      if (this.state.selectedRange) {
+        this.getCurrentDateRecord(this.state.selectedRange);
+      } else {
+        this.applyPreset('30d');
+      }
     }
+  }
+
+  getEarliestRecordDate = () => {
+    const rawData = this.parseRecordsData();
+    const dates = Object.keys(rawData || {});
+    if (!dates.length) {
+      const fallback = new Date();
+      fallback.setFullYear(fallback.getFullYear() - 1);
+      return fallback;
+    }
+    let earliest = Infinity;
+    dates.forEach(d => {
+      const ts = this.getTimestamp(d);
+      if (!isNaN(ts) && ts < earliest) {
+        earliest = ts;
+      }
+    });
+    return earliest !== Infinity ? new Date(earliest) : new Date(Date.now() - 365 * 24 * 60 * 60 * 1000);
+  }
+
+  applyPreset = (presetKey) => {
+    const end = new Date();
+    let start = new Date();
+
+    if (presetKey === '7d') {
+      start.setDate(end.getDate() - 7);
+    } else if (presetKey === '30d') {
+      start.setDate(end.getDate() - 30);
+    } else if (presetKey === 'all') {
+      start = this.getEarliestRecordDate();
+    }
+
+    const range = [start, end];
+    this.setState({
+      selectedRange: range,
+      activePreset: presetKey
+    });
+    this.getCurrentDateRecord(range);
+  }
+
+  handleRangeChange = (value) => {
+    if (!value || !value[0] || !value[1]) {
+      this.applyPreset('30d');
+      return;
+    }
+    this.setState({
+      selectedRange: value,
+      activePreset: 'custom'
+    });
+    this.getCurrentDateRecord(value);
   }
 
   getTimestamp = (date) => {
@@ -345,12 +399,39 @@ export default class ProgressReport extends React.Component {
 
         {/* Filter Card */}
         <div className="card border-0 shadow-sm p-4 mb-4" style={{ backgroundColor: 'var(--bg-card)', borderRadius: '12px', border: '1px solid var(--border-color)', maxWidth: '850px' }}>
-          <h6 className="fw-bold mb-3 text-main"><i className="fa-solid fa-sliders text-primary me-2"></i>Filter Date & Period Resolution</h6>
+          <div className="d-flex align-items-center justify-content-between flex-wrap gap-2 mb-3">
+            <h6 className="fw-bold mb-0 text-main"><i className="fa-solid fa-sliders text-primary me-2"></i>Filter Date & Period Resolution</h6>
+            
+            <div className="btn-group btn-group-sm" role="group" aria-label="Date range presets">
+              <button 
+                type="button" 
+                className={`btn ${this.state.activePreset === '7d' ? 'btn-primary' : 'btn-outline-secondary'}`}
+                onClick={() => this.applyPreset('7d')}
+              >
+                Last 7 Days
+              </button>
+              <button 
+                type="button" 
+                className={`btn ${this.state.activePreset === '30d' ? 'btn-primary' : 'btn-outline-secondary'}`}
+                onClick={() => this.applyPreset('30d')}
+              >
+                Last 30 Days
+              </button>
+              <button 
+                type="button" 
+                className={`btn ${this.state.activePreset === 'all' ? 'btn-primary' : 'btn-outline-secondary'}`}
+                onClick={() => this.applyPreset('all')}
+              >
+                All Time
+              </button>
+            </div>
+          </div>
           <div className="row g-3 align-items-center">
             <div className="col-12 col-sm-7">
               <DateRangePicker 
                 block 
-                onChange={value => this.getCurrentDateRecord(value)} 
+                value={this.state.selectedRange}
+                onChange={this.handleRangeChange} 
                 format="dd/MM/yyyy"
                 placeholder="Select date range"
               />
