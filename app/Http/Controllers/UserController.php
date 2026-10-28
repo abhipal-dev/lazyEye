@@ -210,17 +210,52 @@ class UserController extends Controller
                 ->leftJoin('users as docs', 'users.doctor_id', '=', 'docs.id')
                 ->whereNotIn('users.accounttype', ['admin', 'root', 'doctor'])
                 ->select(
-                    'users.*',
+                    'users.id',
+                    'users.fullname',
+                    'users.username',
+                    'users.email',
+                    'users.gender',
+                    'users.accounttype',
+                    'users.user_playing_time',
+                    'users.doctor_id',
+                    'users.game_speed',
+                    'users.image_address',
+                    'users.left_eye_color',
+                    'users.right_eye_color',
+                    'users.left_eye_contrastvalue',
+                    'users.right_eye_contrastvalue',
+                    'users.left_eye_contrast_color',
+                    'users.right_eye_contrast_color',
+                    'users.created_at',
+                    'users.updated_at',
                     'docs.fullname as doctor_name',
                     'docs.email as doctor_email'
-                );
+                )
+                ->orderBy('users.id', 'desc');
 
             // Doctor can only check their own assigned patients
             if ($userType === 'doctor') {
                 $query->where('users.doctor_id', $userId);
             }
 
-            $data = $query->get();
+            // Optional search filter
+            if ($req->filled('search')) {
+                $search = '%' . trim($req->search) . '%';
+                $query->where(function($q) use ($search) {
+                    $q->where('users.fullname', 'like', $search)
+                      ->orWhere('users.username', 'like', $search)
+                      ->orWhere('users.email', 'like', $search);
+                });
+            }
+
+            // Support server-side pagination when requested (e.g. ?page=1 or ?per_page=20 or ?paginate=1)
+            if ($req->has('page') || $req->has('per_page') || $req->boolean('paginate')) {
+                $perPage = max(1, min(100, intval($req->input('per_page', 20))));
+                $data = $query->paginate($perPage);
+            } else {
+                $data = $query->get();
+            }
+
             return response()->json($data);
         });
     }
@@ -275,14 +310,22 @@ class UserController extends Controller
                     $table->string('left_eye_contrastvalue', 255)->default('255');
                     $table->string('right_eye_contrastvalue', 255)->default('255');
                     $table->string('image_address', 255)->nullable();
-                    $table->unsignedBigInteger('doctor_id')->nullable();
+                    $table->unsignedBigInteger('doctor_id')->nullable()->index();
                     $table->timestamps();
                 });
             } else {
                 if (!Schema::hasColumn('users', 'doctor_id')) {
                     Schema::table('users', function (Blueprint $table) {
-                        $table->unsignedBigInteger('doctor_id')->nullable();
+                        $table->unsignedBigInteger('doctor_id')->nullable()->index();
                     });
+                } else {
+                    try {
+                        Schema::table('users', function (Blueprint $table) {
+                            $table->index('doctor_id');
+                        });
+                    } catch (\Throwable $e) {
+                        // Index already exists
+                    }
                 }
                 if (!Schema::hasColumn('users', 'accounttype')) {
                     Schema::table('users', function (Blueprint $table) {
