@@ -93,6 +93,53 @@ export default class ProgressReport extends React.Component {
     return moment(timestamp).format(this.props.date_format);
   }
 
+  exportCSV = () => {
+    const rawData = this.parseRecordsData();
+    const dates = Object.keys(rawData || {});
+    if (!dates.length) {
+      alert('No therapy records available to export.');
+      return;
+    }
+
+    let startTs = 0;
+    let endTs = Infinity;
+    if (this.state.selectedRange && this.state.selectedRange[0] && this.state.selectedRange[1]) {
+      startTs = moment(this.state.selectedRange[0]).startOf('day').unix() * 1000;
+      endTs = moment(this.state.selectedRange[1]).endOf('day').unix() * 1000;
+    }
+
+    const rows = [];
+    rows.push(['Date / Session Period', 'Modality Key', 'Prescribed Therapy Exercise', 'Clinical Score (pts)']);
+
+    dates.forEach(d => {
+      let ts = this.getTimestamp(d);
+      if (isNaN(ts) || (ts >= startTs && ts <= endTs)) {
+        const dayGames = rawData[d] || {};
+        Object.keys(dayGames).forEach(gameKey => {
+          const score = +dayGames[gameKey];
+          const info = getGameConfig(gameKey);
+          const title = info ? info.title : gameKey;
+          rows.push([`"${d}"`, `"${gameKey}"`, `"${title}"`, score]);
+        });
+      }
+    });
+
+    if (rows.length <= 1) {
+      alert('No therapy sessions found within the selected date range.');
+      return;
+    }
+
+    const csvContent = "data:text/csv;charset=utf-8," + rows.map(e => e.join(",")).join("\n");
+    const encodedUri = encodeURI(csvContent);
+    const link = document.createElement("a");
+    link.setAttribute("href", encodedUri);
+    const filename = `lazyeye_progress_report_${moment().format('YYYY-MM-DD')}.csv`;
+    link.setAttribute("download", filename);
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+  };
+
   parseRecordsData = () => {
     let data = {};
     if (this.props.data) {
@@ -398,7 +445,7 @@ export default class ProgressReport extends React.Component {
         </div>
 
         {/* Filter Card */}
-        <div className="card border-0 shadow-sm p-4 mb-4" style={{ backgroundColor: 'var(--bg-card)', borderRadius: '12px', border: '1px solid var(--border-color)', maxWidth: '850px' }}>
+        <div className="card border-0 shadow-sm p-4 mb-4 d-print-none" style={{ backgroundColor: 'var(--bg-card)', borderRadius: '12px', border: '1px solid var(--border-color)', maxWidth: '850px' }}>
           <div className="d-flex align-items-center justify-content-between flex-wrap gap-2 mb-3">
             <h6 className="fw-bold mb-0 text-main"><i className="fa-solid fa-sliders text-primary me-2"></i>Filter Date & Period Resolution</h6>
             
