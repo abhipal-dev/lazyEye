@@ -81,6 +81,24 @@
       box-shadow: 0 0 6px currentColor;
     }
 
+    .btn-sound-toggle {
+      background: rgba(30, 41, 59, 0.8);
+      border: 1px solid rgba(255, 255, 255, 0.15);
+      border-radius: 8px;
+      color: #cbd5e1;
+      width: 32px;
+      height: 32px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 13px;
+      cursor: pointer;
+      user-select: none;
+    }
+    .btn-sound-toggle:active {
+      background: rgba(56, 189, 248, 0.25);
+      color: #38bdf8;
+    }
     .snake-score-chip {
       background: rgba(30, 41, 59, 0.8);
       border: 1px solid rgba(255, 255, 255, 0.1);
@@ -175,6 +193,9 @@
       </div>
     </div>
 
+    <button type="button" class="btn-sound-toggle" id="snakeAudioToggleBtn" title="Toggle Audio">
+      <i class="fa-solid fa-volume-high"></i>
+    </button>
     <div class="snake-score-chip">
       <span>Score:</span>
       <span id="scoreVal">0</span>
@@ -203,6 +224,60 @@
   </div>
 
   <script>
+    // Web Audio Synthesizer for Snake
+    class SnakeAudio {
+      constructor() {
+        this.ctx = null;
+        this.muted = localStorage.getItem('lazyeye_snake_muted') === 'true';
+      }
+      init() {
+        if (!this.ctx) {
+          const AudioContext = window.AudioContext || window.webkitAudioContext;
+          if (AudioContext) this.ctx = new AudioContext();
+        }
+        if (this.ctx && this.ctx.state === 'suspended') {
+          this.ctx.resume();
+        }
+      }
+      toggle() {
+        this.muted = !this.muted;
+        localStorage.setItem('lazyeye_snake_muted', this.muted);
+        this.updateBtn();
+        return this.muted;
+      }
+      updateBtn() {
+        const btn = document.getElementById('snakeAudioToggleBtn');
+        if (btn) {
+          btn.innerHTML = this.muted ? '<i class="fa-solid fa-volume-xmark"></i>' : '<i class="fa-solid fa-volume-high"></i>';
+        }
+      }
+      play(freq, dur = 0.04, type = 'sine', endFreq = null) {
+        if (this.muted) return;
+        this.init();
+        if (!this.ctx) return;
+        try {
+          const osc = this.ctx.createOscillator();
+          const gain = this.ctx.createGain();
+          osc.type = type;
+          osc.frequency.setValueAtTime(freq, this.ctx.currentTime);
+          if (endFreq) osc.frequency.exponentialRampToValueAtTime(endFreq, this.ctx.currentTime + dur);
+          gain.gain.setValueAtTime(0.1, this.ctx.currentTime);
+          gain.gain.exponentialRampToValueAtTime(0.001, this.ctx.currentTime + dur);
+          osc.connect(gain);
+          gain.connect(this.ctx.destination);
+          osc.start();
+          osc.stop(this.ctx.currentTime + dur);
+        } catch (e) {}
+      }
+      turn() { this.play(260, 0.02, 'triangle'); }
+      eat() {
+        this.play(587, 0.06, 'sine');
+        setTimeout(() => this.play(880, 0.1, 'sine'), 50);
+      }
+      crash() { this.play(180, 0.2, 'sawtooth', 60); }
+    }
+    const sound = new SnakeAudio();
+
     const canvas = document.getElementById('game');
     const context = canvas.getContext('2d');
     const grid = 20; // 20px grid cells
@@ -217,8 +292,8 @@
       const w = Math.floor(maxW / grid) * grid;
       const h = Math.floor(maxH / grid) * grid;
 
-      canvas.width = Math.max(300, w);
-      canvas.height = Math.max(300, h);
+      canvas.width = Math.max(260, w);
+      canvas.height = Math.max(260, h);
     }
 
     resizeCanvas();
@@ -376,6 +451,7 @@
         // Snake ate Apple
         if (cell.x === apple.x && cell.y === apple.y) {
           snake.maxCells++;
+          sound.eat();
           score++;
           window.score = score;
           document.getElementById('scoreVal').innerText = score;
@@ -386,6 +462,7 @@
         // Self-collision detection
         for (let i = index + 1; i < snake.cells.length; i++) {
           if (cell.x === snake.cells[i].x && cell.y === snake.cells[i].y) {
+            sound.crash();
             // Reset snake
             snake.x = grid * 5;
             snake.y = grid * 5;
@@ -402,16 +479,16 @@
     }
 
     // Direction input handlers
-    function turnUp() {
+    function turnUp() { sound.turn();
       if (snake.dy === 0) { nextDx = 0; nextDy = -grid; }
     }
-    function turnDown() {
+    function turnDown() { sound.turn();
       if (snake.dy === 0) { nextDx = 0; nextDy = grid; }
     }
-    function turnLeft() {
+    function turnLeft() { sound.turn();
       if (snake.dx === 0) { nextDx = -grid; nextDy = 0; }
     }
-    function turnRight() {
+    function turnRight() { sound.turn();
       if (snake.dx === 0) { nextDx = grid; nextDy = 0; }
     }
 

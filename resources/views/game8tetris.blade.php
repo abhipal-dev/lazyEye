@@ -2,8 +2,8 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-  <title>Tetris Fusion - LazyEye Therapy</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+  <title>Tetris Therapy - LazyEye</title>
   <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.3/jquery.min.js"></script>
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 
@@ -17,10 +17,11 @@
     }
 
     body {
-      background: radial-gradient(circle at center, #111827 0%, #030712 100%);
+      background: #090d16;
       color: #f3f4f6;
       font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
       min-height: 100vh;
+      min-height: 100dvh;
       display: flex;
       align-items: center;
       justify-content: center;
@@ -33,9 +34,14 @@
       flex-direction: row;
       align-items: center;
       justify-content: center;
-      gap: 24px;
+      gap: 20px;
       max-width: 900px;
       width: 100%;
+    }
+
+    /* Compact Mobile Top Bar (Hidden on desktop) */
+    .mobile-top-bar {
+      display: none;
     }
 
     /* Playfield Column */
@@ -48,48 +54,47 @@
 
     .canvas-border-glow {
       position: relative;
-      padding: 4px;
-      background: linear-gradient(135deg, rgba(239, 68, 68, 0.4), rgba(6, 182, 212, 0.4));
-      border-radius: 12px;
-      box-shadow: 0 10px 30px -10px rgba(0, 0, 0, 0.8), 0 0 20px rgba(6, 182, 212, 0.15);
+      padding: 3px;
+      background: #1e293b;
+      border: 1px solid rgba(255, 255, 255, 0.15);
+      border-radius: 10px;
+      box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.8);
     }
 
     canvas#game {
       display: block;
       background: #000000;
-      border-radius: 8px;
+      border-radius: 7px;
+      touch-action: none;
     }
 
-    /* Sidebar HUD */
+    /* Sidebar HUD (Desktop) */
     .hud-panel {
       display: flex;
       flex-direction: column;
-      gap: 14px;
-      width: 240px;
+      gap: 12px;
+      width: 230px;
     }
 
     .hud-title-box {
-      background: rgba(17, 24, 39, 0.8);
+      background: rgba(17, 24, 39, 0.9);
       border: 1px solid rgba(255, 255, 255, 0.1);
-      border-radius: 12px;
-      padding: 14px;
+      border-radius: 10px;
+      padding: 12px;
       text-align: center;
-      backdrop-filter: blur(8px);
     }
 
     .hud-title-box h1 {
-      font-size: 20px;
+      font-size: 18px;
       font-weight: 800;
-      letter-spacing: 1px;
-      background: linear-gradient(135deg, #f87171, #38bdf8);
-      -webkit-background-clip: text;
-      -webkit-text-fill-color: transparent;
-      margin-bottom: 4px;
+      letter-spacing: 0.5px;
+      color: #38bdf8;
+      margin-bottom: 2px;
     }
 
     .hud-title-box p {
       font-size: 11px;
-      color: #9ca3af;
+      color: #94a3b8;
       text-transform: uppercase;
       letter-spacing: 0.5px;
     }
@@ -98,8 +103,8 @@
     .therapy-status-pill {
       display: flex;
       align-items: center;
-      justify-content: space-around;
-      background: rgba(15, 23, 42, 0.6);
+      justify-content: space-between;
+      background: rgba(15, 23, 42, 0.8);
       border: 1px solid rgba(255, 255, 255, 0.08);
       border-radius: 10px;
       padding: 8px 12px;
@@ -111,39 +116,39 @@
       align-items: center;
       gap: 6px;
       font-weight: 600;
+      font-size: 11px;
     }
 
     .eye-dot {
       width: 10px;
       height: 10px;
       border-radius: 50%;
-      box-shadow: 0 0 8px currentColor;
+      box-shadow: 0 0 6px currentColor;
     }
 
     /* Next Piece Card */
     .next-card {
-      background: rgba(17, 24, 39, 0.8);
+      background: rgba(17, 24, 39, 0.9);
       border: 1px solid rgba(255, 255, 255, 0.1);
-      border-radius: 12px;
-      padding: 12px;
+      border-radius: 10px;
+      padding: 10px;
       display: flex;
       flex-direction: column;
       align-items: center;
-      backdrop-filter: blur(8px);
     }
 
     .hud-label {
-      font-size: 11px;
+      font-size: 10px;
       font-weight: 700;
       color: #94a3b8;
       text-transform: uppercase;
-      letter-spacing: 1px;
-      margin-bottom: 8px;
+      letter-spacing: 0.5px;
+      margin-bottom: 6px;
     }
 
     canvas#nextCanvas {
       background: #030712;
-      border-radius: 8px;
+      border-radius: 6px;
       border: 1px solid rgba(255, 255, 255, 0.05);
     }
 
@@ -151,31 +156,51 @@
     .stats-grid {
       display: grid;
       grid-template-columns: 1fr 1fr;
-      gap: 10px;
+      gap: 8px;
     }
 
     .stat-card {
-      background: rgba(17, 24, 39, 0.8);
+      background: rgba(17, 24, 39, 0.9);
       border: 1px solid rgba(255, 255, 255, 0.08);
-      border-radius: 10px;
-      padding: 10px;
+      border-radius: 8px;
+      padding: 8px;
       text-align: center;
     }
 
     .stat-value {
-      font-size: 20px;
+      font-size: 18px;
       font-weight: 800;
       color: #38bdf8;
       font-variant-numeric: tabular-nums;
       margin-top: 2px;
     }
 
+    /* Audio Toggle Button */
+    .btn-audio-toggle {
+      background: rgba(30, 41, 59, 0.8);
+      border: 1px solid rgba(255, 255, 255, 0.15);
+      border-radius: 6px;
+      color: #cbd5e1;
+      padding: 4px 8px;
+      font-size: 13px;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      transition: background 0.15s ease;
+    }
+
+    .btn-audio-toggle:active {
+      background: rgba(56, 189, 248, 0.2);
+      color: #38bdf8;
+    }
+
     /* Controls Guide */
     .controls-guide {
-      background: rgba(17, 24, 39, 0.6);
+      background: rgba(17, 24, 39, 0.7);
       border: 1px solid rgba(255, 255, 255, 0.06);
-      border-radius: 10px;
-      padding: 10px;
+      border-radius: 8px;
+      padding: 8px 10px;
       font-size: 11px;
       color: #94a3b8;
     }
@@ -183,12 +208,12 @@
     .controls-guide div {
       display: flex;
       justify-content: space-between;
-      margin-bottom: 4px;
+      margin-bottom: 3px;
     }
 
     .key-badge {
       background: rgba(255, 255, 255, 0.1);
-      padding: 2px 6px;
+      padding: 1px 5px;
       border-radius: 4px;
       color: #f1f5f9;
       font-family: monospace;
@@ -198,42 +223,47 @@
     /* Mobile Virtual Controls */
     .mobile-controls {
       display: none;
-      margin-top: 10px;
+      margin-top: 6px;
       width: 100%;
       max-width: 320px;
-      gap: 8px;
+      gap: 6px;
     }
 
     .dpad-row {
       display: flex;
       justify-content: center;
-      gap: 12px;
+      gap: 8px;
       width: 100%;
     }
 
     .btn-virtual {
-      background: rgba(30, 41, 59, 0.9);
+      background: rgba(30, 41, 59, 0.95);
       color: #f8fafc;
       border: 1px solid rgba(255, 255, 255, 0.15);
-      border-radius: 10px;
-      height: 48px;
+      border-radius: 8px;
+      height: 44px;
       flex: 1;
       display: flex;
       align-items: center;
       justify-content: center;
-      font-size: 18px;
+      gap: 6px;
+      font-size: 15px;
+      font-weight: 700;
       cursor: pointer;
-      active: scale(0.95);
       touch-action: manipulation;
+      user-select: none;
+      -webkit-tap-highlight-color: transparent;
+      box-shadow: 0 3px 6px rgba(0, 0, 0, 0.3);
     }
 
     .btn-virtual:active {
       background: rgba(56, 189, 248, 0.3);
       border-color: #38bdf8;
+      transform: scale(0.96);
     }
 
     .btn-hard-drop {
-      background: rgba(239, 68, 68, 0.2);
+      background: rgba(239, 68, 68, 0.25);
       border-color: rgba(239, 68, 68, 0.4);
       color: #fca5a5;
     }
@@ -245,68 +275,138 @@
       left: 0;
       width: 100%;
       height: 100%;
-      background: rgba(3, 7, 18, 0.88);
-      border-radius: 8px;
+      background: rgba(3, 7, 18, 0.9);
+      border-radius: 7px;
       display: none;
       flex-direction: column;
       align-items: center;
       justify-content: center;
-      backdrop-filter: blur(4px);
       z-index: 20;
-      padding: 20px;
+      padding: 16px;
       text-align: center;
     }
 
     .game-over-overlay h2 {
-      font-size: 26px;
+      font-size: 22px;
       font-weight: 800;
       color: #ef4444;
-      margin-bottom: 8px;
-      letter-spacing: 1px;
+      margin-bottom: 6px;
+      letter-spacing: 0.5px;
     }
 
     .game-over-overlay p {
-      font-size: 14px;
+      font-size: 13px;
       color: #cbd5e1;
-      margin-bottom: 16px;
+      margin-bottom: 14px;
     }
 
     .btn-restart {
-      background: linear-gradient(135deg, #ef4444, #06b6d4);
+      background: #2563eb;
       color: white;
       border: none;
-      padding: 10px 24px;
-      border-radius: 8px;
+      padding: 8px 18px;
+      border-radius: 6px;
       font-weight: 700;
-      font-size: 14px;
+      font-size: 13px;
       cursor: pointer;
-      box-shadow: 0 4px 12px rgba(6, 182, 212, 0.3);
-      transition: transform 0.15s ease;
+      display: flex;
+      align-items: center;
+      gap: 6px;
     }
 
     .btn-restart:hover {
-      transform: translateY(-2px);
+      background: #1d4ed8;
     }
 
+    /* Mobile Screen Adaptation (Standard responsive layout) */
     @media (max-width: 768px) {
       body {
-        padding: 5px;
-        align-items: flex-start;
-        overflow-y: auto;
+        padding: 4px;
+        align-items: center;
+        justify-content: flex-start;
+        overflow: hidden;
       }
+
       .tetris-arcade-wrap {
         flex-direction: column;
-        gap: 12px;
+        align-items: center;
+        gap: 4px;
+        width: 100%;
+        max-width: 100%;
       }
-      .hud-panel {
+
+      /* Compact Top Bar on Mobile */
+      .mobile-top-bar {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
         width: 100%;
         max-width: 320px;
-        order: -1;
-        gap: 8px;
+        height: 38px;
+        background: rgba(15, 23, 42, 0.9);
+        border: 1px solid rgba(255, 255, 255, 0.12);
+        border-radius: 8px;
+        padding: 4px 10px;
+        margin-bottom: 4px;
       }
-      .controls-guide {
+
+      .mobile-stat-box {
+        display: flex;
+        flex-direction: column;
+        align-items: flex-start;
+        line-height: 1.1;
+      }
+
+      .mobile-stat-box .m-label {
+        font-size: 9px;
+        font-weight: 700;
+        color: #94a3b8;
+        text-transform: uppercase;
+      }
+
+      .mobile-stat-box .m-val {
+        font-size: 14px;
+        font-weight: 800;
+        color: #38bdf8;
+        font-variant-numeric: tabular-nums;
+      }
+
+      .mobile-next-box {
+        display: flex;
+        align-items: center;
+        gap: 4px;
+      }
+
+      canvas#mobileNextCanvas {
+        background: #030712;
+        border-radius: 4px;
+        border: 1px solid rgba(255, 255, 255, 0.1);
+      }
+
+      .mobile-actions {
+        display: flex;
+        align-items: center;
+        gap: 6px;
+      }
+
+      .btn-mini-action {
+        background: rgba(30, 41, 59, 0.9);
+        border: 1px solid rgba(255, 255, 255, 0.15);
+        color: #cbd5e1;
+        border-radius: 6px;
+        width: 28px;
+        height: 28px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 12px;
+        cursor: pointer;
+      }
+
+      .hud-panel {
         display: none;
       }
+
       .mobile-controls {
         display: flex;
         flex-direction: column;
@@ -317,6 +417,29 @@
 <body>
 
   <div class="tetris-arcade-wrap">
+    <!-- Compact Mobile Status Header -->
+    <div class="mobile-top-bar">
+      <div class="mobile-stat-box">
+        <span class="m-label">Score</span>
+        <span class="m-val" id="mobileScoreDisplay">0</span>
+      </div>
+      <div class="mobile-stat-box">
+        <span class="m-label">Lvl</span>
+        <span class="m-val" id="mobileLevelDisplay">1</span>
+      </div>
+      <div class="mobile-next-box">
+        <canvas id="mobileNextCanvas" width="40" height="30"></canvas>
+      </div>
+      <div class="mobile-actions">
+        <button type="button" class="btn-mini-action" id="mobileAudioToggleBtn" title="Toggle Sound">
+          <i class="fa-solid fa-volume-high"></i>
+        </button>
+        <button type="button" class="btn-mini-action" id="mobileSaveExitBtn" title="Save & Exit" style="background:#059669; color:#fff; border-color:#10b981;">
+          <i class="fa-solid fa-floppy-disk"></i>
+        </button>
+      </div>
+    </div>
+
     <!-- Playfield Panel -->
     <div class="playfield-panel">
       <div class="canvas-border-glow">
@@ -324,9 +447,9 @@
         <div id="gameOverOverlay" class="game-over-overlay">
           <h2>GAME OVER</h2>
           <p>Score: <span id="finalScore">0</span></p>
-          <div style="display:flex; gap:10px; margin-top:10px;">
+          <div style="display:flex; gap:8px;">
             <button id="restartBtn" class="btn-restart"><i class="fa-solid fa-rotate-right"></i> Play Again</button>
-            <button id="saveExitBtn" class="btn-restart" style="background:#059669; border-color:#10b981;"><i class="fa-solid fa-floppy-disk"></i> Save & Exit</button>
+            <button id="saveExitBtn" class="btn-restart" style="background:#059669;"><i class="fa-solid fa-floppy-disk"></i> Save & Exit</button>
           </div>
         </div>
       </div>
@@ -334,22 +457,22 @@
       <!-- Mobile Touch Controls -->
       <div class="mobile-controls">
         <div class="dpad-row">
-          <button class="btn-virtual" id="btnRotate" title="Rotate"><i class="fa-solid fa-rotate"></i></button>
-          <button class="btn-virtual btn-hard-drop" id="btnHardDrop" title="Hard Drop"><i class="fa-solid fa-angles-down"></i></button>
+          <button class="btn-virtual" id="btnRotate"><i class="fa-solid fa-rotate"></i> ROTATE</button>
+          <button class="btn-virtual btn-hard-drop" id="btnHardDrop"><i class="fa-solid fa-angles-down"></i> DROP</button>
         </div>
         <div class="dpad-row">
-          <button class="btn-virtual" id="btnLeft" title="Left"><i class="fa-solid fa-arrow-left"></i></button>
-          <button class="btn-virtual" id="btnDown" title="Soft Drop"><i class="fa-solid fa-arrow-down"></i></button>
-          <button class="btn-virtual" id="btnRight" title="Right"><i class="fa-solid fa-arrow-right"></i></button>
+          <button class="btn-virtual" id="btnLeft"><i class="fa-solid fa-arrow-left"></i></button>
+          <button class="btn-virtual" id="btnDown"><i class="fa-solid fa-arrow-down"></i></button>
+          <button class="btn-virtual" id="btnRight"><i class="fa-solid fa-arrow-right"></i></button>
         </div>
       </div>
     </div>
 
-    <!-- HUD Sidebar -->
+    <!-- Desktop HUD Sidebar -->
     <div class="hud-panel">
       <div class="hud-title-box">
-        <h1>TETRIS FUSION</h1>
-        <p>Binocular Fusion Therapy</p>
+        <h1>TETRIS</h1>
+        <p>Binocular Therapy</p>
       </div>
 
       <!-- Dichoptic Vision Colors Status -->
@@ -362,12 +485,15 @@
           <span class="eye-dot" id="rightDot" style="color: #06b6d4; background: #06b6d4;"></span>
           <span id="rightLabel">Right Eye</span>
         </div>
+        <button type="button" class="btn-audio-toggle" id="desktopAudioToggleBtn" title="Toggle Sound FX">
+          <i class="fa-solid fa-volume-high"></i>
+        </button>
       </div>
 
       <!-- Next Piece Preview -->
       <div class="next-card">
         <span class="hud-label">NEXT PIECE</span>
-        <canvas id="nextCanvas" width="110" height="90"></canvas>
+        <canvas id="nextCanvas" width="100" height="75"></canvas>
       </div>
 
       <!-- Stats Grid -->
@@ -398,28 +524,106 @@
         <div><span>Hard Drop:</span> <span class="key-badge">Space</span></div>
       </div>
 
-      <button id="finishSessionBtn" class="btn-restart" style="width:100%; margin-top:10px; background:#059669; border-color:#10b981; font-size:12px; padding:8px 12px; font-weight:600; cursor:pointer;">
-        <i class="fa-solid fa-floppy-disk me-1"></i> Finish Therapy & Save
+      <button id="finishSessionBtn" class="btn-restart" style="width:100%; margin-top:8px; background:#059669; font-size:12px; padding:8px 12px; justify-content:center;">
+        <i class="fa-solid fa-floppy-disk me-1"></i> Finish & Save
       </button>
     </div>
   </div>
 
   <script>
-    // --- Canvas Setup & Proportions ---
+    // --- Web Audio Synthesizer (No external asset lag) ---
+    class GameAudio {
+      constructor() {
+        this.ctx = null;
+        this.muted = localStorage.getItem('lazyeye_tetris_muted') === 'true';
+      }
+
+      init() {
+        if (!this.ctx) {
+          const AudioContext = window.AudioContext || window.webkitAudioContext;
+          if (AudioContext) {
+            this.ctx = new AudioContext();
+          }
+        }
+        if (this.ctx && this.ctx.state === 'suspended') {
+          this.ctx.resume();
+        }
+      }
+
+      toggle() {
+        this.muted = !this.muted;
+        localStorage.setItem('lazyeye_tetris_muted', this.muted);
+        this.updateButtons();
+        return this.muted;
+      }
+
+      updateButtons() {
+        const iconClass = this.muted ? 'fa-solid fa-volume-xmark' : 'fa-solid fa-volume-high';
+        const desktopBtn = document.getElementById('desktopAudioToggleBtn');
+        const mobileBtn = document.getElementById('mobileAudioToggleBtn');
+        if (desktopBtn) desktopBtn.innerHTML = `<i class="${iconClass}"></i>`;
+        if (mobileBtn) mobileBtn.innerHTML = `<i class="${iconClass}"></i>`;
+      }
+
+      playTone(freq, duration = 0.04, type = 'sine', endFreq = null) {
+        if (this.muted) return;
+        this.init();
+        if (!this.ctx) return;
+        try {
+          const osc = this.ctx.createOscillator();
+          const gain = this.ctx.createGain();
+          osc.type = type;
+          osc.frequency.setValueAtTime(freq, this.ctx.currentTime);
+          if (endFreq) {
+            osc.frequency.exponentialRampToValueAtTime(endFreq, this.ctx.currentTime + duration);
+          }
+          gain.gain.setValueAtTime(0.12, this.ctx.currentTime);
+          gain.gain.exponentialRampToValueAtTime(0.001, this.ctx.currentTime + duration);
+          osc.connect(gain);
+          gain.connect(this.ctx.destination);
+          osc.start();
+          osc.stop(this.ctx.currentTime + duration);
+        } catch (e) {}
+      }
+
+      move() { this.playTone(220, 0.03, 'triangle'); }
+      rotate() { this.playTone(420, 0.04, 'sine', 600); }
+      drop() { this.playTone(140, 0.06, 'triangle', 70); }
+      clear() {
+        this.playTone(523, 0.08, 'sine');
+        setTimeout(() => this.playTone(659, 0.08, 'sine'), 50);
+        setTimeout(() => this.playTone(784, 0.12, 'sine'), 100);
+      }
+      gameOver() { this.playTone(280, 0.25, 'sawtooth', 100); }
+    }
+
+    const sound = new GameAudio();
+
+    // --- Canvas Setup & Responsive Proportions ---
     const canvas = document.getElementById('game');
     const context = canvas.getContext('2d');
     const nextCanvas = document.getElementById('nextCanvas');
     const nextContext = nextCanvas.getContext('2d');
+    const mobileNextCanvas = document.getElementById('mobileNextCanvas');
+    const mobileNextContext = mobileNextCanvas ? mobileNextCanvas.getContext('2d') : null;
 
     const COLS = 10;
     const ROWS = 20;
 
-    // Dynamically size grid so playfield fits comfortably without distortion
     function calculateGridSize() {
-      const availableH = window.innerHeight - 100;
-      const calculated = Math.floor(availableH / ROWS);
-      // Clamp between 22px and 34px
-      return Math.max(22, Math.min(34, calculated));
+      const isMobile = window.innerWidth <= 768;
+      if (isMobile) {
+        // Strict mobile vertical budget: topbar (38px) + controls (100px) + margins (25px) = 163px
+        const availH = window.innerHeight - 165;
+        const availW = window.innerWidth - 20;
+        const gridH = Math.floor(availH / ROWS);
+        const gridW = Math.floor(availW / COLS);
+        return Math.max(14, Math.min(26, Math.min(gridH, gridW)));
+      } else {
+        const availH = window.innerHeight - 80;
+        const calculated = Math.floor(availH / ROWS);
+        return Math.max(22, Math.min(32, calculated));
+      }
     }
 
     let grid = calculateGridSize();
@@ -434,35 +638,23 @@
     let level = 1;
     let gameOver = false;
     let rAF = null;
-    // Dichoptic Speed & Velocity Settings (Doctor Prescribed: Progressive vs Fixed Levels 1-5)
+
     const urlParams = new URLSearchParams(window.location.search);
     let speedParam = urlParams.get('speed') || 'level-3';
 
     function getDropIntervalForSpeed(speed) {
-      if (speed === 'level-1' || speed === 'slow') return 65; // Level 1: Rehab / Very Slow
-      if (speed === 'level-2') return 50; // Level 2: Slow
-      if (speed === 'level-4' || speed === 'fast') return 26; // Level 4: Fast
-      if (speed === 'level-5') return 18; // Level 5: Agility
-      return 38; // Level 3: Normal / Standard baseline
+      if (speed === 'level-1' || speed === 'slow') return 60;
+      if (speed === 'level-2') return 48;
+      if (speed === 'level-4' || speed === 'fast') return 28;
+      if (speed === 'level-5') return 18;
+      return 38;
     }
 
     let isIncremental = (speedParam === 'progressive' || speedParam === 'incremental');
     let baseDropInterval = getDropIntervalForSpeed(speedParam);
-
-    window.addEventListener('message', function(e) {
-      if (!e.data) return;
-      if (e.data.speedMode) {
-        speedParam = e.data.speedMode;
-        isIncremental = (speedParam === 'progressive' || speedParam === 'incremental');
-        baseDropInterval = getDropIntervalForSpeed(speedParam);
-        dropInterval = baseDropInterval;
-      }
-    });
-
+    let dropInterval = baseDropInterval;
     let dropCounter = 0;
-    let dropInterval = baseDropInterval; // frames per drop
 
-    // Dichoptic mapping: shapes alternate between Left and Right eye filters
     const pieceEyeMap = {
       'I': 'left',
       'O': 'right',
@@ -480,10 +672,10 @@
     function updateEyeColors(left, right) {
       if (left) leftColor = left;
       if (right) rightColor = right;
-      document.getElementById('leftDot').style.color = leftColor;
-      document.getElementById('leftDot').style.background = leftColor;
-      document.getElementById('rightDot').style.color = rightColor;
-      document.getElementById('rightDot').style.background = rightColor;
+      const leftDot = document.getElementById('leftDot');
+      const rightDot = document.getElementById('rightDot');
+      if (leftDot) { leftDot.style.color = leftColor; leftDot.style.background = leftColor; }
+      if (rightDot) { rightDot.style.color = rightColor; rightDot.style.background = rightColor; }
       drawNextPiece();
     }
 
@@ -526,9 +718,19 @@
       ]
     };
 
-    // --- Sequence Generator (Bag of 7) ---
-    let tetrominoSequence = [];
+    const tetrominoSequence = [];
+    const playfield = [];
+
+    for (let row = -2; row < ROWS; row++) {
+      playfield[row] = [];
+      for (let col = 0; col < COLS; col++) {
+        playfield[row][col] = 0;
+      }
+    }
+
     function getRandomInt(min, max) {
+      min = Math.ceil(min);
+      max = Math.floor(max);
       return Math.floor(Math.random() * (max - min + 1)) + min;
     }
 
@@ -542,13 +744,18 @@
     }
 
     let nextPieceName = null;
-    let currentTetromino = null;
 
-    function getNextPiece() {
+    function getNextTetromino() {
       if (tetrominoSequence.length === 0) {
         generateSequence();
       }
-      const name = tetrominoSequence.pop();
+      const name = nextPieceName || tetrominoSequence.pop();
+      if (tetrominoSequence.length === 0) {
+        generateSequence();
+      }
+      nextPieceName = tetrominoSequence.pop();
+      drawNextPiece();
+
       const matrix = tetrominos[name];
       const col = Math.floor(COLS / 2) - Math.ceil(matrix[0].length / 2);
       const row = name === 'I' ? -1 : -2;
@@ -559,18 +766,6 @@
         row: row,
         col: col
       };
-    }
-
-    // --- Playfield Grid (10x20) ---
-    let playfield = [];
-    function initPlayfield() {
-      playfield = [];
-      for (let r = -2; r < ROWS; r++) {
-        playfield[r] = [];
-        for (let c = 0; c < COLS; c++) {
-          playfield[r][c] = 0;
-        }
-      }
     }
 
     function rotate(matrix) {
@@ -596,6 +791,8 @@
       return true;
     }
 
+    let currentTetromino = null;
+
     function placeTetromino() {
       for (let r = 0; r < currentTetromino.matrix.length; r++) {
         for (let c = 0; c < currentTetromino.matrix[r].length; c++) {
@@ -608,72 +805,87 @@
         }
       }
 
-      // Check line clears
       let linesCleared = 0;
-      for (let r = ROWS - 1; r >= 0; ) {
-        if (playfield[r].every(cell => !!cell)) {
+      for (let row = ROWS - 1; row >= 0; ) {
+        if (playfield[row].every(cell => !!cell)) {
           linesCleared++;
-          for (let rowAbove = r; rowAbove >= 0; rowAbove--) {
-            for (let col = 0; col < COLS; col++) {
-              playfield[rowAbove][col] = playfield[rowAbove - 1] ? playfield[rowAbove - 1][col] : 0;
+          for (let r = row; r >= 0; r--) {
+            for (let c = 0; c < COLS; c++) {
+              playfield[r][c] = playfield[r - 1] ? playfield[r - 1][c] : 0;
             }
           }
         } else {
-          r--;
+          row--;
         }
       }
 
       if (linesCleared > 0) {
+        sound.clear();
         lines += linesCleared;
-        const lineScores = [0, 100, 300, 500, 800];
+        const lineScores = { 1: 100, 2: 300, 3: 500, 4: 800 };
         score += (lineScores[linesCleared] || 800) * level;
-        window.score = score;
-        try { window.parent.postMessage({ score: score }, '*'); } catch (e) {}
+
         level = Math.floor(lines / 10) + 1;
-        dropInterval = isIncremental ? Math.max(12, baseDropInterval - Math.floor(score / 40) * 3) : Math.max(12, baseDropInterval - (level - 1) * 3);
+        if (isIncremental) {
+          dropInterval = Math.max(12, baseDropInterval - (level - 1) * 3);
+        }
 
-        document.getElementById('scoreDisplay').innerText = score;
-        document.getElementById('linesDisplay').innerText = lines;
-        document.getElementById('levelDisplay').innerText = level;
+        updateHUD();
       }
 
-      // Next piece transition
-      currentTetromino = {
-        name: nextPieceName,
-        matrix: tetrominos[nextPieceName],
-        row: nextPieceName === 'I' ? -1 : -2,
-        col: Math.floor(COLS / 2) - Math.ceil(tetrominos[nextPieceName][0].length / 2)
-      };
-
-      if (tetrominoSequence.length === 0) {
-        generateSequence();
-      }
-      nextPieceName = tetrominoSequence.pop();
-      drawNextPiece();
-
-      // If initial spawn is blocked -> Game Over
-      if (!isValidMove(currentTetromino.matrix, currentTetromino.row, currentTetromino.col)) {
-        showGameOver();
-      }
+      currentTetromino = getNextTetromino();
     }
 
-    // --- Next Piece Canvas Preview ---
+    function updateHUD() {
+      window.score = score;
+      document.getElementById('scoreDisplay').innerText = score;
+      document.getElementById('linesDisplay').innerText = lines;
+      document.getElementById('levelDisplay').innerText = level;
+      const mScore = document.getElementById('mobileScoreDisplay');
+      const mLvl = document.getElementById('mobileLevelDisplay');
+      if (mScore) mScore.innerText = score;
+      if (mLvl) mLvl.innerText = level;
+      try { window.parent.postMessage({ score: score }, '*'); } catch (e) {}
+    }
+
+    // --- Next Piece Preview Rendering ---
     function drawNextPiece() {
+      // Desktop Preview
       nextContext.clearRect(0, 0, nextCanvas.width, nextCanvas.height);
-      if (!nextPieceName) return;
+      if (nextPieceName) {
+        const matrix = tetrominos[nextPieceName];
+        const previewCell = 16;
+        const pieceW = matrix[0].length * previewCell;
+        const pieceH = matrix.length * previewCell;
+        const startX = Math.floor((nextCanvas.width - pieceW) / 2);
+        const startY = Math.floor((nextCanvas.height - pieceH) / 2);
 
-      const matrix = tetrominos[nextPieceName];
-      const previewCell = 18;
-      const pieceW = matrix[0].length * previewCell;
-      const pieceH = matrix.length * previewCell;
-      const startX = Math.floor((nextCanvas.width - pieceW) / 2);
-      const startY = Math.floor((nextCanvas.height - pieceH) / 2);
+        nextContext.fillStyle = getColorForPiece(nextPieceName);
+        for (let r = 0; r < matrix.length; r++) {
+          for (let c = 0; c < matrix[r].length; c++) {
+            if (matrix[r][c]) {
+              nextContext.fillRect(startX + c * previewCell, startY + r * previewCell, previewCell - 1, previewCell - 1);
+            }
+          }
+        }
+      }
 
-      nextContext.fillStyle = getColorForPiece(nextPieceName);
-      for (let r = 0; r < matrix.length; r++) {
-        for (let c = 0; c < matrix[r].length; c++) {
-          if (matrix[r][c]) {
-            nextContext.fillRect(startX + c * previewCell, startY + r * previewCell, previewCell - 1, previewCell - 1);
+      // Mobile Preview
+      if (mobileNextContext && nextPieceName) {
+        mobileNextContext.clearRect(0, 0, mobileNextCanvas.width, mobileNextCanvas.height);
+        const matrix = tetrominos[nextPieceName];
+        const mCell = 7;
+        const pW = matrix[0].length * mCell;
+        const pH = matrix.length * mCell;
+        const sX = Math.floor((mobileNextCanvas.width - pW) / 2);
+        const sY = Math.floor((mobileNextCanvas.height - pH) / 2);
+
+        mobileNextContext.fillStyle = getColorForPiece(nextPieceName);
+        for (let r = 0; r < matrix.length; r++) {
+          for (let c = 0; c < matrix[r].length; c++) {
+            if (matrix[r][c]) {
+              mobileNextContext.fillRect(sX + c * mCell, sY + r * mCell, mCell - 1, mCell - 1);
+            }
           }
         }
       }
@@ -683,58 +895,59 @@
     function showGameOver() {
       cancelAnimationFrame(rAF);
       gameOver = true;
+      sound.gameOver();
       document.getElementById('finalScore').innerText = score;
       document.getElementById('gameOverOverlay').style.display = 'flex';
+      try {
+        window.parent.postMessage({ score: score, msg: 'Tetris Game Over' }, '*');
+      } catch (e) {}
     }
 
     function resetGame() {
-      initPlayfield();
+      cancelAnimationFrame(rAF);
+      for (let r = -2; r < ROWS; r++) {
+        for (let c = 0; c < COLS; c++) {
+          playfield[r][c] = 0;
+        }
+      }
+      tetrominoSequence.length = 0;
+      nextPieceName = null;
       score = 0;
       lines = 0;
       level = 1;
-      dropCounter = 0;
-      dropInterval = baseDropInterval;
       gameOver = false;
-      document.getElementById('scoreDisplay').innerText = '0';
-      document.getElementById('linesDisplay').innerText = '0';
-      document.getElementById('levelDisplay').innerText = '1';
+      dropInterval = baseDropInterval;
+      dropCounter = 0;
+
+      updateHUD();
       document.getElementById('gameOverOverlay').style.display = 'none';
 
-      generateSequence();
-      currentTetromino = getNextPiece();
-      nextPieceName = tetrominoSequence.pop();
-      drawNextPiece();
-
-      cancelAnimationFrame(rAF);
+      currentTetromino = getNextTetromino();
       rAF = requestAnimationFrame(loop);
     }
 
-    document.getElementById('restartBtn').addEventListener('click', resetGame);
-
     // --- Main Game Loop ---
     function loop() {
-      if (gameOver) return;
       rAF = requestAnimationFrame(loop);
-
       context.clearRect(0, 0, canvas.width, canvas.height);
 
-      // Draw subtle background grid lines
+      // Grid background
       context.strokeStyle = 'rgba(255, 255, 255, 0.04)';
       context.lineWidth = 1;
-      for (let c = 0; c <= COLS; c++) {
-        context.beginPath();
-        context.moveTo(c * grid, 0);
-        context.lineTo(c * grid, canvas.height);
-        context.stroke();
-      }
-      for (let r = 0; r <= ROWS; r++) {
+      for (let r = 0; r < ROWS; r++) {
         context.beginPath();
         context.moveTo(0, r * grid);
         context.lineTo(canvas.width, r * grid);
         context.stroke();
       }
+      for (let c = 0; c < COLS; c++) {
+        context.beginPath();
+        context.moveTo(c * grid, 0);
+        context.lineTo(c * grid, canvas.height);
+        context.stroke();
+      }
 
-      // Draw placed blocks on playfield
+      // Draw settled blocks
       for (let r = 0; r < ROWS; r++) {
         for (let c = 0; c < COLS; c++) {
           if (playfield[r][c]) {
@@ -778,6 +991,7 @@
       const col = currentTetromino.col - 1;
       if (isValidMove(currentTetromino.matrix, currentTetromino.row, col)) {
         currentTetromino.col = col;
+        sound.move();
       }
     }
 
@@ -786,6 +1000,7 @@
       const col = currentTetromino.col + 1;
       if (isValidMove(currentTetromino.matrix, currentTetromino.row, col)) {
         currentTetromino.col = col;
+        sound.move();
       }
     }
 
@@ -794,14 +1009,15 @@
       const matrix = rotate(currentTetromino.matrix);
       if (isValidMove(matrix, currentTetromino.row, currentTetromino.col)) {
         currentTetromino.matrix = matrix;
+        sound.rotate();
       } else if (isValidMove(matrix, currentTetromino.row, currentTetromino.col - 1)) {
-        // Wall kick left
         currentTetromino.col -= 1;
         currentTetromino.matrix = matrix;
+        sound.rotate();
       } else if (isValidMove(matrix, currentTetromino.row, currentTetromino.col + 1)) {
-        // Wall kick right
         currentTetromino.col += 1;
         currentTetromino.matrix = matrix;
+        sound.rotate();
       }
     }
 
@@ -814,9 +1030,8 @@
       }
       currentTetromino.row = row;
       score += 1;
-      window.score = score;
-      document.getElementById('scoreDisplay').innerText = score;
-      try { window.parent.postMessage({ score: score }, '*'); } catch (e) {}
+      updateHUD();
+      sound.move();
     }
 
     function hardDrop() {
@@ -825,37 +1040,87 @@
         currentTetromino.row++;
         score += 2;
       }
-      window.score = score;
-      document.getElementById('scoreDisplay').innerText = score;
-      try { window.parent.postMessage({ score: score }, '*'); } catch (e) {}
+      updateHUD();
+      sound.drop();
       placeTetromino();
     }
 
     // Keyboard bindings
     document.addEventListener('keydown', function(e) {
       if (gameOver) return;
-      if (e.which === 37 || e.key === 'a' || e.key === 'A') { // Left
+      if (e.which === 37 || e.key === 'a' || e.key === 'A') {
         moveLeft();
-      } else if (e.which === 39 || e.key === 'd' || e.key === 'D') { // Right
+      } else if (e.which === 39 || e.key === 'd' || e.key === 'D') {
         moveRight();
-      } else if (e.which === 38 || e.key === 'w' || e.key === 'W') { // Rotate
+      } else if (e.which === 38 || e.key === 'w' || e.key === 'W') {
         rotatePiece();
-      } else if (e.which === 40 || e.key === 's' || e.key === 'S') { // Soft Drop
+      } else if (e.which === 40 || e.key === 's' || e.key === 'S') {
         softDrop();
-      } else if (e.which === 32) { // Hard Drop (Space)
+      } else if (e.which === 32) {
         e.preventDefault();
         hardDrop();
       }
     });
 
-    // Mobile Virtual Touch Buttons
-    document.getElementById('btnLeft').addEventListener('click', moveLeft);
-    document.getElementById('btnRight').addEventListener('click', moveRight);
-    document.getElementById('btnRotate').addEventListener('click', rotatePiece);
-    document.getElementById('btnDown').addEventListener('click', softDrop);
-    document.getElementById('btnHardDrop').addEventListener('click', hardDrop);
+    // Mobile Virtual Touch Buttons (Fast pointerdown, no tap delay)
+    function bindVirtualBtn(id, action) {
+      const btn = document.getElementById(id);
+      if (!btn) return;
+      btn.addEventListener('pointerdown', (e) => {
+        e.preventDefault();
+        sound.init();
+        action();
+      });
+    }
 
-    // --- Window Resize Handling ---
+    bindVirtualBtn('btnLeft', moveLeft);
+    bindVirtualBtn('btnRight', moveRight);
+    bindVirtualBtn('btnRotate', rotatePiece);
+    bindVirtualBtn('btnDown', softDrop);
+    bindVirtualBtn('btnHardDrop', hardDrop);
+
+    // Touch Swipe Gestures on Canvas
+    let touchStartX = 0;
+    let touchStartY = 0;
+    let touchStartTime = 0;
+
+    canvas.addEventListener('touchstart', function(e) {
+      if (gameOver) return;
+      sound.init();
+      touchStartX = e.touches[0].clientX;
+      touchStartY = e.touches[0].clientY;
+      touchStartTime = Date.now();
+    }, { passive: true });
+
+    canvas.addEventListener('touchend', function(e) {
+      if (gameOver) return;
+      const dx = e.changedTouches[0].clientX - touchStartX;
+      const dy = e.changedTouches[0].clientY - touchStartY;
+      const dt = Date.now() - touchStartTime;
+
+      if (dt < 250 && Math.abs(dx) < 15 && Math.abs(dy) < 15) {
+        rotatePiece();
+        return;
+      }
+
+      if (Math.abs(dx) > Math.abs(dy) && Math.abs(dx) > 25) {
+        if (dx > 0) moveRight();
+        else moveLeft();
+      } else if (dy > 30) {
+        softDrop();
+      }
+    }, { passive: true });
+
+    // Audio Toggles
+    const toggleAudio = (e) => {
+      e.preventDefault();
+      sound.toggle();
+    };
+    document.getElementById('desktopAudioToggleBtn')?.addEventListener('click', toggleAudio);
+    document.getElementById('mobileAudioToggleBtn')?.addEventListener('click', toggleAudio);
+    sound.updateButtons();
+
+    // Window Resize Handling
     window.addEventListener('resize', () => {
       const newGrid = calculateGridSize();
       if (newGrid !== grid) {
@@ -865,37 +1130,19 @@
       }
     });
 
-    // --- PostMessage & Session Timer Protocol ---
+    // Session Timer
     let sessionRemainingSec = 20 * 60;
     let timerInterval = setInterval(() => {
       if (sessionRemainingSec > 0) {
         sessionRemainingSec--;
         const mins = Math.floor(sessionRemainingSec / 60);
         const secs = sessionRemainingSec % 60;
-        document.getElementById('timerDisplay').innerText = 
-          `${mins.toString().padStart(2, '0')}:${secs.toString().padStart(2, '0')}`;
+        const disp = document.getElementById('timerDisplay');
+        if (disp) {
+          disp.innerText = `${mins.toString().padStart(2, '0')}:${secs.toString().padStart(2, '0')}`;
+        }
       }
     }, 1000);
-
-    window.addEventListener('message', function(event) {
-      if (!event.data) return;
-      if (event.data.leftColor || event.data.rightColor) {
-        updateEyeColors(event.data.leftColor, event.data.rightColor);
-      }
-
-      window.parent.postMessage("Game Started", "*");
-
-      const sessionDuration = (event.data.time && !isNaN(event.data.time) && event.data.time > 10000) 
-        ? event.data.time 
-        : (20 * 60 * 1000);
-
-      sessionRemainingSec = Math.floor(sessionDuration / 1000);
-
-      setTimeout(function() {
-        reportSession();
-        console.log('Game ended by Game js timer');
-      }, sessionDuration);
-    });
 
     function reportSession() {
       clearInterval(timerInterval);
@@ -909,13 +1156,14 @@
       getScore: function() { return score; }
     };
 
-    // Start immediately on load
     $(document).ready(function() {
       $(window).focus();
       resetGame();
 
       document.getElementById('finishSessionBtn')?.addEventListener('click', reportSession);
       document.getElementById('saveExitBtn')?.addEventListener('click', reportSession);
+      document.getElementById('mobileSaveExitBtn')?.addEventListener('click', reportSession);
+      document.getElementById('restartBtn')?.addEventListener('click', resetGame);
     });
   </script>
 </body>
