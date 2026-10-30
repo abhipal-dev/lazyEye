@@ -3,6 +3,18 @@
    Crafted for LazyEye Vision Therapy Platform
    ========================================================= */
 
+/* Respect SweetAlert's internal display toggles strictly */
+.swal2-container [style*="display: none"],
+.swal2-container [style*="display:none"],
+.swal2-popup [style*="display: none"],
+.swal2-popup [style*="display:none"],
+.swal2-icon[style*="display: none"],
+.swal2-icon[style*="display:none"],
+.swal2-styled[style*="display: none"],
+.swal2-styled[style*="display:none"] {
+  display: none !important;
+}
+
 /* Backdrop with silky glassmorphism blur */
 .swal2-container {
   display: flex !important;
@@ -25,9 +37,9 @@
 .swal2-popup {
   position: relative !important;
   box-sizing: border-box !important;
-  width: 28rem !important;
+  width: 26rem !important;
   max-width: calc(100vw - 32px) !important;
-  padding: 2.25rem 2rem 2rem 2rem !important;
+  padding: 2rem 1.75rem 1.75rem 1.75rem !important;
   border-radius: 24px !important;
   font-family: 'Plus Jakarta Sans', system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif !important;
   font-size: 1rem !important;
@@ -79,7 +91,7 @@
   font-size: 1.35rem !important;
   font-weight: 800 !important;
   letter-spacing: -0.025em !important;
-  margin: 0.25rem 0 0.75rem 0 !important;
+  margin: 0.25rem 0 0.5rem 0 !important;
   padding: 0 !important;
   line-height: 1.3 !important;
 }
@@ -101,7 +113,7 @@
   font-family: 'Plus Jakarta Sans', system-ui, -apple-system, sans-serif !important;
   font-size: 0.95rem !important;
   font-weight: 450 !important;
-  line-height: 1.65 !important;
+  line-height: 1.6 !important;
   margin: 0 !important;
   padding: 0 0.5rem !important;
 }
@@ -135,17 +147,16 @@
   color: #0284c7 !important;
 }
 
-/* Modern Icons System */
+/* Modern Icons System - DO NOT override display on all icons! */
 .swal2-container .swal2-icon,
 .swal2-icon {
-  width: 4.25rem !important;
-  height: 4.25rem !important;
-  margin: 0.25rem auto 1.25rem auto !important;
+  width: 4rem !important;
+  height: 4rem !important;
+  margin: 0.25rem auto 1rem auto !important;
   border-width: 3px !important;
   border-style: solid !important;
   border-radius: 50% !important;
   box-sizing: border-box !important;
-  display: flex !important;
   align-items: center !important;
   justify-content: center !important;
   transition: transform 0.3s cubic-bezier(0.16, 1, 0.3, 1) !important;
@@ -194,7 +205,7 @@
   color: #f59e0b !important;
   font-family: 'Plus Jakarta Sans', system-ui, sans-serif !important;
   font-weight: 800 !important;
-  font-size: 2.25rem !important;
+  font-size: 2rem !important;
   line-height: 1 !important;
 }
 
@@ -208,7 +219,7 @@
   color: #06b6d4 !important;
   font-family: 'Plus Jakarta Sans', system-ui, sans-serif !important;
   font-weight: 800 !important;
-  font-size: 2.25rem !important;
+  font-size: 2rem !important;
   line-height: 1 !important;
 }
 
@@ -222,7 +233,7 @@
   color: #3b82f6 !important;
   font-family: 'Plus Jakarta Sans', system-ui, sans-serif !important;
   font-weight: 800 !important;
-  font-size: 2.25rem !important;
+  font-size: 2rem !important;
   line-height: 1 !important;
 }
 
@@ -234,22 +245,21 @@
   align-items: center !important;
   justify-content: center !important;
   gap: 12px !important;
-  margin: 1.75rem auto 0 auto !important;
+  margin: 1.5rem auto 0 auto !important;
   width: 100% !important;
 }
 
-/* Common Styled Button */
+/* Common Styled Button - DO NOT override display on all buttons! */
 .swal2-container .swal2-styled,
 .swal2-styled {
   position: relative !important;
-  display: inline-flex !important;
   align-items: center !important;
   justify-content: center !important;
   font-family: 'Plus Jakarta Sans', system-ui, -apple-system, sans-serif !important;
   font-size: 0.95rem !important;
   font-weight: 600 !important;
   letter-spacing: 0.01em !important;
-  padding: 0.75rem 1.6rem !important;
+  padding: 0.7rem 1.6rem !important;
   border-radius: 12px !important;
   border: none !important;
   outline: none !important;
@@ -319,6 +329,14 @@
 [data-theme="dark"] .swal2-container .swal2-styled.swal2-cancel:hover {
   background: rgba(255, 255, 255, 0.15) !important;
   color: #ffffff !important;
+}
+
+/* Deny Button */
+.swal2-container .swal2-styled.swal2-deny,
+.swal2-styled.swal2-deny {
+  background: linear-gradient(135deg, #ef4444 0%, #dc2626 100%) !important;
+  color: #ffffff !important;
+  box-shadow: 0 4px 14px -2px rgba(220, 38, 38, 0.45) !important;
 }
 
 /* Close Button */
@@ -397,18 +415,13 @@
   outline: none !important;
 }
 
-/* Custom Animation Keyframes */
 @keyframes swal2ModernIn {
   0% {
     opacity: 0;
-    transform: scale(0.9) translateY(14px);
-  }
-  60% {
-    transform: scale(1.02) translateY(-2px);
+    transform: scale(0.92) translateY(10px);
   }
   100% {
     opacity: 1;
     transform: scale(1) translateY(0);
   }
 }
-
