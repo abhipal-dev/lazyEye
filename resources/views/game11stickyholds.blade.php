@@ -241,7 +241,7 @@ const hill2BaseHeight = 70;
 const hill2Amplitude = 20;
 const hill2Stretch = 0.5;
 
-const stretchingSpeed = 4; // Milliseconds it takes to draw a pixel
+const stretchingSpeed = 2; // Milliseconds it takes to draw a pixel
 const turningSpeed = 4; // Milliseconds it takes to turn a degree
 const walkingSpeed = 4;
 const transitioningSpeed = 2;

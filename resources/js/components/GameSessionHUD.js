@@ -13,7 +13,8 @@ export default class GameSessionHUD extends React.Component {
         this.state = {
             elapsedSeconds: 0,
             currentScore: 0,
-            isRotated: false
+            isRotated: false,
+            showPauseModal: false
         };
 
         this.timer = null;
@@ -23,12 +24,26 @@ export default class GameSessionHUD extends React.Component {
     componentDidMount() {
         this.startTimer();
         window.addEventListener('message', this.handleIframeMessage);
+
+        // Auto-rotate by default for horizontal / wide games on mobile portrait
+        try {
+            const rawTitle = (this.props.game?.title || '').toLowerCase();
+            const isWideGame = rawTitle.includes('ping') || rawTitle.includes('flappy') || rawTitle.includes('catcher') || rawTitle.includes('sticky');
+            const isMobilePortrait = window.innerWidth < 768 && window.innerHeight > window.innerWidth;
+            if (isWideGame && isMobilePortrait) {
+                this.setState({ isRotated: true });
+            }
+        } catch (e) {}
     }
 
     componentWillUnmount() {
         this.stopTimer();
         window.removeEventListener('message', this.handleIframeMessage);
     }
+
+    togglePauseModal = () => {
+        this.setState(prev => ({ showPauseModal: !prev.showPauseModal }));
+    };
 
     toggleRotate = () => {
         this.setState(prev => ({ isRotated: !prev.isRotated }), () => {
@@ -225,57 +240,31 @@ export default class GameSessionHUD extends React.Component {
                         <span>{this.formatTime(elapsedSeconds)}</span>
                     </div>
 
-                    {/* Right: Controls & Exit Button */}
-                    <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-                        {/* 1-Click Widescreen / Landscape Rotate Toggle */}
-                        <button 
-                            type="button" 
-                            onClick={this.toggleRotate}
-                            style={{
-                                backgroundColor: this.state.isRotated ? '#0284c7' : '#334155',
-                                color: '#ffffff',
-                                border: '1px solid rgba(255, 255, 255, 0.2)',
-                                borderRadius: '6px',
-                                padding: '6px 12px',
-                                fontSize: '0.8rem',
-                                fontWeight: 600,
-                                cursor: 'pointer',
-                                display: 'flex',
-                                alignItems: 'center',
-                                gap: '6px',
-                                transition: 'all 0.15s ease'
-                            }}
-                            title="Toggle 90° Widescreen Landscape for Mobile"
-                        >
-                            <i className="fa-solid fa-arrows-rotate" style={{ color: this.state.isRotated ? '#38bdf8' : '#e2e8f0' }}></i>
-                            <span>{this.state.isRotated ? 'Portrait' : 'Rotate'}</span>
-                        </button>
-
-                        <button 
-                            type="button" 
-                            onClick={() => this.handleExit()}
-                            style={{
-                                backgroundColor: '#dc2626',
-                                color: '#ffffff',
-                                border: 'none',
-                                borderRadius: '6px',
-                                padding: '6px 14px',
-                                fontSize: '0.85rem',
-                                fontWeight: 600,
-                                cursor: 'pointer',
-                                display: 'flex',
-                                alignItems: 'center',
-                                gap: '6px',
-                                transition: 'background-color 0.15s ease'
-                            }}
-                            onMouseEnter={(e) => e.currentTarget.style.backgroundColor = '#b91c1c'}
-                            onMouseLeave={(e) => e.currentTarget.style.backgroundColor = '#dc2626'}
-                            title="Exit and Save Therapy Session"
-                        >
-                            <i className="fa-solid fa-arrow-right-from-bracket"></i>
-                            <span>Exit & Save</span>
-                        </button>
-                    </div>
+                    {/* Right: Single-Line Stop Game Button (Never wraps) */}
+                    <button 
+                        type="button" 
+                        onClick={this.togglePauseModal}
+                        style={{
+                            backgroundColor: '#dc2626',
+                            color: '#ffffff',
+                            border: 'none',
+                            borderRadius: '6px',
+                            padding: '6px 14px',
+                            fontSize: '0.85rem',
+                            fontWeight: 700,
+                            cursor: 'pointer',
+                            display: 'flex',
+                            alignItems: 'center',
+                            gap: '6px',
+                            whiteSpace: 'nowrap',
+                            boxShadow: '0 2px 6px rgba(220, 38, 38, 0.4)',
+                            transition: 'background-color 0.15s ease'
+                        }}
+                        title="Pause Game & View Options"
+                    >
+                        <i className="fa-solid fa-pause"></i>
+                        <span>Stop Game</span>
+                    </button>
                 </header>
 
                 {/* Game Canvas Container with Instant Rotation Support */}
@@ -314,6 +303,134 @@ export default class GameSessionHUD extends React.Component {
                         }}
                     />
                 </div>
+
+                {/* Elegant Mid-Screen Pause & Options Modal */}
+                {this.state.showPauseModal && (
+                    <div 
+                        style={{
+                            position: 'fixed',
+                            top: 0,
+                            left: 0,
+                            width: '100vw',
+                            height: '100vh',
+                            backgroundColor: 'rgba(0, 0, 0, 0.78)',
+                            backdropFilter: 'blur(8px)',
+                            WebkitBackdropFilter: 'blur(8px)',
+                            zIndex: 9999999,
+                            display: 'flex',
+                            alignItems: 'center',
+                            justifyContent: 'center',
+                            padding: '16px'
+                        }}
+                    >
+                        <div 
+                            style={{
+                                width: '100%',
+                                maxWidth: '340px',
+                                backgroundColor: '#0f172a',
+                                border: '1px solid rgba(255, 255, 255, 0.15)',
+                                borderRadius: '16px',
+                                padding: '24px',
+                                boxShadow: '0 25px 50px -12px rgba(0, 0, 0, 0.9)',
+                                color: '#ffffff',
+                                display: 'flex',
+                                flexDirection: 'column',
+                                gap: '14px',
+                                textAlign: 'center'
+                            }}
+                        >
+                            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '8px', color: '#38bdf8' }}>
+                                <i className="fa-solid fa-circle-pause" style={{ fontSize: '1.4rem' }}></i>
+                                <h3 style={{ margin: 0, fontSize: '1.15rem', fontWeight: 800, letterSpacing: '0.5px' }}>GAME PAUSED</h3>
+                            </div>
+
+                            <div style={{
+                                display: 'flex',
+                                justifyContent: 'space-around',
+                                backgroundColor: '#1e293b',
+                                border: '1px solid #334155',
+                                borderRadius: '10px',
+                                padding: '10px',
+                                fontSize: '0.85rem',
+                                fontFamily: 'monospace'
+                            }}>
+                                <div>Time: <b style={{ color: '#f59e0b' }}>{this.formatTime(elapsedSeconds)}</b></div>
+                                <div>Score: <b style={{ color: '#38bdf8' }}>{currentScore}</b></div>
+                            </div>
+
+                            {/* Option 1: Resume Game */}
+                            <button
+                                type="button"
+                                onClick={this.togglePauseModal}
+                                style={{
+                                    backgroundColor: '#059669',
+                                    color: '#ffffff',
+                                    border: 'none',
+                                    borderRadius: '8px',
+                                    padding: '11px 16px',
+                                    fontSize: '0.9rem',
+                                    fontWeight: 700,
+                                    cursor: 'pointer',
+                                    display: 'flex',
+                                    alignItems: 'center',
+                                    justifyContent: 'center',
+                                    gap: '8px',
+                                    boxShadow: '0 4px 12px rgba(5, 150, 105, 0.3)'
+                                }}
+                            >
+                                <i className="fa-solid fa-play"></i>
+                                <span>Resume Game</span>
+                            </button>
+
+                            {/* Option 2: 1-Click Orientation Rotation */}
+                            <button
+                                type="button"
+                                onClick={this.toggleRotate}
+                                style={{
+                                    backgroundColor: '#1e293b',
+                                    color: '#38bdf8',
+                                    border: '1px solid #334155',
+                                    borderRadius: '8px',
+                                    padding: '11px 16px',
+                                    fontSize: '0.85rem',
+                                    fontWeight: 600,
+                                    cursor: 'pointer',
+                                    display: 'flex',
+                                    alignItems: 'center',
+                                    justifyContent: 'center',
+                                    gap: '8px'
+                                }}
+                            >
+                                <i className="fa-solid fa-arrows-rotate"></i>
+                                <span>{this.state.isRotated ? 'Switch to Vertical View' : 'Switch to Widescreen (Rotate 90°)'}</span>
+                            </button>
+
+                            {/* Option 3: Exit & Save Session */}
+                            <button
+                                type="button"
+                                onClick={() => this.handleExit()}
+                                style={{
+                                    backgroundColor: '#dc2626',
+                                    color: '#ffffff',
+                                    border: 'none',
+                                    borderRadius: '8px',
+                                    padding: '11px 16px',
+                                    fontSize: '0.9rem',
+                                    fontWeight: 700,
+                                    cursor: 'pointer',
+                                    display: 'flex',
+                                    alignItems: 'center',
+                                    justifyContent: 'center',
+                                    gap: '8px',
+                                    boxShadow: '0 4px 12px rgba(220, 38, 38, 0.3)'
+                                }}
+                            >
+                                <i className="fa-solid fa-arrow-right-from-bracket"></i>
+                                <span>Save & Exit Session</span>
+                            </button>
+                        </div>
+                    </div>
+                )}
             </div>
         );
     }

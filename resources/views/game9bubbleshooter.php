@@ -7,40 +7,41 @@
 
 <style>
 html, body {
-height: 100%;
-margin: 0;
+  width: 100%;
+  height: 100%;
+  margin: 0;
+  padding: 0;
+  overflow: hidden;
+  background: #000000;
+  touch-action: none;
+  user-select: none;
+  -webkit-user-select: none;
 }
-
-body {
-background: black;
-display: flex;
-align-items: center;
-justify-content: center;
+canvas#game {
+  display: block;
+  width: 100vw;
+  height: 100vh;
+  background: #000000;
 }
 </style>
 </head>
 <body>
-<div id="bubbleTopBar" style="position:fixed; top:8px; left:50%; transform:translateX(-50%); z-index:100; display:flex; align-items:center; gap:12px; background:rgba(15,23,42,0.85); border:1px solid rgba(255,255,255,0.15); border-radius:30px; padding:4px 16px; color:#f8fafc; font-family:sans-serif; font-size:12px; backdrop-filter:blur(8px); box-shadow:0 4px 16px rgba(0,0,0,0.5);">
-  <span id="bubbleTitleText" style="font-weight:700; letter-spacing:0.5px; color:#38bdf8;">BUBBLE SHOOTER</span>
-  <span>Score: <b id="hudScore" style="color:#facc15;">0</b></span>
-  <button id="finishBubbleBtn" style="background:#059669; border:none; color:#fff; border-radius:20px; padding:3px 12px; font-size:11px; font-weight:600; cursor:pointer;">Finish & Save</button>
-</div>
-<style>
-  body.in-hud #bubbleTopBar {
-    display: none !important;
-  }
-</style>
-<canvas width="471" height="992" id="game"></canvas>
+<canvas id="game"></canvas>
 <script>
-var h = window.innerHeight;
-var w = window.innerWidth;
-var leftColor ='',rightColor=''; 
-h = h-(h%32)
-w = w-(w%64)
-console.log("width:"+ w, "Height : "+h)   
-var fixed_col =20,fixed_row=h/32,score=0;
+// Canvas initialized above
+// grid defined above
+const wallSize = 6;
+// bubbleGap defined above
 
-$("canvas").attr("height",h);
+let h = window.innerHeight;
+let w = window.innerWidth;
+canvas.width = w;
+canvas.height = h;
+
+let fixed_col = Math.max(6, Math.floor((w - wallSize * 2) / grid));
+let fixed_row = Math.max(10, Math.floor(h / grid));
+let score = 0;
+let leftColor = '#ef4444', rightColor = '#06b6d4';
 
 function reportSession() {
   var message = { msg: 'Game Ended', game: "Bubble Shooter", score: score };
@@ -118,7 +119,7 @@ const colors = Object.values(colorMap);
 const bubbleGap = 1;
 
 // the size of the outer walls for the game
-const wallSize = 4;
+// wallSize defined above
 var bubbles = [];
 let particles = [];
 
@@ -181,29 +182,20 @@ bubble
 
 // create the bubble grid bubble. passing a color will create
 // an active bubble
-function createBubble(x, y, color) {
-const row = Math.floor(y / grid);
-const col = Math.floor(x / grid);
+function createBubble(col, row, color) {
+  const startX = (row % 2 === 0) ? 0 : (grid / 2);
+  const totalRowW = (fixed_col - (row % 2 === 0 ? 0 : 1)) * grid;
+  const sideMargin = Math.max(wallSize, (canvas.width - totalRowW) / 2);
 
-// bubbles on odd rows need to start half-way on the grid
-const startX = row % 2 === 0 ? 0 : 0.5 * grid;
-
-// because we are drawing circles we need the x/y position
-// to be the center of the circle instead of the top-left
-// corner like you would for a square
-const center = grid / 2;
-
-bubbles.push({
-x: wallSize + (grid + bubbleGap) * col + startX + center,
-
-// the bubbles are closer on the y axis so we subtract 4 on every
-// row
-y: wallSize + (grid + bubbleGap - 4) * row + center,
-
-radius: grid / 2,
-color: color,
-active: color ? true : false
-});
+  bubbles.push({
+    col: col,
+    row: row,
+    x: sideMargin + col * grid + startX + (grid / 2),
+    y: wallSize + row * (grid - 4) + (grid / 2),
+    radius: (grid - 2) / 2,
+    color: color,
+    active: color ? true : false
+  });
 }
 
 // get all bubbles that touch the passed in bubble
@@ -270,12 +262,12 @@ neighbors = neighbors.concat(getNeighbors(neighbor));
 }
 
 if (matches.length >= 3) {
-matches.forEach(bubble => {
-bubble.active = false;
-score+=1;
-});
-const el = document.getElementById('hudScore');
-if (el) el.innerText = score;
+  matches.forEach(bubble => {
+    bubble.active = false;
+    score += 1;
+  });
+  window.score = score;
+  try { window.parent.postMessage({ score: score }, '*'); } catch (e) {}
 }
 }
 
@@ -315,16 +307,19 @@ active: true
 });
 }
 
-// fill the grid with inactive bubbles
-console.log(fixed_row)
-console.log(fixed_col)
+// Clean initial grid initialization: 4 active rows, rest inactive
+const samplePalette = ['R', 'L', 'C', 'Y'];
+bubbles = [];
 for (let row = 0; row < fixed_row; row++) {
-for (let col = 0; col <  (row % 2 === 0 ? fixed_col : fixed_col-1); col++) {
-// if the level has a bubble at the location, create an active
-// bubble rather than an inactive one
-const color = level1[row]?.[col];
-createBubble(col * grid, row * grid, colorMap[color]);
-}
+  const numCols = (row % 2 === 0) ? fixed_col : (fixed_col - 1);
+  for (let col = 0; col < numCols; col++) {
+    let colorKey = null;
+    if (row < 4) {
+      // Deterministic pleasing color sequence for therapy
+      colorKey = samplePalette[(col + row * 2) % samplePalette.length];
+    }
+    createBubble(col, row, colorKey ? colorMap[colorKey] : null);
+  }
 }
 
 const curBubblePos = {
@@ -339,7 +334,7 @@ color: leftColor,
 radius: grid / 2,  // a circles radius is half the width (diameter)
 
 // how fast the bubble should go in either the x or y direction
-speed: 8,
+speed: 5.5,
 
 // bubble velocity
 dx: 0,
@@ -436,13 +431,15 @@ if (!closestBubble)  {
          activeBubbles=[]
 // fill the grid with inactive bubbles
 for (let row = 0; row < fixed_row; row++) {
-  for (let col = 0; col < (row % 2 === 0 ? fixed_row : fixed_row-1); col++) {
-    // if the level has a bubble at the location, create an active
-    // bubble rather than an inactive one
-    const color = level1[row]?.[col];
-    createBubble(col * grid, row * grid, colorMap[color]);
+    const numCols = (row % 2 === 0) ? fixed_col : (fixed_col - 1);
+    for (let col = 0; col < numCols; col++) {
+      let colorKey = null;
+      if (row < 4) {
+        colorKey = samplePalette[(col + row * 2) % samplePalette.length];
+      }
+      createBubble(col, row, colorKey ? colorMap[colorKey] : null);
+    }
   }
-}
 }
 
 if (closestBubble) {

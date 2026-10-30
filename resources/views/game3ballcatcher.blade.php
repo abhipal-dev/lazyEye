@@ -254,7 +254,7 @@
     let score = 0;
     let leftColor = '#ef4444';
     let rightColor = '#06b6d4';
-    let speed = 2.0; // movement velocity
+    let speed = 1.0; // movement velocity
     let targetX = 150;
     let targetY = 150;
     let currentX = 150;

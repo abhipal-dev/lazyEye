@@ -164,9 +164,9 @@
           x: canvas.width / 2,
           y: canvas.height / 2,
           radius: 16,
-          speed: 7,
-          velocityX: 5,
-          velocityY: 5,
+          speed: 3.5,
+          velocityX: 3,
+          velocityY: 2.5,
           color: leftColor
         };
 

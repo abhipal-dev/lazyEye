@@ -360,7 +360,7 @@
       if (speed === 'level-2') return 8; // Level 2: Slow
       if (speed === 'level-4' || speed === 'fast') return 4; // Level 4: Fast
       if (speed === 'level-5') return 3; // Level 5: Agility
-      return 6; // Level 3: Normal / Standard default
+      return 10; // Level 3: Relaxed Easy Therapy Default
     }
 
     let isIncremental = (speedParam === 'progressive' || speedParam === 'incremental');
