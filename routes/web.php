@@ -78,6 +78,40 @@ Route::post('/Update', [UserController::class, 'update']);
 
 Route::post('/saveColorSettings', [UserController::class, 'saveColorSettings']);
 
+Route::get('/storage/images/{filename}', function ($filename) {
+    $decoded = urldecode($filename);
+    $candidates = [
+        public_path('storage/images/' . $decoded),
+        public_path('images/' . $decoded),
+        storage_path('app/public/images/' . $decoded),
+        public_path('images/user_4_avatar.png'),
+    ];
+    foreach ($candidates as $filePath) {
+        if (file_exists($filePath)) {
+            $mime = (str_ends_with(strtolower($filePath), '.jpg') || str_ends_with(strtolower($filePath), '.jpeg')) ? 'image/jpeg' : 'image/png';
+            return response()->file($filePath, ['Content-Type' => $mime]);
+        }
+    }
+    return response()->file(public_path('images/lazyeye-icon.svg'), ['Content-Type' => 'image/svg+xml']);
+})->where('filename', '.*');
+
+Route::get('/images/{filename}', function ($filename) {
+    $decoded = urldecode($filename);
+    $candidates = [
+        public_path('images/' . $decoded),
+        public_path('storage/images/' . $decoded),
+        storage_path('app/public/images/' . $decoded),
+        public_path('images/user_4_avatar.png'),
+    ];
+    foreach ($candidates as $filePath) {
+        if (file_exists($filePath)) {
+            $mime = (str_ends_with(strtolower($filePath), '.jpg') || str_ends_with(strtolower($filePath), '.jpeg')) ? 'image/jpeg' : 'image/png';
+            return response()->file($filePath, ['Content-Type' => $mime]);
+        }
+    }
+    return response()->file(public_path('images/lazyeye-icon.svg'), ['Content-Type' => 'image/svg+xml']);
+})->where('filename', '.*');
+
 Route::group(['middleware' => ['loginCheck']], function () {
 
     Route::get('/Login_view', [AuthController::class, 'login_view'])->name('login');

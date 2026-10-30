@@ -221,17 +221,25 @@ export default class UserDashboard extends React.Component {
             success: (data) => {
                 this.fetchUserData();
 
-                if (typeof Swal !== 'undefined' && result.durationSeconds > 5) {
+                if (typeof Swal !== 'undefined') {
                     Swal.fire({
                         title: 'Therapy Session Logged!',
-                        html: `You completed <strong>${result.elapsedFormatted || '00:00'}</strong> in <strong>${gameName}</strong>.<br><br><span class="badge bg-primary fs-6">${result.score || 0} pts</span>`,
+                        html: `You completed <strong>${result.elapsedFormatted || '00:01'}</strong> in <strong>${gameName}</strong>.<br><br><span class="badge bg-primary fs-6" style="padding: 6px 16px; border-radius: 9999px; background: rgba(16, 185, 129, 0.2); color: #10b981; font-weight: 700;">+${result.score || 0} pts</span>`,
                         icon: 'success',
-                        confirmButtonColor: '#2563eb'
+                        confirmButtonText: 'Great, Continue'
                     });
                 }
             },
             error: () => {
                 this.fetchUserData();
+                if (typeof Swal !== 'undefined') {
+                    Swal.fire({
+                        title: 'Session Recorded!',
+                        html: `You completed <strong>${result.elapsedFormatted || '00:01'}</strong> in <strong>${gameName}</strong>.<br><br><span class="badge bg-primary fs-6" style="padding: 6px 16px; border-radius: 9999px; background: rgba(16, 185, 129, 0.2); color: #10b981; font-weight: 700;">+${result.score || 0} pts</span>`,
+                        icon: 'success',
+                        confirmButtonText: 'Great, Continue'
+                    });
+                }
             }
         });
     };
@@ -451,7 +459,7 @@ export default class UserDashboard extends React.Component {
                                                     if (!e.currentTarget.dataset.retried) {
                                                         e.currentTarget.dataset.retried = '1';
                                                         const imgName = this.state.data?.image_address || 'user_4_avatar.png';
-                                                        e.currentTarget.src = `/images/${encodeURIComponent(imgName)}`;
+                                                        e.currentTarget.src = '/images/user_4_avatar.png';
                                                     } else {
                                                         e.currentTarget.style.display = 'none';
                                                     }
@@ -479,7 +487,7 @@ export default class UserDashboard extends React.Component {
                                                             if (!e.currentTarget.dataset.retried) {
                                                                 e.currentTarget.dataset.retried = '1';
                                                                 const imgName = this.state.data?.image_address || 'user_4_avatar.png';
-                                                                e.currentTarget.src = `/images/${encodeURIComponent(imgName)}`;
+                                                                e.currentTarget.src = '/images/user_4_avatar.png';
                                                             } else {
                                                                 e.currentTarget.style.display = 'none';
                                                             }

@@ -15,6 +15,7 @@
     <link rel="stylesheet" href="https://unpkg.com/aos@next/dist/aos.css" />
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.1/jquery.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="{{ asset('js/sweetAlert2.min.js') }}"></script>
     <script src="https://unpkg.com/aos@next/dist/aos.js"></script>
     <link href="{{ asset('css/sweetAlert2.min.css') }}" rel="stylesheet" />
     <link rel="stylesheet" href="{{ asset('css/modern-theme.css') }}?v={{ file_exists(public_path('css/modern-theme.css')) ? filemtime(public_path('css/modern-theme.css')) : time() }}">
@@ -112,7 +113,6 @@ function scrollToTop() {
 window.addEventListener("scroll", webdevanim1);
 window.addEventListener("scroll", webdevanim2);
 </script>
-<script src="{{ asset('js/sweetAlert2.min.js') }}"></script>
 <script src="{{ asset('js/app.js') }}?v={{ time() }}"></script>
 <script src="{{ asset('js/frontendScript.js') }}"></script>
 </body>
