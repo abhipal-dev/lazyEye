@@ -16,8 +16,9 @@
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.1/jquery.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
     <script src="https://unpkg.com/aos@next/dist/aos.js"></script>
-    <link rel="stylesheet" href="{{ asset('css/modern-theme.css') }}?v={{ file_exists(public_path('css/modern-theme.css')) ? filemtime(public_path('css/modern-theme.css')) : time() }}">
     <link href="{{ asset('css/sweetAlert2.min.css') }}" rel="stylesheet" />
+    <link rel="stylesheet" href="{{ asset('css/modern-theme.css') }}?v={{ file_exists(public_path('css/modern-theme.css')) ? filemtime(public_path('css/modern-theme.css')) : time() }}">
+    <link rel="stylesheet" href="{{ asset('css/sweetalert2-modern.css') }}?v={{ file_exists(public_path('css/sweetalert2-modern.css')) ? filemtime(public_path('css/sweetalert2-modern.css')) : time() }}">
     <title>Lazy Eye Vision Therapy</title>
     <style>
       body{
@@ -46,9 +47,6 @@
         .c_head1{
             font-size: 5rem;
             padding: 5rem;
-        }
-        div.swal2-modal{
-            font-size:1.4rem!important;
         }
         /* .webdevanim1{
           position: relative;
