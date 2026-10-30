@@ -20,12 +20,16 @@ justify-content: center;
 </style>
 </head>
 <body>
-<div style="position:fixed; top:12px; left:50%; transform:translateX(-50%); z-index:100; display:flex; align-items:center; gap:16px; background:rgba(15,23,42,0.88); border:1px solid rgba(255,255,255,0.2); border-radius:30px; padding:6px 20px; color:#f8fafc; font-family:sans-serif; font-size:13px; backdrop-filter:blur(8px); box-shadow:0 4px 16px rgba(0,0,0,0.5);">
-  <span style="font-weight:700; letter-spacing:0.5px; color:#38bdf8;">BUBBLE SHOOTER</span>
-  <span style="color:#64748b;">|</span>
+<div id="bubbleTopBar" style="position:fixed; top:8px; left:50%; transform:translateX(-50%); z-index:100; display:flex; align-items:center; gap:12px; background:rgba(15,23,42,0.85); border:1px solid rgba(255,255,255,0.15); border-radius:30px; padding:4px 16px; color:#f8fafc; font-family:sans-serif; font-size:12px; backdrop-filter:blur(8px); box-shadow:0 4px 16px rgba(0,0,0,0.5);">
+  <span id="bubbleTitleText" style="font-weight:700; letter-spacing:0.5px; color:#38bdf8;">BUBBLE SHOOTER</span>
   <span>Score: <b id="hudScore" style="color:#facc15;">0</b></span>
-  <button id="finishBubbleBtn" style="background:#059669; border:none; color:#fff; border-radius:20px; padding:4px 14px; font-size:12px; font-weight:600; cursor:pointer;">Finish & Save</button>
+  <button id="finishBubbleBtn" style="background:#059669; border:none; color:#fff; border-radius:20px; padding:3px 12px; font-size:11px; font-weight:600; cursor:pointer;">Finish & Save</button>
 </div>
+<style>
+  body.in-hud #bubbleTopBar {
+    display: none !important;
+  }
+</style>
 <canvas width="471" height="992" id="game"></canvas>
 <script>
 var h = window.innerHeight;
@@ -52,6 +56,9 @@ window.currentSession = {
 
 $(document).ready(function(){
   $(window).focus();
+  if (window.self !== window.top) {
+    document.body.classList.add('in-hud');
+  }
   document.getElementById('finishBubbleBtn')?.addEventListener('click', reportSession);
 }) 
 
@@ -90,19 +97,12 @@ const grid = 32;
 // each even row is 8 bubbles long and each odd row is 7 bubbles long.
 // the level consists of 4 rows of bubbles of 4 colors: red, orange,
 // green, and yellow
+// Standard 4 active rows to ensure ample aiming runway on mobile screens
 const level1 = [
 ['R','R','Y','Y','L','L','C','C','R','R','L','L','Y','Y'],
 ['R','R','Y','Y','L','L','C','C','L','Y','Y','L','L'],
 ['L','L','C','C','R','R','Y','Y','R','L','Y','Y','R','R'],
-['L','C','C','L','R','C','C','L','C','C','R','L','Y'],
-['L','Y','R','R','L','Y','Y','L','C','C','Y','R','Y'],
-['R','R','Y','Y','C','C','R','R','Y','R','C','L','R'],
-['C','C','L','Y','L','L','C','C','R','R','L','L','Y','Y'],
-['R','R','Y','Y','L','L','C','C','L','Y','Y','L','L'],
-['L','L','C','C','R','R','Y','Y','R','L','Y','Y','R','R'],
-['L','C','C','L','R','C','C','L','C','C','R','L','Y'],
-['L','Y','R','R','L','Y','Y','L','C','C','Y','R','Y'],
-['R','R','Y','Y','C','C','R','R','Y','R','C','L','R']
+['L','C','C','L','R','C','C','L','C','C','R','L','Y']
 ];
 
 // create a mapping between color short code (R, G, B, Y) and color name
@@ -541,18 +541,57 @@ shootDir = 0;
 }
 });
 
-// Aim and shoot on click / touch
-canvas.addEventListener('pointerdown', (e) => {
+// Aim and shoot with touch / pointer tracking
+let isAiming = false;
+
+function updateAim(e) {
+  if (!curBubble || curBubble.dx !== 0 || curBubble.dy !== 0) return;
+  const rect = canvas.getBoundingClientRect();
+  const clickX = (e.clientX !== undefined ? e.clientX : (e.touches && e.touches[0] ? e.touches[0].clientX : 0)) - rect.left;
+  const clickY = (e.clientY !== undefined ? e.clientY : (e.touches && e.touches[0] ? e.touches[0].clientY : 0)) - rect.top;
+  const angle = Math.atan2(clickX - curBubble.x, -(clickY - curBubble.y));
+  shootDeg = Math.max(degToRad(-78), Math.min(degToRad(78), angle));
+}
+
+function fireBubble() {
   if (curBubble && curBubble.dx === 0 && curBubble.dy === 0) {
-    const rect = canvas.getBoundingClientRect();
-    const clickX = e.clientX - rect.left;
-    const clickY = e.clientY - rect.top;
-    const angle = Math.atan2(clickX - curBubble.x, -(clickY - curBubble.y));
-    shootDeg = Math.max(degToRad(-75), Math.min(degToRad(75), angle));
     curBubble.dx = Math.sin(shootDeg) * curBubble.speed;
     curBubble.dy = -Math.cos(shootDeg) * curBubble.speed;
   }
+}
+
+canvas.addEventListener('pointerdown', (e) => {
+  isAiming = true;
+  updateAim(e);
 });
+
+canvas.addEventListener('pointermove', (e) => {
+  if (isAiming) updateAim(e);
+});
+
+window.addEventListener('pointerup', () => {
+  if (isAiming) {
+    isAiming = false;
+    fireBubble();
+  }
+});
+
+// Also support direct touch listeners for older mobile webviews
+canvas.addEventListener('touchstart', (e) => {
+  isAiming = true;
+  updateAim(e);
+}, { passive: true });
+
+canvas.addEventListener('touchmove', (e) => {
+  if (isAiming) updateAim(e);
+}, { passive: true });
+
+window.addEventListener('touchend', () => {
+  if (isAiming) {
+    isAiming = false;
+    fireBubble();
+  }
+}, { passive: true });
 
 // start the game
 requestAnimationFrame(loop);

@@ -31,6 +31,21 @@
       padding: 8px;
     }
 
+    /* In-HUD embedding optimizations */
+    body.in-hud {
+      padding: 4px;
+    }
+    body.in-hud .snake-hud-bar {
+      padding: 4px 10px;
+      margin-bottom: 4px;
+      background: rgba(15, 23, 42, 0.6);
+      border-color: rgba(255, 255, 255, 0.05);
+    }
+    body.in-hud #finishSnakeBtn,
+    body.in-hud .snake-brand h1 {
+      display: none !important;
+    }
+
     /* Top HUD Bar */
     .snake-hud-bar {
       width: 100%;
@@ -81,22 +96,28 @@
       box-shadow: 0 0 6px currentColor;
     }
 
-    .btn-sound-toggle {
-      background: rgba(30, 41, 59, 0.8);
+    .btn-sound-toggle, .btn-keys-toggle {
+      background: rgba(30, 41, 59, 0.85);
       border: 1px solid rgba(255, 255, 255, 0.15);
       border-radius: 8px;
       color: #cbd5e1;
-      width: 32px;
-      height: 32px;
-      display: flex;
+      height: 30px;
+      padding: 0 10px;
+      display: inline-flex;
       align-items: center;
-      justify-content: center;
-      font-size: 13px;
+      gap: 6px;
+      font-size: 12px;
+      font-weight: 600;
       cursor: pointer;
       user-select: none;
     }
-    .btn-sound-toggle:active {
+    .btn-sound-toggle:active, .btn-keys-toggle:active {
       background: rgba(56, 189, 248, 0.25);
+      color: #38bdf8;
+    }
+    .btn-keys-toggle.active {
+      background: rgba(56, 189, 248, 0.2);
+      border-color: #38bdf8;
       color: #38bdf8;
     }
     .snake-score-chip {
@@ -164,10 +185,13 @@
       border-color: #34d399;
     }
 
+    .mobile-dpad {
+      display: none;
+    }
+    .mobile-dpad.show-keys {
+      display: flex !important;
+    }
     @media (max-width: 768px) {
-      .mobile-dpad {
-        display: flex;
-      }
       .snake-brand h1 {
         font-size: 14px;
       }
@@ -193,9 +217,15 @@
       </div>
     </div>
 
-    <button type="button" class="btn-sound-toggle" id="snakeAudioToggleBtn" title="Toggle Audio">
-      <i class="fa-solid fa-volume-high"></i>
-    </button>
+    <div style="display: flex; align-items: center; gap: 8px;">
+      <button type="button" class="btn-sound-toggle" id="snakeAudioToggleBtn" title="Toggle Audio">
+        <i class="fa-solid fa-volume-high"></i>
+      </button>
+      <button type="button" class="btn-keys-toggle" id="snakeKeysToggleBtn" title="Toggle On-Screen Arrow Keys">
+        <i class="fa-regular fa-keyboard"></i>
+        <span id="keysBtnLabel">Keys</span>
+      </button>
+    </div>
     <div class="snake-score-chip">
       <span>Score:</span>
       <span id="scoreVal">0</span>
@@ -284,9 +314,14 @@
 
     // Responsive Canvas Resolution
     function resizeCanvas() {
-      const maxW = Math.min(window.innerWidth - 30, 800);
-      const isMobile = window.innerWidth <= 768;
-      const maxH = Math.min(window.innerHeight - (isMobile ? 220 : 120), 560);
+      const dpadEl = document.querySelector('.mobile-dpad');
+      const isDpadActive = dpadEl && dpadEl.classList.contains('show-keys');
+      const inHud = window.self !== window.top;
+      
+      const maxW = Math.min(window.innerWidth - 20, 800);
+      const headerOffset = inHud ? 50 : 80;
+      const bottomOffset = isDpadActive ? 140 : 20;
+      const maxH = Math.min(window.innerHeight - headerOffset - bottomOffset, 650);
 
       // Snap to multiples of grid
       const w = Math.floor(maxW / grid) * grid;
@@ -506,30 +541,73 @@
     document.getElementById('btnLeft').addEventListener('click', turnLeft);
     document.getElementById('btnRight').addEventListener('click', turnRight);
 
-    // Touch Swipe Detection (Correct Direction!)
-    let touchstartX = 0;
-    let touchstartY = 0;
+    // Touch screen detection
+    const isTouchDevice = ('ontouchstart' in window) || (navigator.maxTouchPoints > 0) || (window.matchMedia && window.matchMedia('(pointer: coarse)').matches);
+    const dpad = document.querySelector('.mobile-dpad');
+    const keysBtn = document.getElementById('snakeKeysToggleBtn');
 
-    canvas.addEventListener('touchstart', function(e) {
-      touchstartX = e.changedTouches[0].clientX;
-      touchstartY = e.changedTouches[0].clientY;
+    // Only show on-screen keys if touch is NOT available, or if user explicitly toggles keys
+    let showKeys = !isTouchDevice;
+    function updateKeysVisibility() {
+      if (dpad) {
+        if (showKeys) {
+          dpad.classList.add('show-keys');
+          if (keysBtn) keysBtn.classList.add('active');
+        } else {
+          dpad.classList.remove('show-keys');
+          if (keysBtn) keysBtn.classList.remove('active');
+        }
+        resizeCanvas();
+      }
+    }
+    updateKeysVisibility();
+
+    if (keysBtn) {
+      keysBtn.addEventListener('click', () => {
+        showKeys = !showKeys;
+        updateKeysVisibility();
+      });
+    }
+
+    // Fluid Touch Slide to Move (Listens across the whole play arena)
+    let touchStartX = 0;
+    let touchStartY = 0;
+    let isSwiping = false;
+
+    const touchArea = document.querySelector('.arena-container') || canvas;
+
+    window.addEventListener('touchstart', function(e) {
+      if (e.target.closest('.mobile-dpad') || e.target.closest('button')) return;
+      touchStartX = e.touches[0].clientX;
+      touchStartY = e.touches[0].clientY;
+      isSwiping = true;
     }, { passive: true });
 
-    canvas.addEventListener('touchend', function(e) {
-      const dx = e.changedTouches[0].clientX - touchstartX;
-      const dy = e.changedTouches[0].clientY - touchstartY;
+    window.addEventListener('touchmove', function(e) {
+      if (!isSwiping || e.target.closest('.mobile-dpad') || e.target.closest('button')) return;
+      
+      const currentX = e.touches[0].clientX;
+      const currentY = e.touches[0].clientY;
+      const dx = currentX - touchStartX;
+      const dy = currentY - touchStartY;
+      const threshold = 18; // Low threshold for instant responsive turns
 
-      if (Math.abs(dx) > Math.abs(dy)) {
-        if (Math.abs(dx) > 20) {
+      if (Math.abs(dx) > threshold || Math.abs(dy) > threshold) {
+        if (Math.abs(dx) > Math.abs(dy)) {
           if (dx > 0) turnRight();
           else turnLeft();
-        }
-      } else {
-        if (Math.abs(dy) > 20) {
+        } else {
           if (dy > 0) turnDown();
           else turnUp();
         }
+        // Reset anchor point to enable continuous smooth gliding turns
+        touchStartX = currentX;
+        touchStartY = currentY;
       }
+    }, { passive: false });
+
+    window.addEventListener('touchend', function() {
+      isSwiping = false;
     }, { passive: true });
 
     // Handle Window Resize
@@ -569,6 +647,10 @@
 
     $(document).ready(function() {
       $(window).focus();
+      if (window.self !== window.top) {
+        document.body.classList.add('in-hud');
+      }
+      resizeCanvas();
       updateColors(leftColor, rightColor);
       requestAnimationFrame(loop);
 

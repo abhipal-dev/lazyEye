@@ -50,6 +50,36 @@
       perspective: 600px;
       }
 
+      @media (max-width: 640px) {
+        #center {
+          padding: 4px;
+          height: auto;
+          min-height: 100%;
+        }
+        #game {
+          display: flex !important;
+          flex-direction: column !important;
+          align-items: center !important;
+          gap: 16px !important;
+          width: 100%;
+        }
+        #maze {
+          width: min(340px, 92vw) !important;
+          height: min(300px, 48vh) !important;
+        }
+        #joystick {
+          margin: 4px auto !important;
+          width: 68px !important;
+          height: 68px !important;
+          touch-action: none;
+        }
+        #joystick-head {
+          width: 30px !important;
+          height: 30px !important;
+          touch-action: none;
+        }
+      }
+
       #maze {
       position: relative;
       grid-row: 1 / -1;
@@ -613,48 +643,76 @@
       y: hole.row * (wallW + pathW) + (wallW / 2 + pathW / 2)
       }));
 
-      joystickHeadElement.addEventListener("mousedown", function (event) {
-      if (!gameInProgress) {
-          mouseStartX = event.clientX;
-          mouseStartY = event.clientY;
+      function onJoystickDragStart(clientX, clientY) {
+        mouseStartX = clientX;
+        mouseStartY = clientY;
+        if (!gameInProgress) {
           gameInProgress = true;
           window.requestAnimationFrame(main);
-          noteElement.style.opacity = 0;
-          joystickHeadElement.style.cssText = `
-              animation: none;
-              cursor: grabbing;
-          `;
+          if (noteElement) noteElement.style.opacity = 0;
+        }
+        joystickHeadElement.style.animation = 'none';
+        joystickHeadElement.style.cursor = 'grabbing';
       }
+
+      function onJoystickDragMove(clientX, clientY) {
+        if (!gameInProgress || mouseStartX === undefined) return;
+        const mouseDeltaX = -Math.minmax(mouseStartX - clientX, 20);
+        const mouseDeltaY = -Math.minmax(mouseStartY - clientY, 20);
+
+        joystickHeadElement.style.left = `${mouseDeltaX}px`;
+        joystickHeadElement.style.top = `${mouseDeltaY}px`;
+
+        const rotationY = mouseDeltaX * 0.85;
+        const rotationX = mouseDeltaY * 0.85;
+
+        mazeElement.style.transform = `rotateY(${rotationY}deg) rotateX(${-rotationX}deg)`;
+
+        const gravity = 2;
+        const friction = 0.01;
+
+        accelerationX = gravity * Math.sin((rotationY / 180) * Math.PI);
+        accelerationY = gravity * Math.sin((rotationX / 180) * Math.PI);
+        frictionX = gravity * Math.cos((rotationY / 180) * Math.PI) * friction;
+        frictionY = gravity * Math.cos((rotationX / 180) * Math.PI) * friction;
+      }
+
+      // Mouse Listeners
+      joystickHeadElement.addEventListener("mousedown", function (event) {
+        onJoystickDragStart(event.clientX, event.clientY);
       });
 
       window.addEventListener("mousemove", function (event) {
-      if (gameInProgress) {
-          const mouseDeltaX = -Math.minmax(mouseStartX - event.clientX, 15);
-          const mouseDeltaY = -Math.minmax(mouseStartY - event.clientY, 15);
-
-          joystickHeadElement.style.cssText = `
-              left: ${mouseDeltaX}px;
-              top: ${mouseDeltaY}px;
-              animation: none;
-              cursor: grabbing;
-          `;
-
-          const rotationY = mouseDeltaX * 0.8; // Max rotation = 12
-          const rotationX = mouseDeltaY * 0.8;
-
-          mazeElement.style.cssText = `
-              transform: rotateY(${rotationY}deg) rotateX(${-rotationX}deg)
-          `;
-
-          const gravity = 2;
-          const friction = 0.01; // Coefficients of friction
-
-          accelerationX = gravity * Math.sin((rotationY / 180) * Math.PI);
-          accelerationY = gravity * Math.sin((rotationX / 180) * Math.PI);
-          frictionX = gravity * Math.cos((rotationY / 180) * Math.PI) * friction;
-          frictionY = gravity * Math.cos((rotationX / 180) * Math.PI) * friction;
-      }
+        onJoystickDragMove(event.clientX, event.clientY);
       });
+
+      // Touch Listeners for mobile
+      joystickHeadElement.addEventListener("touchstart", function (event) {
+        if (event.touches && event.touches.length > 0) {
+          event.preventDefault();
+          onJoystickDragStart(event.touches[0].clientX, event.touches[0].clientY);
+        }
+      }, { passive: false });
+
+      window.addEventListener("touchmove", function (event) {
+        if (event.touches && event.touches.length > 0) {
+          onJoystickDragMove(event.touches[0].clientX, event.touches[0].clientY);
+        }
+      }, { passive: false });
+
+      // Direct Touch support on maze
+      mazeElement.addEventListener("touchstart", function (event) {
+        if (event.touches && event.touches.length > 0) {
+          onJoystickDragStart(event.touches[0].clientX, event.touches[0].clientY);
+        }
+      }, { passive: true });
+
+      mazeElement.addEventListener("touchmove", function (event) {
+        if (event.touches && event.touches.length > 0) {
+          event.preventDefault();
+          onJoystickDragMove(event.touches[0].clientX, event.touches[0].clientY);
+        }
+      }, { passive: false });
 
       window.addEventListener("keydown", function (event) {
       // If not an arrow key or space or H was pressed then return

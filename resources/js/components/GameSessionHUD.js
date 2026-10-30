@@ -12,7 +12,8 @@ export default class GameSessionHUD extends React.Component {
 
         this.state = {
             elapsedSeconds: 0,
-            currentScore: 0
+            currentScore: 0,
+            isRotated: false
         };
 
         this.timer = null;
@@ -28,6 +29,19 @@ export default class GameSessionHUD extends React.Component {
         this.stopTimer();
         window.removeEventListener('message', this.handleIframeMessage);
     }
+
+    toggleRotate = () => {
+        this.setState(prev => ({ isRotated: !prev.isRotated }), () => {
+            setTimeout(() => {
+                const iframe = document.getElementById('session-game-iframe');
+                if (iframe && iframe.contentWindow) {
+                    try {
+                        iframe.contentWindow.dispatchEvent(new Event('resize'));
+                    } catch (e) {}
+                }
+            }, 150);
+        });
+    };
 
     startTimer = () => {
         this.stopTimer();
@@ -211,48 +225,95 @@ export default class GameSessionHUD extends React.Component {
                         <span>{this.formatTime(elapsedSeconds)}</span>
                     </div>
 
-                    {/* Right: Exit and Save Button */}
-                    <button 
-                        type="button" 
-                        onClick={() => this.handleExit()}
-                        style={{
-                            backgroundColor: '#dc2626',
-                            color: '#ffffff',
-                            border: 'none',
-                            borderRadius: '6px',
-                            padding: '6px 14px',
-                            fontSize: '0.85rem',
-                            fontWeight: 600,
-                            cursor: 'pointer',
-                            display: 'flex',
-                            alignItems: 'center',
-                            gap: '6px',
-                            transition: 'background-color 0.15s ease'
-                        }}
-                        onMouseEnter={(e) => e.currentTarget.style.backgroundColor = '#b91c1c'}
-                        onMouseLeave={(e) => e.currentTarget.style.backgroundColor = '#dc2626'}
-                        title="Exit and Save Therapy Session"
-                    >
-                        <i className="fa-solid fa-arrow-right-from-bracket"></i>
-                        <span>Exit & Save</span>
-                    </button>
+                    {/* Right: Controls & Exit Button */}
+                    <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                        {/* 1-Click Widescreen / Landscape Rotate Toggle */}
+                        <button 
+                            type="button" 
+                            onClick={this.toggleRotate}
+                            style={{
+                                backgroundColor: this.state.isRotated ? '#0284c7' : '#334155',
+                                color: '#ffffff',
+                                border: '1px solid rgba(255, 255, 255, 0.2)',
+                                borderRadius: '6px',
+                                padding: '6px 12px',
+                                fontSize: '0.8rem',
+                                fontWeight: 600,
+                                cursor: 'pointer',
+                                display: 'flex',
+                                alignItems: 'center',
+                                gap: '6px',
+                                transition: 'all 0.15s ease'
+                            }}
+                            title="Toggle 90° Widescreen Landscape for Mobile"
+                        >
+                            <i className="fa-solid fa-arrows-rotate" style={{ color: this.state.isRotated ? '#38bdf8' : '#e2e8f0' }}></i>
+                            <span>{this.state.isRotated ? 'Portrait' : 'Rotate'}</span>
+                        </button>
+
+                        <button 
+                            type="button" 
+                            onClick={() => this.handleExit()}
+                            style={{
+                                backgroundColor: '#dc2626',
+                                color: '#ffffff',
+                                border: 'none',
+                                borderRadius: '6px',
+                                padding: '6px 14px',
+                                fontSize: '0.85rem',
+                                fontWeight: 600,
+                                cursor: 'pointer',
+                                display: 'flex',
+                                alignItems: 'center',
+                                gap: '6px',
+                                transition: 'background-color 0.15s ease'
+                            }}
+                            onMouseEnter={(e) => e.currentTarget.style.backgroundColor = '#b91c1c'}
+                            onMouseLeave={(e) => e.currentTarget.style.backgroundColor = '#dc2626'}
+                            title="Exit and Save Therapy Session"
+                        >
+                            <i className="fa-solid fa-arrow-right-from-bracket"></i>
+                            <span>Exit & Save</span>
+                        </button>
+                    </div>
                 </header>
 
-                {/* Direct Full-Screen Game Canvas Frame */}
-                <iframe 
-                    id="session-game-iframe" 
-                    src={gameRoute} 
-                    allow="fullscreen" 
-                    title={title}
+                {/* Game Canvas Container with Instant Rotation Support */}
+                <div 
                     style={{
                         flex: 1,
                         width: '100%',
                         height: 'calc(100vh - 48px)',
-                        border: 'none',
-                        backgroundColor: '#000000',
-                        display: 'block'
+                        position: 'relative',
+                        overflow: 'hidden',
+                        backgroundColor: '#000000'
                     }}
-                />
+                >
+                    <iframe 
+                        id="session-game-iframe" 
+                        src={gameRoute} 
+                        allow="fullscreen" 
+                        title={title}
+                        style={this.state.isRotated ? {
+                            position: 'absolute',
+                            top: '50%',
+                            left: '50%',
+                            width: 'calc(100vh - 48px)',
+                            height: '100vw',
+                            transform: 'translate(-50%, -50%) rotate(90deg)',
+                            transformOrigin: 'center center',
+                            border: 'none',
+                            backgroundColor: '#000000',
+                            display: 'block'
+                        } : {
+                            width: '100%',
+                            height: '100%',
+                            border: 'none',
+                            backgroundColor: '#000000',
+                            display: 'block'
+                        }}
+                    />
+                </div>
             </div>
         );
     }

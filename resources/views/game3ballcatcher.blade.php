@@ -278,28 +278,28 @@
     }
 
     function moveOrb() {
-      const areaW = playArea.clientWidth;
-      const areaH = playArea.clientHeight;
+      const areaW = Math.max(160, playArea.clientWidth || window.innerWidth);
+      const areaH = Math.max(160, playArea.clientHeight || window.innerHeight);
       const radius = 32;
 
       currentX += vx * speed;
       currentY += vy * speed;
 
-      // Bounce against arena walls
+      // Bounce against arena walls safely without edge trapping
       if (currentX <= radius) {
         currentX = radius;
-        vx = Math.abs(vx);
+        vx = Math.abs(vx) || 2;
       } else if (currentX >= areaW - radius) {
         currentX = areaW - radius;
-        vx = -Math.abs(vx);
+        vx = -Math.abs(vx) || -2;
       }
 
       if (currentY <= radius) {
         currentY = radius;
-        vy = Math.abs(vy);
+        vy = Math.abs(vy) || 2;
       } else if (currentY >= areaH - radius) {
         currentY = areaH - radius;
-        vy = -Math.abs(vy);
+        vy = -Math.abs(vy) || -2;
       }
 
       orb.style.left = currentX + 'px';
@@ -329,6 +329,9 @@
     }
 
     orb.addEventListener('pointerdown', catchOrb);
+    orb.addEventListener('touchstart', function(e) {
+      catchOrb(e);
+    }, { passive: false });
 
     function setDifficulty(level) {
       document.querySelectorAll('.btn-diff').forEach(b => b.classList.remove('active'));
@@ -367,6 +370,9 @@
     window.currentSession = { game: 'Ball Catcher', getScore: function() { return score; } };
 $(document).ready(function() {
       $(window).focus();
+      if (window.self !== window.top) {
+        document.body.classList.add('in-hud');
+      }
       updateColors(leftColor, rightColor);
       currentX = playArea.clientWidth / 2 || 150;
       currentY = playArea.clientHeight / 2 || 150;

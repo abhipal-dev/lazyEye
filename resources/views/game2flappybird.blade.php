@@ -30,6 +30,7 @@
       display: flex;
       align-items: center;
       justify-content: center;
+      touch-action: none;
     }
 
     .game-stage {
@@ -80,6 +81,9 @@
     }
 
     /* Modern Top HUD Bar */
+    body.in-hud .top-hud {
+      display: none !important;
+    }
     .top-hud {
       position: absolute;
       top: 16px;
@@ -283,6 +287,12 @@
         flap();
       }
     });
+    stage.addEventListener('touchstart', (e) => {
+      if (game_state === 'Play') {
+        e.preventDefault();
+        flap();
+      }
+    }, { passive: false });
 
     startBtn.addEventListener('click', (e) => {
       e.stopPropagation();
@@ -435,6 +445,9 @@
 
     $(document).ready(function() {
       $(window).focus();
+      if (window.self !== window.top) {
+        document.body.classList.add('in-hud');
+      }
       updateColors(leftColor, rightColor);
     });
   </script>

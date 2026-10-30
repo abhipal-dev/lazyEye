@@ -12,7 +12,7 @@
 <div class="container">
 <div id="score"></div>
 <canvas id="game" width="375" height="375"></canvas>
-<div id="introduction">Hold down the mouse to stretch out a stick</div>
+<div id="introduction">Hold down touch or mouse to stretch stick</div>
 <div id="perfect">DOUBLE SCORE</div>
 <button id="restart">RESTART</button>
 </div>
@@ -34,6 +34,10 @@ margin: 0;
 body {
 font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
 cursor: pointer;
+touch-action: none;
+-webkit-touch-callout: none;
+user-select: none;
+-webkit-user-select: none;
 }
 
 .container {
@@ -45,10 +49,12 @@ height: 100%;
 
 #score {
 position: absolute;
-top: 30px;
-right: 30px;
+top: 20px;
+right: 20px;
 font-size: 2em;
 font-weight: 900;
+color: #0f172a;
+z-index: 20;
 }
 
 #introduction {
@@ -349,20 +355,31 @@ resetGame();
 //   }
 // });
 
-window.addEventListener("mousedown", function (event) {
-if (phase == "waiting") {
-lastTimestamp = undefined;
-introductionElement.style.opacity = 0;
-phase = "stretching";
-window.requestAnimationFrame(animate);
+function handleStretchStart(event) {
+  if (event && event.type === 'touchstart') {
+    event.preventDefault();
+  }
+  if (phase == "waiting") {
+    lastTimestamp = undefined;
+    if (introductionElement) introductionElement.style.opacity = 0;
+    phase = "stretching";
+    window.requestAnimationFrame(animate);
+  }
 }
-});
 
-window.addEventListener("mouseup", function (event) {
-if (phase == "stretching") {
-phase = "turning";
+function handleStretchEnd(event) {
+  if (event && event.type === 'touchend') {
+    event.preventDefault();
+  }
+  if (phase == "stretching") {
+    phase = "turning";
+  }
 }
-});
+
+window.addEventListener("mousedown", handleStretchStart);
+window.addEventListener("mouseup", handleStretchEnd);
+window.addEventListener("touchstart", handleStretchStart, { passive: false });
+window.addEventListener("touchend", handleStretchEnd, { passive: false });
 
 window.addEventListener("resize", function (event) {
 canvas.width = window.innerWidth;

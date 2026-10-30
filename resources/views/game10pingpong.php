@@ -16,13 +16,17 @@
         }
 
         body {
-          width: 100%;
-          height: 100%;
-          display: flex;
-          justify-content: center;
-          align-items: center;
-          background-color: black;
-        }
+        width: 100%;
+        height: 100%;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        background-color: black;
+        touch-action: none;
+        overflow: hidden;
+        user-select: none;
+        -webkit-user-select: none;
+      }
         /* canvas{
           border: 2px solid white;
 
@@ -49,10 +53,28 @@
         $("canvas").attr("height",h);
         $("canvas").attr("width",w);
 
+        function handleResize() {
+          let newH = window.innerHeight;
+          let newW = window.innerWidth;
+          newH = newH - (newH % 32);
+          newW = newW - (newW % 32);
+          canvas.height = newH;
+          canvas.width = newW;
+          if (typeof net !== 'undefined') {
+            net.height = newH;
+            net.x = newW / 2 - netWidth / 2;
+          }
+          if (typeof ai !== 'undefined') {
+            ai.x = newW - (paddleWidth + 10);
+          }
+        }
+
+        window.addEventListener('resize', handleResize);
+
         $(document).ready(function(){
           $(window).focus();
-               
-              }) 
+          handleResize();
+        }) 
         
           window.addEventListener('message', function(event) {
             console.log("mESSAGE RECEIVED"); 
@@ -222,17 +244,28 @@
           }
         }
 
-        /* moving paddles section end */
-        window.addEventListener('mousemove', function(e) {
+        /* moving paddles section with full touch & drag support */
+        function moveUserPaddle(clientY) {
           let rect = canvas.getBoundingClientRect();
-          user.y = Math.max(0, Math.min(canvas.height - user.height, e.clientY - rect.top - user.height / 2));
+          user.y = Math.max(0, Math.min(canvas.height - user.height, clientY - rect.top - user.height / 2));
+        }
+
+        window.addEventListener('mousemove', function(e) {
+          moveUserPaddle(e.clientY);
         });
-        window.addEventListener('touchmove', function(e) {
-          if (e.touches.length > 0) {
-            let rect = canvas.getBoundingClientRect();
-            user.y = Math.max(0, Math.min(canvas.height - user.height, e.touches[0].clientY - rect.top - user.height / 2));
+
+        window.addEventListener('touchstart', function(e) {
+          if (e.touches && e.touches.length > 0) {
+            moveUserPaddle(e.touches[0].clientY);
           }
-        }, { passive: true });
+        }, { passive: false });
+
+        window.addEventListener('touchmove', function(e) {
+          if (e.touches && e.touches.length > 0) {
+            e.preventDefault();
+            moveUserPaddle(e.touches[0].clientY);
+          }
+        }, { passive: false });
 
         // reset the ball
         function reset() {
