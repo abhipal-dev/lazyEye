@@ -63,7 +63,7 @@ $(document).ready(function(){
   document.getElementById('finishBubbleBtn')?.addEventListener('click', reportSession);
 }) 
 
-var leftColor = '#ef4444', rightColor = '#06b6d4';
+// colors already initialized above
 
 window.addEventListener('message', function(event) {
   if (!event.data) return;

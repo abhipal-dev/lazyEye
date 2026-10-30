@@ -318,6 +318,11 @@
       modalDesc.innerHTML = `Final Score: <strong style="color: #facc15; font-size: 18px;">${score}</strong><br>Tap below to try again.`;
       startBtn.innerText = 'PLAY AGAIN';
       gameModal.style.display = 'flex';
+      
+      // Notify parent HUD to freeze the session timer
+      try {
+        window.parent.postMessage({ msg: 'Game Over', gameOver: true, score: score }, '*');
+      } catch (e) {}
     }
 
     function gameLoop() {

@@ -25,15 +25,8 @@ export default class GameSessionHUD extends React.Component {
         this.startTimer();
         window.addEventListener('message', this.handleIframeMessage);
 
-        // Auto-rotate by default for horizontal / wide games on mobile portrait
-        try {
-            const rawTitle = (this.props.game?.title || '').toLowerCase();
-            const isWideGame = rawTitle.includes('ping') || rawTitle.includes('flappy') || rawTitle.includes('catcher') || rawTitle.includes('sticky');
-            const isMobilePortrait = window.innerWidth < 768 && window.innerHeight > window.innerWidth;
-            if (isWideGame && isMobilePortrait) {
-                this.setState({ isRotated: true });
-            }
-        } catch (e) {}
+        // Default to upright orientation (only rotate if user explicitly taps Rotate in Menu)
+        this.setState({ isRotated: false });
     }
 
     componentWillUnmount() {
@@ -107,6 +100,19 @@ export default class GameSessionHUD extends React.Component {
             this.setState(prev => ({
                 currentScore: Math.max(prev.currentScore, newScore)
             }));
+        }
+
+        // Listen for Game Over: stop the timer immediately!
+        if (event.data.msg === 'Game Over' || event.data.gameOver) {
+            this.stopTimer();
+            if (event.data.score !== undefined && !isNaN(event.data.score)) {
+                this.setState({ currentScore: Number(event.data.score) });
+            }
+        }
+
+        // Listen for Play Again / Game Restart: resume timer
+        if (event.data.msg === 'Game Resumed' || event.data.resume) {
+            this.startTimer();
         }
 
         // Listen for internal game-over or session finished
@@ -220,13 +226,22 @@ export default class GameSessionHUD extends React.Component {
                         boxSizing: 'border-box'
                     }}
                 >
-                    {/* Left: Clean Game Title (Text Only) */}
-                    <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                    {/* Left: Single-line Title and Score Chip (Never wraps) */}
+                    <div style={{ 
+                        display: 'flex', 
+                        alignItems: 'center', 
+                        gap: '6px', 
+                        minWidth: 0, 
+                        flexShrink: 1, 
+                        whiteSpace: 'nowrap',
+                        overflow: 'hidden'
+                    }}>
                         <span style={{ 
                             color: '#ffffff', 
                             fontWeight: 700, 
-                            fontSize: '0.95rem', 
-                            letterSpacing: '0.5px' 
+                            fontSize: '0.85rem', 
+                            letterSpacing: '0.3px',
+                            whiteSpace: 'nowrap'
                         }}>
                             {title}
                         </span>
@@ -236,10 +251,12 @@ export default class GameSessionHUD extends React.Component {
                                 color: '#38bdf8',
                                 border: '1px solid rgba(56, 189, 248, 0.3)',
                                 borderRadius: '6px',
-                                padding: '1px 8px',
-                                fontSize: '0.75rem',
-                                fontWeight: 600,
-                                fontFamily: 'monospace'
+                                padding: '1px 6px',
+                                fontSize: '0.7rem',
+                                fontWeight: 700,
+                                fontFamily: 'monospace',
+                                whiteSpace: 'nowrap',
+                                flexShrink: 0
                             }}>
                                 Score: {currentScore}
                             </span>
