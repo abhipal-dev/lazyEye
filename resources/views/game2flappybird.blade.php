@@ -232,6 +232,7 @@
     let rightColor = '#06b6d4';
     let score = 0;
     let game_state = 'Start';
+    let isPausedByParent = false;
     let move_speed = 3.5;
     let gravity = 0.45;
     let bird_dy = 0;
@@ -416,6 +417,9 @@
     // PostMessage Protocol
     window.addEventListener('message', function(event) {
       if (!event.data) return;
+      if (event.data.paused !== undefined) {
+        isPausedByParent = !!event.data.paused;
+      }
       if (event.data.leftColor || event.data.rightColor) {
         updateColors(event.data.leftColor, event.data.rightColor);
       }

@@ -377,6 +377,7 @@
 
     let count = 0;
     let score = 0;
+    let isGamePaused = false;
 
     let snake = {
       x: grid * 5,
@@ -411,6 +412,7 @@
 
     function loop() {
       requestAnimationFrame(loop);
+      if (isGamePaused) return;
 
       // Control game speed dynamically based on selected therapy velocity
       let currentDivider = baseSpeedDivider;
@@ -618,6 +620,9 @@
     // Parent postMessage Communication
     window.addEventListener('message', function(event) {
       if (!event.data) return;
+      if (event.data.paused !== undefined) {
+        isGamePaused = !!event.data.paused;
+      }
       if (event.data.leftColor || event.data.rightColor) {
         updateColors(event.data.leftColor, event.data.rightColor);
       }

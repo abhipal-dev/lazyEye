@@ -42,7 +42,31 @@ export default class GameSessionHUD extends React.Component {
     }
 
     togglePauseModal = () => {
-        this.setState(prev => ({ showPauseModal: !prev.showPauseModal }));
+        this.setState(prev => {
+            const willPause = !prev.showPauseModal;
+            if (willPause) {
+                // Freeze the therapy timer while paused
+                this.stopTimer();
+            } else {
+                // Resume the therapy timer when continuing
+                this.startTimer();
+            }
+
+            // Post pause / resume event to the child game iframe
+            setTimeout(() => {
+                const iframe = document.getElementById('session-game-iframe');
+                if (iframe && iframe.contentWindow) {
+                    try {
+                        iframe.contentWindow.postMessage({ 
+                            msg: willPause ? 'Game Paused' : 'Game Resumed', 
+                            paused: willPause 
+                        }, '*');
+                    } catch (e) {}
+                }
+            }, 50);
+
+            return { showPauseModal: willPause };
+        });
     };
 
     toggleRotate = () => {

@@ -42,7 +42,8 @@
       <script>
     var h = window.innerHeight;
     var w = window.innerWidth;    // var w = window.innerWidth;
-    var leftColor = '#ef4444', rightColor = '#06b6d4'; 
+    var leftColor = '#ef4444', rightColor = '#06b6d4';
+    var isGamePaused = false; 
     h = h-(h%32)
     w = w-(w%32)    // w = w-(w%16)
     console.log("Height : "+h) 
@@ -77,6 +78,9 @@
         }) 
         
           window.addEventListener('message', function(event) {
+            if (event.data && event.data.paused !== undefined) {
+              isGamePaused = !!event.data.paused;
+            }
             console.log("mESSAGE RECEIVED"); 
               console.log(event.data.msg);
               console.log(event.

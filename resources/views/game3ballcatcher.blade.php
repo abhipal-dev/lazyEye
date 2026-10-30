@@ -252,6 +252,7 @@
 
   <script>
     let score = 0;
+    let isGamePaused = false;
     let leftColor = '#ef4444';
     let rightColor = '#06b6d4';
     let speed = 1.0; // movement velocity
@@ -278,6 +279,10 @@
     }
 
     function moveOrb() {
+      if (isGamePaused) {
+        animId = requestAnimationFrame(moveOrb);
+        return;
+      }
       const areaW = Math.max(160, playArea.clientWidth || window.innerWidth);
       const areaH = Math.max(160, playArea.clientHeight || window.innerHeight);
       const radius = 32;
@@ -350,6 +355,9 @@
     // PostMessage Protocol
     window.addEventListener('message', function(event) {
       if (!event.data) return;
+      if (event.data.paused !== undefined) {
+        isGamePaused = !!event.data.paused;
+      }
       if (event.data.leftColor || event.data.rightColor) {
         updateColors(event.data.leftColor, event.data.rightColor);
       }
