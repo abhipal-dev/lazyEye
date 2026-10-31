@@ -270,7 +270,7 @@ export default class UserDashboard extends React.Component {
                         data: data[0],
                         data2: data,
                         today_games_summary: data[0].today_games_summary || {},
-                        userProfileImage: `storage/images/${data[0].image_address}`
+                        userProfileImage: `storage/images/${data[0].image_address}?v=${Date.now()}`
                     });
                     const leftDiv = document.querySelector('#leftColorTestDiv');
                     const rightDiv = document.querySelector('#rightColorTestDiv');
@@ -296,13 +296,31 @@ export default class UserDashboard extends React.Component {
         });
     };
 
+    handleProfileUpdated = (e) => {
+        if (e && e.detail && (e.detail.image_address || e.detail.image_url)) {
+            const addr = e.detail.image_address;
+            const newImgPath = addr ? `storage/images/${addr}?v=${Date.now()}` : this.state.userProfileImage;
+            this.setState(prevState => ({
+                userProfileImage: newImgPath,
+                data: {
+                    ...prevState.data,
+                    image_address: addr || prevState.data?.image_address
+                }
+            }));
+        } else {
+            this.fetchUserData();
+        }
+    };
+
     componentDidMount() {
         this.fetchUserData();
         window.addEventListener('lazyeye:game-completed', this.fetchUserData);
+        window.addEventListener('lazyeye:profile-updated', this.handleProfileUpdated);
     }
 
     componentWillUnmount() {
         window.removeEventListener('lazyeye:game-completed', this.fetchUserData);
+        window.removeEventListener('lazyeye:profile-updated', this.handleProfileUpdated);
     }
     pad = (n) => {
         return (n.length < 2) ? "0" + n : n;
@@ -459,15 +477,14 @@ export default class UserDashboard extends React.Component {
                                         <span>{(this.state.fullname ? this.state.fullname.charAt(0) : 'P').toUpperCase()}</span>
                                         {this.state.userProfileImage && !this.state.userProfileImage.includes('default') && (
                                             <img 
-                                                src={encodeURI(`/${this.state.userProfileImage}?v=${this.state.id || 4}`)} 
+                                                src={encodeURI(this.state.userProfileImage.startsWith("/") ? this.state.userProfileImage : `/${this.state.userProfileImage}`)} 
                                                 alt="" 
                                                 className="position-absolute top-0 start-0 w-100 h-100 rounded-circle" 
                                                 style={{ objectFit: 'cover' }} 
                                                 onError={(e) => {
                                                     if (!e.currentTarget.dataset.retried) {
                                                         e.currentTarget.dataset.retried = '1';
-                                                        const imgName = this.state.data?.image_address || 'user_4_avatar.png';
-                                                        e.currentTarget.src = '/images/user_4_avatar.png';
+                                                        e.currentTarget.src = '/images/0_default_male_profile_image.png';
                                                     } else {
                                                         e.currentTarget.style.display = 'none';
                                                     }
@@ -487,15 +504,14 @@ export default class UserDashboard extends React.Component {
                                                 <span>{(this.state.fullname ? this.state.fullname.charAt(0) : 'P').toUpperCase()}</span>
                                                 {this.state.userProfileImage && !this.state.userProfileImage.includes('default') && (
                                                     <img 
-                                                        src={encodeURI(`/${this.state.userProfileImage}?v=${this.state.id || 4}`)} 
+                                                        src={encodeURI(this.state.userProfileImage.startsWith("/") ? this.state.userProfileImage : `/${this.state.userProfileImage}`)} 
                                                         alt="" 
                                                         className="position-absolute top-0 start-0 w-100 h-100 rounded-circle" 
                                                         style={{ objectFit: 'cover' }} 
                                                         onError={(e) => {
                                                             if (!e.currentTarget.dataset.retried) {
                                                                 e.currentTarget.dataset.retried = '1';
-                                                                const imgName = this.state.data?.image_address || 'user_4_avatar.png';
-                                                                e.currentTarget.src = '/images/user_4_avatar.png';
+                                                                e.currentTarget.src = '/images/0_default_male_profile_image.png';
                                                             } else {
                                                                 e.currentTarget.style.display = 'none';
                                                             }
