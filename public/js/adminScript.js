@@ -461,6 +461,7 @@ function renderUserRow(e, sliceIdx) {
         <td><span class="badge border font-mono small" style="background-color: var(--bg-surface-secondary); border-color: var(--border-color); color: var(--text-main);">`+ e.username + `</span></td>
         <td>`+ doctorBadge + `</td>
         <td>`+ badge + `</td>
+        <td>`+ compliancePill + `</td>
         <td>`+ e.gender + `</td>
         <td class="font-mono">`+ (e.user_playing_time || 20) + ` mins/day</td> 
         <td class="font-mono small">`+ localEnrolled + `</td>
@@ -509,6 +510,7 @@ function fetchUsers(silentPreload) {
                 <th>Username</th>
                 <th>Assigned Doctor</th>
                 <th>Therapy Status</th>
+                <th>Compliance Radar</th>
                 <th>Gender</th>
                 <th>Target</th>
                 <th>Enrolled (Local)</th>
@@ -516,7 +518,11 @@ function fetchUsers(silentPreload) {
                 </tr>
             `);
             $('div.card-header span.fw-semibold').text('Patients -> Active Therapy Patients');
-            setupAdminTableData('Users', userList, renderUserRow);
+            let displayList = userList;
+            if (window.currentComplianceFilter && window.currentComplianceFilter !== 'all') {
+                displayList = userList.filter(u => u.compliance_status === window.currentComplianceFilter);
+            }
+            setupAdminTableData('Users', displayList, renderUserRow);
         }
     });
 }
@@ -699,6 +705,28 @@ function showRecordDetailsModal(record, type) {
                     <div class="p-3 rounded-3 h-100" style="background: var(--bg-card); border: 1px solid var(--border-color);">
                         <small class="text-sub text-uppercase fw-bold d-block mb-1">Enrollment Date</small>
                         <div class="small fw-semibold text-main mt-1"><i class="fa-regular fa-calendar-check text-success me-1"></i>` + enrolledDate + `</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Clinical Adherence & Inactivity Radar -->
+            <div class="row g-3 mb-3">
+                <div class="col-12 col-md-4">
+                    <div class="p-3 rounded-3 h-100" style="background: var(--bg-card); border: 1px solid var(--border-color);">
+                        <small class="text-sub text-uppercase fw-bold d-block mb-1">Adherence Status</small>
+                        <div class="mt-1">` + (record.compliance_status === 'compliant' ? '<span class="badge bg-success-subtle text-success font-mono"><i class="fa-solid fa-circle-check me-1"></i>Compliant</span>' : (record.compliance_status === 'needs_review' ? '<span class="badge bg-warning-subtle text-warning font-mono"><i class="fa-solid fa-clock-rotate-left me-1"></i>Needs Review</span>' : '<span class="badge bg-danger-subtle text-danger font-mono"><i class="fa-solid fa-triangle-exclamation me-1"></i>At-Risk Cohort</span>')) + `</div>
+                    </div>
+                </div>
+                <div class="col-12 col-md-4">
+                    <div class="p-3 rounded-3 h-100" style="background: var(--bg-card); border: 1px solid var(--border-color);">
+                        <small class="text-sub text-uppercase fw-bold d-block mb-1">Weekly Adherence Score</small>
+                        <div class="fw-bold text-main mt-1 tabular-nums">` + (record.compliance_score || 0) + `% <small class="text-sub fw-normal">(` + (record.weekly_sessions_count || 0) + ` sessions/wk)</small></div>
+                    </div>
+                </div>
+                <div class="col-12 col-md-4">
+                    <div class="p-3 rounded-3 h-100" style="background: var(--bg-card); border: 1px solid var(--border-color);">
+                        <small class="text-sub text-uppercase fw-bold d-block mb-1">Last Active Session</small>
+                        <div class="small fw-semibold text-main mt-1"><i class="fa-regular fa-clock me-1 text-primary"></i>` + (record.last_active_formatted || (record.days_inactive === 999 ? 'No sessions' : record.days_inactive + 'd ago')) + `</div>
                     </div>
                 </div>
             </div>
@@ -1012,13 +1040,31 @@ window.fetchUsers = fetchUsers;
 
 window.currentComplianceFilter = 'all';
 window.filterUsersByCompliance = function(status) {
-    window.currentComplianceFilter = status;
+    window.currentComplianceFilter = status || 'all';
     $('.compliance-filter-btn').removeClass('active');
-    $('.compliance-filter-btn.' + status).addClass('active');
+    $('.compliance-filter-btn.' + window.currentComplianceFilter).addClass('active');
 
-    let filtered = window.allUsersData || [];
+    if (window.updateTableFilterUI) {
+        window.updateTableFilterUI(window.currentComplianceFilter);
+    }
+
+    if (typeof latestActiveCategory !== 'undefined' && latestActiveCategory !== 'fetchUsers') {
+        if (typeof showTable === 'function') {
+            showTable('fetchUsers');
+        } else if (typeof window.switchToAdminTable === 'function') {
+            window.switchToAdminTable('fetchUsers');
+        }
+    }
+
+    let allUsers = window.allUsersData || [];
+    if (!allUsers || allUsers.length === 0) {
+        fetchUsers();
+        return;
+    }
+
+    let filtered = allUsers;
     if (status && status !== 'all') {
-        filtered = filtered.filter(u => u.compliance_status === status);
+        filtered = allUsers.filter(u => u.compliance_status === status);
     }
     setupAdminTableData('Users', filtered, renderUserRow);
 };

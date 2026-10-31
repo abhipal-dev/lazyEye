@@ -140,6 +140,28 @@ class UserController extends Controller
             } catch (\Throwable $e) {}
         }
 
+        // If any patients lack game_records, look up legacy user_game_records for accurate adherence calculation
+        $missingPatientIds = [];
+        foreach ($patients as $p) {
+            if (!isset($latestSessions[$p->id]) && empty($p->user_game_records)) {
+                $missingPatientIds[] = $p->id;
+            }
+        }
+        if (!empty($missingPatientIds) && Schema::hasColumn('users', 'user_game_records')) {
+            try {
+                $legacyRecords = DB::table('users')
+                    ->whereIn('id', $missingPatientIds)
+                    ->pluck('user_game_records', 'id')
+                    ->toArray();
+                foreach ($patients as &$p) {
+                    if (isset($legacyRecords[$p->id])) {
+                        $p->user_game_records = $legacyRecords[$p->id];
+                    }
+                }
+                unset($p);
+            } catch (\Throwable $e) {}
+        }
+
         $now = time();
         $compliantCount = 0;
         $needsReviewCount = 0;
@@ -249,11 +271,40 @@ class UserController extends Controller
             }
 
             // Support server-side pagination when requested (e.g. ?page=1 or ?per_page=20 or ?paginate=1)
-            if ($req->has('page') || $req->has('per_page') || $req->boolean('paginate')) {
+            $isPaginated = ($req->has('page') || $req->has('per_page') || $req->boolean('paginate'));
+            if ($isPaginated) {
                 $perPage = max(1, min(100, intval($req->input('per_page', 20))));
                 $data = $query->paginate($perPage);
+                $enrichedResult = self::enrichPatientsWithCompliance($data->items());
             } else {
                 $data = $query->get();
+                $enrichedResult = self::enrichPatientsWithCompliance($data);
+            }
+
+            // Optional compliance_status filtering (?compliance_status=at_risk or ?at_risk=1)
+            $complianceFilter = $req->input('compliance_status');
+            if ($req->boolean('at_risk')) {
+                $complianceFilter = 'at_risk';
+            }
+
+            if (!empty($complianceFilter) && $complianceFilter !== 'all') {
+                if ($isPaginated) {
+                    $filteredItems = array_values(array_filter($data->items(), function($u) use ($complianceFilter) {
+                        return isset($u->compliance_status) && $u->compliance_status === $complianceFilter;
+                    }));
+                    $data->setCollection(collect($filteredItems));
+                } else {
+                    $data = $data->filter(function($u) use ($complianceFilter) {
+                        return isset($u->compliance_status) && $u->compliance_status === $complianceFilter;
+                    })->values();
+                }
+            }
+
+            if ($req->boolean('with_radar')) {
+                return response()->json([
+                    'data' => $data,
+                    'radar' => $enrichedResult['radar']
+                ]);
             }
 
             return response()->json($data);
