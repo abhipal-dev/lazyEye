@@ -3,6 +3,32 @@ import ReactDOM from 'react-dom';
 import $ from "jquery";
 import {NavLink} from 'react-router-dom';
 export default class Table extends React.Component{
+    constructor(props) {
+        super(props);
+        this.state = {
+            complianceFilter: window.currentComplianceFilter || 'all'
+        };
+    }
+
+    componentDidMount() {
+        window.updateTableFilterUI = (filter) => {
+            this.setState({ complianceFilter: filter });
+        };
+    }
+
+    componentWillUnmount() {
+        if (window.updateTableFilterUI) {
+            window.updateTableFilterUI = null;
+        }
+    }
+
+    setFilter = (status) => {
+        this.setState({ complianceFilter: status });
+        if (window.filterUsersByCompliance) {
+            window.filterUsersByCompliance(status);
+        }
+    };
+
     render(){
         const role = this.props.currentUser?.accounttype || 'admin';
         const isDoctor = (role === 'doctor');
@@ -39,10 +65,34 @@ export default class Table extends React.Component{
                                             {(!this.props.activeCategory || this.props.activeCategory === 'fetchUsers') && (
                             <div className="d-flex align-items-center gap-1 p-1 rounded border font-mono small mt-2 mt-md-0" style={{ backgroundColor: 'var(--bg-surface-secondary)', borderColor: 'var(--border-color)', fontSize: '0.78rem' }}>
                                 <span className="px-2 text-sub small fw-semibold">Radar:</span>
-                                <button type="button" className="btn btn-xs btn-outline-secondary compliance-filter-btn all active px-2 py-0" onClick={() => window.filterUsersByCompliance && window.filterUsersByCompliance('all')}>All</button>
-                                <button type="button" className="btn btn-xs btn-outline-success compliance-filter-btn compliant px-2 py-0" onClick={() => window.filterUsersByCompliance && window.filterUsersByCompliance('compliant')}><i className="fa-solid fa-circle-check me-1"></i>Compliant</button>
-                                <button type="button" className="btn btn-xs btn-outline-warning compliance-filter-btn needs_review px-2 py-0" onClick={() => window.filterUsersByCompliance && window.filterUsersByCompliance('needs_review')}><i className="fa-solid fa-clock-rotate-left me-1"></i>Review</button>
-                                <button type="button" className="btn btn-xs btn-outline-danger compliance-filter-btn at_risk px-2 py-0" onClick={() => window.filterUsersByCompliance && window.filterUsersByCompliance('at_risk')}><i className="fa-solid fa-triangle-exclamation me-1"></i>At-Risk</button>
+                                <button 
+                                    type="button" 
+                                    className={`btn btn-xs ${this.state.complianceFilter === 'all' ? 'btn-secondary text-white' : 'btn-outline-secondary'} compliance-filter-btn all ${this.state.complianceFilter === 'all' ? 'active' : ''} px-2 py-0`} 
+                                    onClick={() => this.setFilter('all')}
+                                >
+                                    All
+                                </button>
+                                <button 
+                                    type="button" 
+                                    className={`btn btn-xs ${this.state.complianceFilter === 'compliant' ? 'btn-success text-white' : 'btn-outline-success'} compliance-filter-btn compliant ${this.state.complianceFilter === 'compliant' ? 'active' : ''} px-2 py-0`} 
+                                    onClick={() => this.setFilter('compliant')}
+                                >
+                                    <i className="fa-solid fa-circle-check me-1"></i>Compliant
+                                </button>
+                                <button 
+                                    type="button" 
+                                    className={`btn btn-xs ${this.state.complianceFilter === 'needs_review' ? 'btn-warning text-dark' : 'btn-outline-warning'} compliance-filter-btn needs_review ${this.state.complianceFilter === 'needs_review' ? 'active' : ''} px-2 py-0`} 
+                                    onClick={() => this.setFilter('needs_review')}
+                                >
+                                    <i className="fa-solid fa-clock-rotate-left me-1"></i>Review
+                                </button>
+                                <button 
+                                    type="button" 
+                                    className={`btn btn-xs ${this.state.complianceFilter === 'at_risk' ? 'btn-danger text-white' : 'btn-outline-danger'} compliance-filter-btn at_risk ${this.state.complianceFilter === 'at_risk' ? 'active' : ''} px-2 py-0`} 
+                                    onClick={() => this.setFilter('at_risk')}
+                                >
+                                    <i className="fa-solid fa-triangle-exclamation me-1"></i>At-Risk
+                                </button>
                             </div>
                         )}
 
