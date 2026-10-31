@@ -2228,7 +2228,7 @@ tr.patient-record-row:hover td {
   line-height: 1.5 !important;
   text-align: center !important;
   overflow: hidden !important;
-  animation: swal2ModernIn 0.3s cubic-bezier(0.16, 1, 0.3, 1) forwards !important;
+  animation: swal2ModernIn 0.25s cubic-bezier(0.16, 1, 0.3, 1) forwards;
 }
 
 /* Light Theme Card */
@@ -2607,3 +2607,7 @@ tr.patient-record-row:hover td {
     transform: scale(1) translateY(0);
   }
 }
+
+
+.swal2-container .swal2-popup.swal2-hide, .swal2-popup.swal2-hide { animation: swal2-hide 0.15s forwards !important; display: none !important; }
+.swal2-container.swal2-backdrop-hide { display: none !important; }

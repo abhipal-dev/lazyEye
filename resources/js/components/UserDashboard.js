@@ -226,7 +226,11 @@ export default class UserDashboard extends React.Component {
                         title: 'Therapy Session Logged!',
                         html: `You completed <strong>${result.elapsedFormatted || '00:01'}</strong> in <strong>${gameName}</strong>.<br><br><span class="badge bg-primary fs-6" style="padding: 6px 16px; border-radius: 9999px; background: rgba(16, 185, 129, 0.2); color: #10b981; font-weight: 700;">+${result.score || 0} pts</span>`,
                         icon: 'success',
-                        confirmButtonText: 'Great, Continue'
+                        confirmButtonText: 'Great, Continue',
+                        allowOutsideClick: true
+                    }).then(() => {
+                        document.querySelectorAll('.swal2-container').forEach(el => el.remove());
+                        document.body.classList.remove('swal2-shown', 'swal2-height-auto');
                     });
                 }
             },
@@ -237,7 +241,11 @@ export default class UserDashboard extends React.Component {
                         title: 'Session Recorded!',
                         html: `You completed <strong>${result.elapsedFormatted || '00:01'}</strong> in <strong>${gameName}</strong>.<br><br><span class="badge bg-primary fs-6" style="padding: 6px 16px; border-radius: 9999px; background: rgba(16, 185, 129, 0.2); color: #10b981; font-weight: 700;">+${result.score || 0} pts</span>`,
                         icon: 'success',
-                        confirmButtonText: 'Great, Continue'
+                        confirmButtonText: 'Great, Continue',
+                        allowOutsideClick: true
+                    }).then(() => {
+                        document.querySelectorAll('.swal2-container').forEach(el => el.remove());
+                        document.body.classList.remove('swal2-shown', 'swal2-height-auto');
                     });
                 }
             }
