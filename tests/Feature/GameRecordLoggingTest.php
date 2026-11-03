@@ -235,3 +235,4 @@ class GameRecordLoggingTest extends TestCase
         $this->assertEquals('progressive', $user->game_speed);
     }
 }
+
