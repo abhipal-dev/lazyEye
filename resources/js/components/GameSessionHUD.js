@@ -27,12 +27,47 @@ export default class GameSessionHUD extends React.Component {
 
         // Default to upright orientation (only rotate if user explicitly taps Rotate in Menu)
         this.setState({ isRotated: false });
+        setTimeout(() => this.postCalibrationToIframe(), 300);
     }
 
     componentWillUnmount() {
         this.stopTimer();
         window.removeEventListener('message', this.handleIframeMessage);
     }
+
+    postCalibrationToIframe = () => {
+        const iframe = document.getElementById('session-game-iframe');
+        if (!iframe || !iframe.contentWindow) return;
+
+        let cal = this.props.userCalibration;
+        if (!cal) {
+            try {
+                const stored = localStorage.getItem('lazyeye_lens_calibration');
+                if (stored) cal = JSON.parse(stored);
+            } catch (e) {}
+        }
+        if (!cal) cal = {};
+
+        const leftColor = cal.leftHex || cal.leftColor || '#ef4444';
+        const rightColor = cal.rightHex || cal.rightColor || '#06b6d4';
+        const leftName = cal.leftEyeColor || cal.leftColorName || 'red';
+        const rightName = cal.rightEyeColor || cal.rightColorName || 'cyan';
+
+        try {
+            iframe.contentWindow.postMessage({
+                leftColor,
+                rightColor,
+                leftColorName: leftName,
+                rightColorName: rightName,
+                leftContrast: cal.leftContrast || 255,
+                rightContrast: cal.rightContrast || 255
+            }, '*');
+        } catch (e) {}
+    };
+
+    handleIframeLoad = () => {
+        this.postCalibrationToIframe();
+    };
 
     togglePauseModal = () => {
         this.setState(prev => {
@@ -93,6 +128,11 @@ export default class GameSessionHUD extends React.Component {
 
     handleIframeMessage = (event) => {
         if (!event.data) return;
+
+        // Synchronize chromatic calibration when child game begins
+        if (event.data === 'Game Started' || event.data?.msg === 'Game Started') {
+            this.postCalibrationToIframe();
+        }
 
         // Listen for live score updates from game engine
         if (event.data.score !== undefined && !isNaN(event.data.score)) {
@@ -324,6 +364,7 @@ export default class GameSessionHUD extends React.Component {
                         src={gameRoute} 
                         allow="fullscreen" 
                         title={title}
+                        onLoad={this.handleIframeLoad}
                         style={this.state.isRotated ? {
                             position: 'absolute',
                             top: '50%',
