@@ -1314,19 +1314,26 @@ class UserController extends Controller
 
     public function saveColorSettings(Request $req){
         return self::safelyQuery(function() use ($req) {
-            $payload = [
-                'left_eye_color' => $req->left_eye_color,
-                'right_eye_color' => $req->right_eye_color,
-                'left_eye_contrastvalue' => $req->left_eye_contrastvalue,
-                'right_eye_contrastvalue' => $req->right_eye_contrastvalue,
-                'left_eye_contrast_color' => $req->left_eye_contrast_color,
-                'right_eye_contrast_color' => $req->right_eye_contrast_color
-            ];
-            if ($req->has('game_speed') && !empty($req->game_speed)) {
-                $payload['game_speed'] = $req->game_speed;
+            $id = $req->input('id');
+            if (!$id) {
+                list($authId, $role) = self::getAuthUser($req);
+                $id = $authId ?: session('loggedInUser');
             }
-            $data = DB::table('users')->where('id', $req->id)->update($payload);
-            return $data;
+            $payload = [
+                'left_eye_color' => $req->input('left_eye_color', 'red'),
+                'right_eye_color' => $req->input('right_eye_color', 'cyan'),
+                'left_eye_contrastvalue' => intval($req->input('left_eye_contrastvalue', 255)),
+                'right_eye_contrastvalue' => intval($req->input('right_eye_contrastvalue', 255)),
+                'left_eye_contrast_color' => $req->input('left_eye_contrast_color', '#ff0000'),
+                'right_eye_contrast_color' => $req->input('right_eye_contrast_color', '#00ffff')
+            ];
+            if ($req->filled('game_speed')) {
+                $payload['game_speed'] = $req->input('game_speed');
+            }
+            if ($id) {
+                DB::table('users')->where('id', $id)->update($payload);
+            }
+            return response()->json(['status' => 'success', 'data' => $payload]);
         });
     }
 
