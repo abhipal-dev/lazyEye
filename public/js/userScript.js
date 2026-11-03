@@ -272,36 +272,84 @@ function sweetAlert(head, msg, type) {
 
 
 $(document).on('submit', 'form[name="imageUpload"]', function (e) {
-  e.preventDefault();
-  let form = $(this);
-  let formData = new FormData($(this)[0]);
-  let token = $('meta[name="csrf-token"]').attr('content');
-  console.log(formData)
-  $.ajax({
-    url: "/uploadImage",
-    type: "post",
-    processData: false,
-    contentType: false,
-    headers: { 'X-CSRF-TOKEN': token },
-    data: formData,
-    success: function (data) {
-      if (data) {
-        $('#uploadImageModal').modal('hide')
-        Swal.fire(
-          'Updation Success!',
-          'User profile image is updated',
-          'success'
-        )
-      }
-      else {
-        $('#uploadImageModal').modal('hide')
-        Swal.fire(
-          'Updation Failed!',
-          'User profile image is not updated',
-          'error'
-        )
-      }
-      $('form[name="imageUpload"]').reset();
+    e.preventDefault();
+    let form = $(this);
+    let submitBtn = form.find('button[type="submit"]');
+    let originalBtnHtml = submitBtn.html();
+
+    submitBtn.prop('disabled', true).html('<i class="fa-solid fa-spinner fa-spin me-1"></i> Uploading...');
+
+    let formData = new FormData(form[0]);
+    let token = $('meta[name="csrf-token"]').attr('content');
+
+    // Ensure user ID is attached if hidden field was empty
+    if (!formData.get('id')) {
+        let secId = document.querySelector('section#user')?.dataset?.id || 
+                    document.querySelector('section#admin')?.dataset?.id || '';
+        if (secId) formData.set('id', secId);
     }
-  });
+
+    $.ajax({
+        url: "/uploadImage",
+        type: "post",
+        processData: false,
+        contentType: false,
+        headers: { 'X-CSRF-TOKEN': token },
+        data: formData,
+        success: function (data) {
+            submitBtn.prop('disabled', false).html(originalBtnHtml);
+            let isSuccess = data && (data.success || data.image_address || (typeof data === 'string' && data.includes('public/images')));
+
+            if (isSuccess) {
+                let imgAddress = (typeof data === 'object' && data.image_address) ? data.image_address : (typeof data === 'string' ? data.replace(/^public\/images\//, '') : '');
+                let newUrl = (data && data.image_url) ? data.image_url : ('/storage/images/' + imgAddress + '?v=' + Date.now());
+
+                // Update all profile avatars currently in the DOM
+                $('#navbarDropdown img, .navbar-nav img, .user-avatar-img, .profile-avatar-img, #userDetailsModal img[alt="Avatar"]').each(function() {
+                    $(this).attr('src', newUrl).show();
+                });
+
+                // Dispatch global event for React components to update state
+                window.dispatchEvent(new CustomEvent('lazyeye:profile-updated', {
+                    detail: {
+                        image_address: imgAddress,
+                        image_url: newUrl
+                    }
+                }));
+
+                $('#uploadImageModal').modal('hide');
+                if (form[0] && typeof form[0].reset === 'function') {
+                    form[0].reset();
+                }
+
+                Swal.fire({
+                    title: 'Photo Updated!',
+                    text: (data && data.message) ? data.message : 'Your profile photo has been updated successfully.',
+                    icon: 'success',
+                    confirmButtonColor: '#2563eb'
+                });
+            } else {
+                Swal.fire({
+                    title: 'Update Failed',
+                    text: (data && data.message) ? data.message : 'User profile image could not be updated.',
+                    icon: 'error',
+                    confirmButtonColor: '#2563eb'
+                });
+            }
+        },
+        error: function (xhr) {
+            submitBtn.prop('disabled', false).html(originalBtnHtml);
+            let msg = 'Failed to upload photo. Please check your image format and try again.';
+            if (xhr.responseJSON && xhr.responseJSON.message) {
+                msg = xhr.responseJSON.message;
+            }
+            Swal.fire({
+                title: 'Upload Error',
+                text: msg,
+                icon: 'error',
+                confirmButtonColor: '#2563eb'
+            });
+        }
+    });
+});
 });

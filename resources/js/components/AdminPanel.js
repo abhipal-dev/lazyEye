@@ -36,6 +36,20 @@ export default class AdminDashboard extends React.Component {
             this.switchToTable(categoryFn);
         };
 
+        window.addEventListener('lazyeye:profile-updated', (e) => {
+            if (e && e.detail && (e.detail.image_address || e.detail.image_url)) {
+                const addr = e.detail.image_address;
+                const newImgPath = addr ? `storage/images/${addr}?v=${Date.now()}` : this.state.userProfileImage;
+                this.setState(prevState => ({
+                    userProfileImage: newImgPath,
+                    data: {
+                        ...prevState.data,
+                        image_address: addr || prevState.data?.image_address
+                    }
+                }));
+            }
+        });
+
         let token = $('meta[name="csrf-token"]').attr('content');
         $.ajax({
             url: "/fetchLoginUser",
@@ -49,7 +63,7 @@ export default class AdminDashboard extends React.Component {
                         fullname: data[0].fullname,
                         username: data[0].username,
                         data: data[0],
-                        userProfileImage: `storage/images/${data[0].image_address}`
+                        userProfileImage: `storage/images/${data[0].image_address}?v=${Date.now()}`
                     });
                 }
             }
@@ -130,7 +144,7 @@ export default class AdminDashboard extends React.Component {
                                         <span>{(this.state.fullname ? this.state.fullname.charAt(0) : (isDoctor ? 'D' : 'A')).toUpperCase()}</span>
                                         {this.state.userProfileImage && !this.state.userProfileImage.includes('default') && (
                                             <img 
-                                                src={encodeURI(`/${this.state.userProfileImage}`)} 
+                                                src={encodeURI(this.state.userProfileImage.startsWith("/") ? this.state.userProfileImage : `/${this.state.userProfileImage}`)} 
                                                 alt="" 
                                                 className="position-absolute top-0 start-0 w-100 h-100 rounded-circle" 
                                                 style={{ objectFit: 'cover' }} 
@@ -150,7 +164,7 @@ export default class AdminDashboard extends React.Component {
                                                 <span>{(this.state.fullname ? this.state.fullname.charAt(0) : 'A').toUpperCase()}</span>
                                                 {this.state.userProfileImage && !this.state.userProfileImage.includes('default') && (
                                                     <img 
-                                                        src={encodeURI(`/${this.state.userProfileImage}`)} 
+                                                        src={encodeURI(this.state.userProfileImage.startsWith("/") ? this.state.userProfileImage : `/${this.state.userProfileImage}`)} 
                                                         alt="" 
                                                         className="position-absolute top-0 start-0 w-100 h-100 rounded-circle" 
                                                         style={{ objectFit: 'cover' }} 

@@ -84,12 +84,17 @@ Route::get('/storage/images/{filename}', function ($filename) {
         public_path('storage/images/' . $decoded),
         public_path('images/' . $decoded),
         storage_path('app/public/images/' . $decoded),
-        public_path('images/user_4_avatar.png'),
+        public_path('images/0_default_male_profile_image.png'),
+        public_path('images/default.png'),
     ];
     foreach ($candidates as $filePath) {
         if (file_exists($filePath)) {
-            $mime = (str_ends_with(strtolower($filePath), '.jpg') || str_ends_with(strtolower($filePath), '.jpeg')) ? 'image/jpeg' : 'image/png';
-            return response()->file($filePath, ['Content-Type' => $mime]);
+            $ext = strtolower(pathinfo($filePath, PATHINFO_EXTENSION));
+            $mime = ($ext === 'jpg' || $ext === 'jpeg') ? 'image/jpeg' : (($ext === 'webp') ? 'image/webp' : 'image/png');
+            return response()->file($filePath, [
+                'Content-Type' => $mime,
+                'Cache-Control' => 'no-cache, must-revalidate'
+            ]);
         }
     }
     return response()->file(public_path('images/lazyeye-icon.svg'), ['Content-Type' => 'image/svg+xml']);
@@ -101,12 +106,17 @@ Route::get('/images/{filename}', function ($filename) {
         public_path('images/' . $decoded),
         public_path('storage/images/' . $decoded),
         storage_path('app/public/images/' . $decoded),
-        public_path('images/user_4_avatar.png'),
+        public_path('images/0_default_male_profile_image.png'),
+        public_path('images/default.png'),
     ];
     foreach ($candidates as $filePath) {
         if (file_exists($filePath)) {
-            $mime = (str_ends_with(strtolower($filePath), '.jpg') || str_ends_with(strtolower($filePath), '.jpeg')) ? 'image/jpeg' : 'image/png';
-            return response()->file($filePath, ['Content-Type' => $mime]);
+            $ext = strtolower(pathinfo($filePath, PATHINFO_EXTENSION));
+            $mime = ($ext === 'jpg' || $ext === 'jpeg') ? 'image/jpeg' : (($ext === 'webp') ? 'image/webp' : 'image/png');
+            return response()->file($filePath, [
+                'Content-Type' => $mime,
+                'Cache-Control' => 'no-cache, must-revalidate'
+            ]);
         }
     }
     return response()->file(public_path('images/lazyeye-icon.svg'), ['Content-Type' => 'image/svg+xml']);
