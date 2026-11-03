@@ -1346,11 +1346,19 @@ class UserController extends Controller
 
     public function saveGameRecords(Request $req){
         return self::safelyQuery(function() use ($req) {
+            $id = $req->input('id');
+            if (!$id) {
+                list($authId, $role) = self::getAuthUser($req);
+                $id = $authId ?: session('loggedInUser');
+            }
+
             // 1. Maintain string_score for legacy compatibility
             if ($req->has('string_score') && !empty($req->string_score)) {
-                DB::table('users')->where('id', $req->id)->update([
-                    'user_game_records' => $req->string_score
-                ]);
+                if ($id) {
+                    DB::table('users')->where('id', $id)->update([
+                        'user_game_records' => $req->string_score
+                    ]);
+                }
             }
 
             // 2. High performance normalized insert into game_records in UTC
@@ -1360,17 +1368,18 @@ class UserController extends Controller
             $utcNow = gmdate('Y-m-d H:i:s');
 
             // Fallback: extract latest entry from score array if game_name wasn't passed directly
-            if (empty($gameName) && !empty($req->score) && is_array($req->score)) {
-                $latestBatch = end($req->score);
+            $scores = $req->input('score');
+            if (empty($gameName) && !empty($scores) && is_array($scores)) {
+                $latestBatch = end($scores);
                 if (is_array($latestBatch)) {
                     $gameName = key($latestBatch);
                     $score = intval(current($latestBatch));
                 }
             }
 
-            if (!empty($gameName)) {
+            if (!empty($gameName) && $id) {
                 DB::table('game_records')->insert([
-                    'user_id' => $req->id,
+                    'user_id' => $id,
                     'game_name' => $gameName,
                     'score' => $score,
                     'duration_seconds' => $duration,
