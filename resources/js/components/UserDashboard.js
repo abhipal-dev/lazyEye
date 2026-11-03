@@ -18,85 +18,18 @@ import moment from 'moment';
 
 var frameRef = React.createRef(null);
 let message = {}
-$(document).ready(function () {
-    // Check if calibration elements exist on current page
-    const leftEye = document.getElementById('leftEyeColor');
-    const rightEye = document.getElementById('rightEyeColor');
-    if (!leftEye || !rightEye) {
-        return; // Elements not present on this page (e.g. Login / Welcome page)
-    }
-
-    var l, r, leftDiv, rightDiv, leftColor, rightColor;
-
-    //  'l' and 'r' references to contrast sliders
-    l = document.querySelector('#leftColorContrastSlider');
-    r = document.querySelector('#rightColorContrastSlider');
-
-    // 'leftDiv' & 'rightDiv' are references to left and right color div
-    leftDiv = document.querySelector('#leftColorTestDiv');
-    rightDiv = document.querySelector('#rightColorTestDiv');
-
-    // 'leftColor' & 'rightColor' are references to left and right color options
-    leftColor = leftEye.value;
-    rightColor = rightEye.value;
-
-    function pad(n) {
-        return (n.length < 2) ? "0" + n : n;
-    }
-    function makeColor(color, contrastValue) {
-        let hex, r_hex;
-        r_hex = parseInt(contrastValue, 10).toString(16)
-        if (color === 'red') {
-            return hex = "#" + pad(r_hex) + pad("00") + pad("00");
-        }
-        else if (color === 'green') {
-            return hex = "#" + pad('00') + pad(r_hex) + pad("00");
-        }
-        else if (color === 'blue') {
-            return hex = "#" + pad("00") + pad("00") + pad(r_hex);
-        }
-    }
-    function setLeftColor() {
-        var hex;
-        leftColor = document.getElementById('leftEyeColor').value //getting left options color value
-        hex = makeColor(leftColor, l.value)
-        console.log("Left color :" + leftColor)
-        console.log("Color code :" + hex)
-        leftDiv.style.backgroundColor = hex;
-        leftDiv.innerHTML = hex;
-    }
-
-    function setRightColor() {
-        var hex;
-        rightColor = document.getElementById('rightEyeColor').value
-        hex = makeColor(rightColor, r.value)
-        console.log("right color :" + rightColor)
-        console.log("Color code :" + hex)
-        rightDiv.style.backgroundColor = hex;
-        rightDiv.innerHTML = hex;
-    }
-
-    l.addEventListener('change', function () {
-        console.log('left Changed')
-        setLeftColor();
-    }, false);
-    l.addEventListener('input', function () {
-        console.log('left Changed')
-
-        setLeftColor();
-    }, false);
-    r.addEventListener('change', function () {
-        console.log('right Changed')
-
-        setRightColor();
-    }, false);
-    r.addEventListener('input', function () {
-        console.log('right Changed')
-
-        setRightColor();
-    }, false);
-
-});
+// Dichoptic lens calibration helpers
+const padHex = (n) => (n.length < 2 ? "0" + n : n);
+const buildColorHex = (color, contrastValue) => {
+    const val = Math.max(0, Math.min(255, parseInt(contrastValue, 10) || 0));
+    const r_hex = padHex(val.toString(16));
+    const c = (color || 'red').toLowerCase();
+    if (c === 'red') return "#" + r_hex + "0000";
+    if (c === 'green') return "#00" + r_hex + "00";
+    if (c === 'blue') return "#0000" + r_hex;
+    if (c === 'cyan') return "#00" + r_hex + r_hex;
+    return "#" + r_hex + "0000";
+};
 
 export default class UserDashboard extends React.Component {
     constructor(props) {
@@ -110,7 +43,15 @@ export default class UserDashboard extends React.Component {
             userProfileImage: '',
             current_component: 'user',
             date_format: "DD/MM/YYYY",
-            activeSession: null
+            activeSession: null,
+            calibration: {
+                leftEyeColor: 'red',
+                rightEyeColor: 'cyan',
+                leftContrast: 255,
+                rightContrast: 255,
+                leftHex: '#ff0000',
+                rightHex: '#00ffff'
+            }
         }
     }
     
@@ -270,7 +211,15 @@ export default class UserDashboard extends React.Component {
                         data: data[0],
                         data2: data,
                         today_games_summary: data[0].today_games_summary || {},
-                        userProfileImage: `storage/images/${data[0].image_address}?v=${Date.now()}`
+                        userProfileImage: `storage/images/${data[0].image_address}?v=${Date.now()}`,
+                        calibration: {
+                            leftEyeColor: data[0].left_eye_color || 'red',
+                            rightEyeColor: data[0].right_eye_color || (data[0].left_eye_color === 'red' ? 'cyan' : 'blue'),
+                            leftContrast: parseInt(data[0].left_eye_contrastvalue, 10) || 255,
+                            rightContrast: parseInt(data[0].right_eye_contrastvalue, 10) || 255,
+                            leftHex: data[0].left_eye_contrast_color || buildColorHex(data[0].left_eye_color || 'red', data[0].left_eye_contrastvalue || 255),
+                            rightHex: data[0].right_eye_contrast_color || buildColorHex(data[0].right_eye_color || 'cyan', data[0].right_eye_contrastvalue || 255)
+                        }
                     });
                     const leftDiv = document.querySelector('#leftColorTestDiv');
                     const rightDiv = document.querySelector('#rightColorTestDiv');
@@ -324,88 +273,109 @@ export default class UserDashboard extends React.Component {
     }
     pad = (n) => {
         return (n.length < 2) ? "0" + n : n;
-    }
-    makeColor(color, contrastValue) {
-        let hex, r_hex;
-        r_hex = parseInt(contrastValue, 10).toString(16)
-        if (color === 'red') {
-            return hex = "#" + this.pad(r_hex) + this.pad("00") + this.pad("00");
-        }
-        else if (color === 'green') {
-            return hex = "#" + this.pad('00') + this.pad(r_hex) + this.pad("00");
-        }
-        else if (color === 'blue') {
-            return hex = "#" + this.pad("00") + this.pad("00") + this.pad(r_hex);
-        }
-    }
-    changeColor = (eyeSide) => {
-        console.log(this.state.username)
-        console.log(this.state.fullname)
-        let hex, leftColor, rightColor,
-            l = document.querySelector('#leftColorContrastSlider'),
-            r = document.querySelector('#rightColorContrastSlider'),
-            leftDiv = document.querySelector('#leftColorTestDiv'),
-            rightDiv = document.querySelector('#rightColorTestDiv')
-        if (eyeSide === 'left') {
-            leftColor = document.getElementById('leftEyeColor').value
-            hex = this.makeColor(leftColor, l.value)
-            console.log("left color :" + leftColor)
-            console.log("Color code :" + hex)
-            leftDiv.style.backgroundColor = hex;
-            leftDiv.innerHTML = hex;
-        }
-        else if (eyeSide === 'right') {
-            rightColor = document.getElementById('rightEyeColor').value
-            hex = this.makeColor(rightColor, r.value)
-            console.log("right color :" + rightColor)
-            console.log("Color code :" + hex)
-            rightDiv.style.backgroundColor = hex;
-            rightDiv.innerHTML = hex;
-        }
-    }
+    };
 
+    makeColor = (color, contrastValue) => {
+        return buildColorHex(color, contrastValue);
+    };
 
-    saveColorSettings() {
-        console.log("Save Color Settings")
-        let l = document.querySelector('#leftColorContrastSlider'),
-            r = document.querySelector('#rightColorContrastSlider'),
-            leftDiv = document.querySelector('#leftColorTestDiv'),
-            rightDiv = document.querySelector('#rightColorTestDiv')
-        leftColor = document.getElementById('leftEyeColor').value
-        rightColor = document.getElementById('rightEyeColor').value
-        let leftContrastColor = leftDiv.innerHTML
-        let rightContrastColor = rightDiv.innerHTML
+    handleEyeColorChange = (eyeSide, color) => {
+        this.setState(prev => {
+            const cal = { ...prev.calibration };
+            if (eyeSide === 'left') {
+                cal.leftEyeColor = color;
+                cal.leftHex = buildColorHex(color, cal.leftContrast);
+            } else {
+                cal.rightEyeColor = color;
+                cal.rightHex = buildColorHex(color, cal.rightContrast);
+            }
+            return { calibration: cal };
+        });
+    };
 
-        console.log(l.value)
-        console.log(r.value)
-        console.log(leftColor)
-        console.log(rightColor)
-        console.log(leftContrastColor)
-        console.log(rightContrastColor)
+    handleContrastChange = (eyeSide, value) => {
+        const val = Math.max(0, Math.min(255, parseInt(value, 10) || 0));
+        this.setState(prev => {
+            const cal = { ...prev.calibration };
+            if (eyeSide === 'left') {
+                cal.leftContrast = val;
+                cal.leftHex = buildColorHex(cal.leftEyeColor, val);
+            } else {
+                cal.rightContrast = val;
+                cal.rightHex = buildColorHex(cal.rightEyeColor, val);
+            }
+            return { calibration: cal };
+        });
+    };
 
-        let token = $('meta[name="csrf-token"]').attr('content');
+    applyCalibrationPreset = (preset) => {
+        let leftEyeColor = 'red', rightEyeColor = 'cyan';
+        if (preset === 'red-blue') {
+            rightEyeColor = 'blue';
+        } else if (preset === 'red-green') {
+            rightEyeColor = 'green';
+        }
+        const leftHex = buildColorHex(leftEyeColor, 255);
+        const rightHex = buildColorHex(rightEyeColor, 255);
+        this.setState({
+            calibration: {
+                leftEyeColor,
+                rightEyeColor,
+                leftContrast: 255,
+                rightContrast: 255,
+                leftHex,
+                rightHex
+            }
+        });
+    };
+
+    saveColorSettings = () => {
+        const { calibration } = this.state;
         const speedVal = document.getElementById('userTherapySpeed')?.value || this.state.data?.game_speed || 'level-3';
+        const userId = this.props.id || this.state.id || document.querySelector('section#user')?.dataset?.id;
+
+        try {
+            localStorage.setItem('lazyeye_lens_calibration', JSON.stringify({
+                leftColor: calibration.leftHex,
+                rightColor: calibration.rightHex,
+                leftColorName: calibration.leftEyeColor,
+                rightColorName: calibration.rightEyeColor,
+                leftContrast: calibration.leftContrast,
+                rightContrast: calibration.rightContrast
+            }));
+        } catch (e) {}
+
+        const token = $('meta[name="csrf-token"]').attr('content');
         $.ajax({
             url: "/saveColorSettings",
             type: "post",
             headers: { 'X-CSRF-TOKEN': token },
             data: {
-                id: this.props.id,
-                left_eye_contrastvalue: l.value,
-                right_eye_contrastvalue: r.value,
-                left_eye_color: leftColor,
-                right_eye_color: rightColor,
-                left_eye_contrast_color: leftContrastColor,
-                right_eye_contrast_color: rightContrastColor,
+                id: userId,
+                left_eye_contrastvalue: calibration.leftContrast,
+                right_eye_contrastvalue: calibration.rightContrast,
+                left_eye_color: calibration.leftEyeColor,
+                right_eye_color: calibration.rightEyeColor,
+                left_eye_contrast_color: calibration.leftHex,
+                right_eye_contrast_color: calibration.rightHex,
                 game_speed: speedVal
             },
-            success: (data) => {
-                console.log(data)
+            success: (res) => {
+                this.setState(prev => ({
+                    data: {
+                        ...prev.data,
+                        left_eye_color: calibration.leftEyeColor,
+                        right_eye_color: calibration.rightEyeColor,
+                        left_eye_contrastvalue: calibration.leftContrast,
+                        right_eye_contrastvalue: calibration.rightContrast,
+                        left_eye_contrast_color: calibration.leftHex,
+                        right_eye_contrast_color: calibration.rightHex,
+                        game_speed: speedVal
+                    }
+                }));
             }
         });
-
-
-    }
+    };
     render() {
         const isAdmin = (this.state.data && this.state.data.accounttype === 'admin') || this.props.type === 'admin';
 
@@ -715,54 +685,206 @@ export default class UserDashboard extends React.Component {
                                     <h5 className="modal-title fw-bold text-main mb-0" id="colorSettingLabel">
                                         <i className="fa-solid fa-glasses text-primary me-2"></i>Dichoptic Glasses Calibration
                                     </h5>
-                                    <small className="text-sub">Adjust colors and contrast so each eye sees only its designated elements</small>
+                                    <small className="text-sub">Fine-tune RGB chromatic filters and eliminate ghosting crosstalk for physical 3D glasses</small>
                                 </div>
                                 <button type="button" className="btn-close" data-bs-dismiss="modal" aria-label="Close" onClick={() => this.saveColorSettings()}></button>
                             </div>
                             <div className="modal-body p-4">
+                                {/* Preset quick selector */}
+                                <div className="d-flex align-items-center justify-content-between flex-wrap gap-2 mb-4 p-2 px-3 rounded-pill" style={{ backgroundColor: 'rgba(15, 23, 42, 0.6)', border: '1px solid #334155' }}>
+                                    <span className="small text-white-50 fw-semibold"><i className="fa-solid fa-wand-magic-sparkles me-1 text-warning"></i>Presets:</span>
+                                    <div className="d-flex gap-2 flex-wrap">
+                                        <button 
+                                            type="button" 
+                                            className="btn btn-xs btn-sm btn-outline-info rounded-pill px-3 py-1"
+                                            onClick={() => this.applyCalibrationPreset('red-cyan')}
+                                        >
+                                            Red - Cyan (Standard)
+                                        </button>
+                                        <button 
+                                            type="button" 
+                                            className="btn btn-xs btn-sm btn-outline-primary rounded-pill px-3 py-1"
+                                            onClick={() => this.applyCalibrationPreset('red-blue')}
+                                        >
+                                            Red - Blue
+                                        </button>
+                                        <button 
+                                            type="button" 
+                                            className="btn btn-xs btn-sm btn-outline-success rounded-pill px-3 py-1"
+                                            onClick={() => this.applyCalibrationPreset('red-green')}
+                                        >
+                                            Red - Green
+                                        </button>
+                                    </div>
+                                </div>
+
                                 <div className="row g-4">
+                                    {/* Left Eye Calibration Card */}
                                     <div className="col-12 col-md-6">
-                                        <div className="p-3 rounded-4" style={{ backgroundColor: "#0f172a", border: "1px solid #334155" }}>
+                                        <div className="p-3 rounded-4 h-100" style={{ backgroundColor: "#0f172a", border: "1px solid #334155" }}>
                                             <div className="d-flex align-items-center justify-content-between mb-2">
                                                 <span className="badge bg-danger px-3 py-2">Left Eye</span>
-                                                <small className="text-white-50">Filter Check</small>
+                                                <span className="badge bg-dark text-white-50 border border-secondary">
+                                                    {Math.round(((this.state.calibration?.leftContrast ?? 255) / 255) * 100)}% Contrast
+                                                </span>
                                             </div>
-                                            <div id="leftColorTestDiv" className="d-flex align-items-center justify-content-center mx-auto my-3 text-white fw-bold shadow" style={{ height: "130px", width: "130px", borderRadius: "50%", border: "3px solid rgba(255,255,255,0.2)", fontSize: "0.9rem" }}></div>
+                                            <div 
+                                                id="leftColorTestDiv" 
+                                                className="d-flex align-items-center justify-content-center mx-auto my-3 text-white fw-bold shadow" 
+                                                style={{ 
+                                                    height: "120px", 
+                                                    width: "120px", 
+                                                    borderRadius: "50%", 
+                                                    border: "3px solid rgba(255,255,255,0.2)", 
+                                                    fontSize: "0.85rem",
+                                                    backgroundColor: this.state.calibration?.leftHex || '#ff0000',
+                                                    boxShadow: `0 0 20px ${this.state.calibration?.leftHex || '#ff0000'}44`
+                                                }}
+                                            >
+                                                {this.state.calibration?.leftHex || '#ff0000'}
+                                            </div>
                                             <div className="mb-3">
-                                                <label className="form-label text-white small fw-semibold">Lens Color</label>
-                                                <select id="leftEyeColor" className="form-select bg-dark text-white border-secondary" onChange={this.changeColor.bind(this, 'left')}>
+                                                <label className="form-label text-white small fw-semibold">Lens Filter Color</label>
+                                                <select 
+                                                    id="leftEyeColor" 
+                                                    className="form-select bg-dark text-white border-secondary" 
+                                                    value={this.state.calibration?.leftEyeColor || 'red'}
+                                                    onChange={(e) => this.handleEyeColorChange('left', e.target.value)}
+                                                >
                                                     <option value="red">Red Filter</option>
-                                                    <option value="green">Green Filter</option>
+                                                    <option value="cyan">Cyan Filter</option>
                                                     <option value="blue">Blue Filter</option>
+                                                    <option value="green">Green Filter</option>
                                                 </select>
                                             </div>
                                             <div>
-                                                <label className="form-label text-white small fw-semibold">Contrast Balance (0 - 255)</label>
-                                                <input type="range" min="0" max="255" id="leftColorContrastSlider" step="1" className="form-range" />
+                                                <div className="d-flex justify-content-between align-items-center mb-1">
+                                                    <label className="form-label text-white small fw-semibold mb-0">Contrast Level</label>
+                                                    <small className="text-white-50">{this.state.calibration?.leftContrast ?? 255} / 255</small>
+                                                </div>
+                                                <input 
+                                                    type="range" 
+                                                    min="0" 
+                                                    max="255" 
+                                                    id="leftColorContrastSlider" 
+                                                    step="1" 
+                                                    className="form-range" 
+                                                    value={this.state.calibration?.leftContrast ?? 255}
+                                                    onChange={(e) => this.handleContrastChange('left', e.target.value)}
+                                                />
                                             </div>
                                         </div>
                                     </div>
+
+                                    {/* Right Eye Calibration Card */}
                                     <div className="col-12 col-md-6">
-                                        <div className="p-3 rounded-4" style={{ backgroundColor: "#0f172a", border: "1px solid #334155" }}>
+                                        <div className="p-3 rounded-4 h-100" style={{ backgroundColor: "#0f172a", border: "1px solid #334155" }}>
                                             <div className="d-flex align-items-center justify-content-between mb-2">
                                                 <span className="badge bg-primary px-3 py-2">Right Eye</span>
-                                                <small className="text-white-50">Filter Check</small>
+                                                <span className="badge bg-dark text-white-50 border border-secondary">
+                                                    {Math.round(((this.state.calibration?.rightContrast ?? 255) / 255) * 100)}% Contrast
+                                                </span>
                                             </div>
-                                            <div id="rightColorTestDiv" className="d-flex align-items-center justify-content-center mx-auto my-3 text-white fw-bold shadow" style={{ height: "130px", width: "130px", borderRadius: "50%", border: "3px solid rgba(255,255,255,0.2)", fontSize: "0.9rem" }}></div>
+                                            <div 
+                                                id="rightColorTestDiv" 
+                                                className="d-flex align-items-center justify-content-center mx-auto my-3 text-white fw-bold shadow" 
+                                                style={{ 
+                                                    height: "120px", 
+                                                    width: "120px", 
+                                                    borderRadius: "50%", 
+                                                    border: "3px solid rgba(255,255,255,0.2)", 
+                                                    fontSize: "0.85rem",
+                                                    backgroundColor: this.state.calibration?.rightHex || '#00ffff',
+                                                    boxShadow: `0 0 20px ${this.state.calibration?.rightHex || '#00ffff'}44`
+                                                }}
+                                            >
+                                                {this.state.calibration?.rightHex || '#00ffff'}
+                                            </div>
                                             <div className="mb-3">
-                                                <label className="form-label text-white small fw-semibold">Lens Color</label>
-                                                <select id="rightEyeColor" className="form-select bg-dark text-white border-secondary" onChange={this.changeColor.bind(this, 'right')}>
+                                                <label className="form-label text-white small fw-semibold">Lens Filter Color</label>
+                                                <select 
+                                                    id="rightEyeColor" 
+                                                    className="form-select bg-dark text-white border-secondary" 
+                                                    value={this.state.calibration?.rightEyeColor || 'cyan'}
+                                                    onChange={(e) => this.handleEyeColorChange('right', e.target.value)}
+                                                >
+                                                    <option value="cyan">Cyan Filter (Recommended)</option>
                                                     <option value="blue">Blue Filter</option>
-                                                    <option value="red">Red Filter</option>
                                                     <option value="green">Green Filter</option>
+                                                    <option value="red">Red Filter</option>
                                                 </select>
                                             </div>
                                             <div>
-                                                <label className="form-label text-white small fw-semibold">Contrast Balance (0 - 255)</label>
-                                                <input type="range" min="0" max="255" id="rightColorContrastSlider" step="1" className="form-range" />
+                                                <div className="d-flex justify-content-between align-items-center mb-1">
+                                                    <label className="form-label text-white small fw-semibold mb-0">Contrast Level</label>
+                                                    <small className="text-white-50">{this.state.calibration?.rightContrast ?? 255} / 255</small>
+                                                </div>
+                                                <input 
+                                                    type="range" 
+                                                    min="0" 
+                                                    max="255" 
+                                                    id="rightColorContrastSlider" 
+                                                    step="1" 
+                                                    className="form-range" 
+                                                    value={this.state.calibration?.rightContrast ?? 255}
+                                                    onChange={(e) => this.handleContrastChange('right', e.target.value)}
+                                                />
                                             </div>
                                         </div>
                                     </div>
+
+                                    {/* Dichoptic Crosstalk Suppression Verification Box */}
+                                    <div className="col-12">
+                                        <div className="p-3 rounded-4" style={{ backgroundColor: "#020617", border: "1px solid #1e293b" }}>
+                                            <div className="d-flex align-items-center justify-content-between mb-2">
+                                                <span className="badge bg-secondary px-3 py-2">
+                                                    <i className="fa-solid fa-eye-low-vision me-1"></i> Suppression & Ghosting Crosstalk Test
+                                                </span>
+                                                <small className="text-white-50">Put on physical 3D glasses</small>
+                                            </div>
+                                            <p className="text-white-50 small mb-3" style={{ fontSize: '0.8rem' }}>
+                                                Close your <strong>Right eye</strong>: only the Left target should remain visible. Close your <strong>Left eye</strong>: only the Right target should remain visible. If you see ghosting through either lens, adjust the corresponding contrast slider.
+                                            </p>
+                                            <div className="row text-center g-3">
+                                                <div className="col-6">
+                                                    <div className="p-3 rounded-3" style={{ backgroundColor: '#000000', border: '1px dashed #334155' }}>
+                                                        <div 
+                                                            className="d-inline-flex align-items-center justify-content-center rounded-circle mb-2" 
+                                                            style={{ 
+                                                                width: '56px', 
+                                                                height: '56px', 
+                                                                backgroundColor: this.state.calibration?.leftHex || '#ff0000', 
+                                                                boxShadow: `0 0 16px ${this.state.calibration?.leftHex || '#ff0000'}` 
+                                                            }}
+                                                        >
+                                                            <i className="fa-solid fa-circle text-black fs-5"></i>
+                                                        </div>
+                                                        <div className="small text-white fw-bold">Left Eye Target</div>
+                                                        <small className="text-white-50" style={{ fontSize: '0.72rem' }}>Visible through Left Filter Only</small>
+                                                    </div>
+                                                </div>
+                                                <div className="col-6">
+                                                    <div className="p-3 rounded-3" style={{ backgroundColor: '#000000', border: '1px dashed #334155' }}>
+                                                        <div 
+                                                            className="d-inline-flex align-items-center justify-content-center rounded-circle mb-2" 
+                                                            style={{ 
+                                                                width: '56px', 
+                                                                height: '56px', 
+                                                                backgroundColor: this.state.calibration?.rightHex || '#00ffff', 
+                                                                boxShadow: `0 0 16px ${this.state.calibration?.rightHex || '#00ffff'}` 
+                                                            }}
+                                                        >
+                                                            <i className="fa-solid fa-square text-black fs-5"></i>
+                                                        </div>
+                                                        <div className="small text-white fw-bold">Right Eye Target</div>
+                                                        <small className="text-white-50" style={{ fontSize: '0.72rem' }}>Visible through Right Filter Only</small>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    {/* Prescribed Therapy Speed */}
                                     <div className="col-12">
                                         <div className="p-3 rounded-4" style={{ backgroundColor: "#0f172a", border: "1px solid #334155" }}>
                                             <div className="d-flex align-items-center justify-content-between mb-2">
@@ -783,7 +905,7 @@ export default class UserDashboard extends React.Component {
                                             </select>
                                             <small className="text-white-50 d-block mt-2" style={{ fontSize: '0.8rem' }}>
                                                 <i className="fa-solid fa-circle-info text-info me-1"></i>
-                                                Controls game velocity in Snake and Tetris. Progressive automatically increases speed as your score climbs.
+                                                Controls game velocity across exercises. Progressive automatically tunes speed as your score climbs.
                                             </small>
                                         </div>
                                     </div>
