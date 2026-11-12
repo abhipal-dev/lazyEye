@@ -19,6 +19,7 @@ class HealthCheckTest extends TestCase
             ->assertJsonStructure([
                 'status',
                 'database',
+                'latency_ms',
                 'timestamp',
                 'environment',
             ])
@@ -26,5 +27,8 @@ class HealthCheckTest extends TestCase
                 'status' => 'healthy',
                 'database' => 'connected',
             ]);
+
+        $data = $response->json();
+        $this->assertIsNumeric($data['latency_ms']);
     }
 }
