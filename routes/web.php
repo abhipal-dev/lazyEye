@@ -5,6 +5,7 @@ use App\Http\Controllers\UserController;
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\RegisterController;
 use App\Http\Controllers\UploadImageController;
+use App\Http\Controllers\IrisAgentController;
 
 /*
 |--------------------------------------------------------------------------
@@ -67,6 +68,7 @@ Route::get('/fetchConsultations', [UserController::class, 'fetchConsultations'])
 Route::get('/fetchGameRecords', [UserController::class, 'fetchGameRecords']);
 Route::get('/fetchPatientActivity', [UserController::class, 'fetchPatientActivity']);
 Route::match(['get', 'post'], '/seedPatientSessions', [UserController::class, 'seedPatientSessions']);
+Route::match(['get', 'post'], '/iris/chat', [IrisAgentController::class, 'chat']);
 
 Route::post('/Approve', [UserController::class, 'approve']);
 

@@ -1,6 +1,7 @@
 import React from 'react';
 import ReactDOM from 'react-dom';
 import $ from "jquery";
+import IrisCopilotDrawer from './IrisCopilotDrawer';
 
 export default class Dashboard extends React.Component {
     constructor(props) {
@@ -758,6 +759,7 @@ export default class Dashboard extends React.Component {
                         </div>
                     </div>
                 </div>
+                <IrisCopilotDrawer role={isDoctor ? 'doctor' : 'doctor'} />
             </div>
         );
     }
