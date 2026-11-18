@@ -1,7 +1,6 @@
 import React from 'react';
 import ReactDOM from 'react-dom';
 import $ from "jquery";
-import IrisCopilotDrawer from './IrisCopilotDrawer';
 
 export default class Dashboard extends React.Component {
     constructor(props) {
@@ -34,9 +33,20 @@ export default class Dashboard extends React.Component {
             },
             leftContrast: 65,
             rightContrast: 85,
+            activePreset: 'moderate',
             loading: true
         };
     }
+
+    setPreset = (preset) => {
+        if (preset === 'mild') {
+            this.setState({ leftContrast: 85, rightContrast: 70, activePreset: 'mild' });
+        } else if (preset === 'moderate') {
+            this.setState({ leftContrast: 65, rightContrast: 85, activePreset: 'moderate' });
+        } else if (preset === 'severe') {
+            this.setState({ leftContrast: 40, rightContrast: 95, activePreset: 'severe' });
+        }
+    };
 
     componentDidMount() {
         this.fetchStats();
@@ -511,24 +521,56 @@ export default class Dashboard extends React.Component {
                                 borderRadius: '16px' 
                             }}
                         >
-                            <div className="d-flex align-items-center justify-content-between mb-3">
+                            <div className="d-flex align-items-center justify-content-between mb-3 flex-wrap gap-2">
                                 <div>
-                                    <span className="small text-uppercase tracking-wider fw-bold text-primary font-mono">Optical Calibration</span>
+                                    <div className="d-flex align-items-center gap-2">
+                                        <span className="small text-uppercase tracking-wider fw-bold text-primary font-mono">Optical Calibration</span>
+                                        <span className="badge bg-primary-subtle text-primary font-mono" style={{ fontSize: '0.7rem' }}>Anti-Suppression</span>
+                                    </div>
                                     <h5 className="fw-bold mb-0 text-main">Dichoptic Anaglyph Telemetry</h5>
-                                    <small className="text-sub">Dual-channel eye balance telemetry & suppression scotoma filter</small>
+                                    <small className="text-sub">Balances contrast attenuation between dominant &amp; amblyopic eyes</small>
                                 </div>
-                                <span className="badge rounded-circle p-2 d-flex align-items-center justify-content-center text-primary" style={{ width: 32, height: 32, backgroundColor: 'rgba(56, 139, 253, 0.15)' }}>
+                                <span className="badge rounded-circle p-2 d-flex align-items-center justify-content-center text-primary" style={{ width: 34, height: 34, backgroundColor: 'rgba(56, 139, 253, 0.15)' }}>
                                     <i className="fa-solid fa-glasses"></i>
                                 </span>
                             </div>
 
+                            {/* Clinical Presets Bar */}
+                            <div className="d-flex align-items-center gap-2 mb-3 flex-wrap">
+                                <span className="small text-sub font-mono me-1" style={{ fontSize: '0.74rem' }}>Clinical Presets:</span>
+                                <button
+                                    type="button"
+                                    onClick={() => this.setPreset('mild')}
+                                    className={`btn btn-xs rounded-pill px-2 py-1 font-mono fw-semibold ${this.state.activePreset === 'mild' ? 'btn-primary' : 'btn-outline-secondary'}`}
+                                    style={{ fontSize: '0.72rem' }}
+                                >
+                                    Mild (85% / 70%)
+                                </button>
+                                <button
+                                    type="button"
+                                    onClick={() => this.setPreset('moderate')}
+                                    className={`btn btn-xs rounded-pill px-2 py-1 font-mono fw-semibold ${this.state.activePreset === 'moderate' ? 'btn-primary' : 'btn-outline-secondary'}`}
+                                    style={{ fontSize: '0.72rem' }}
+                                >
+                                    Standard (65% / 85%)
+                                </button>
+                                <button
+                                    type="button"
+                                    onClick={() => this.setPreset('severe')}
+                                    className={`btn btn-xs rounded-pill px-2 py-1 font-mono fw-semibold ${this.state.activePreset === 'severe' ? 'btn-primary' : 'btn-outline-secondary'}`}
+                                    style={{ fontSize: '0.72rem' }}
+                                >
+                                    Severe (40% / 95%)
+                                </button>
+                            </div>
+
                             {/* Dual Channel Sliders Visualizer */}
-                            <div className="d-flex flex-column gap-3 my-auto py-2">
+                            <div className="d-flex flex-column gap-3 my-auto py-1">
                                 {/* Left Eye Channel */}
                                 <div>
                                     <div className="d-flex align-items-center justify-content-between small mb-1">
                                         <span className="fw-semibold text-danger">
-                                            <i className="fa-solid fa-eye me-1"></i> Left Eye (Red Filter)
+                                            <i className="fa-solid fa-eye me-1"></i> Left Eye (Red Filter &bull; Non-Dominant)
                                         </span>
                                         <span className="fw-bold text-main font-mono">{leftContrast}%</span>
                                     </div>
@@ -539,7 +581,8 @@ export default class Dashboard extends React.Component {
                                                 width: `${leftContrast}%`, 
                                                 background: 'linear-gradient(90deg, #dc2626, #ef4444)', 
                                                 borderRadius: '6px',
-                                                boxShadow: '0 0 10px rgba(239, 68, 68, 0.4)' 
+                                                boxShadow: '0 0 10px rgba(239, 68, 68, 0.4)',
+                                                transition: 'width 0.4s ease'
                                             }}
                                         ></div>
                                     </div>
@@ -549,7 +592,7 @@ export default class Dashboard extends React.Component {
                                 <div>
                                     <div className="d-flex align-items-center justify-content-between small mb-1">
                                         <span className="fw-semibold" style={{ color: '#06b6d4' }}>
-                                            <i className="fa-solid fa-eye me-1"></i> Right Eye (Cyan Filter)
+                                            <i className="fa-solid fa-eye me-1"></i> Right Eye (Cyan Filter &bull; Dominant Attenuation)
                                         </span>
                                         <span className="fw-bold text-main font-mono">{rightContrast}%</span>
                                     </div>
@@ -560,16 +603,32 @@ export default class Dashboard extends React.Component {
                                                 width: `${rightContrast}%`, 
                                                 background: 'linear-gradient(90deg, #0284c7, #06b6d4)', 
                                                 borderRadius: '6px',
-                                                boxShadow: '0 0 10px rgba(6, 182, 212, 0.4)' 
+                                                boxShadow: '0 0 10px rgba(6, 182, 212, 0.4)',
+                                                transition: 'width 0.4s ease'
                                             }}
                                         ></div>
                                     </div>
                                 </div>
 
                                 {/* Suppression Index Readout */}
-                                <div className="p-2 px-3 rounded-3 d-flex align-items-center justify-content-between" style={{ backgroundColor: 'var(--bg-surface-secondary)', border: '1px solid var(--border-color)' }}>
+                                <div className="p-2 px-3 rounded-3 d-flex align-items-center justify-content-between flex-wrap gap-2" style={{ backgroundColor: 'var(--bg-surface-secondary)', border: '1px solid var(--border-color)' }}>
                                     <span className="small text-sub">Cortical Suppression Index:</span>
-                                    <span className="badge bg-success-subtle text-success font-mono fw-semibold">Balanced &bull; Zero Diplopia</span>
+                                    {Math.abs(leftContrast - rightContrast) <= 15 ? (
+                                        <span className="badge bg-success-subtle text-success font-mono fw-semibold">Balanced &bull; Zero Diplopia</span>
+                                    ) : Math.abs(leftContrast - rightContrast) <= 30 ? (
+                                        <span className="badge bg-info-subtle text-info font-mono fw-semibold">Anti-Suppression Active &bull; Binocular Fusion</span>
+                                    ) : (
+                                        <span className="badge bg-warning-subtle text-warning font-mono fw-semibold">Deep Scotoma Attenuation &bull; Rebalancing</span>
+                                    )}
+                                </div>
+
+                                <div className="d-flex align-items-center justify-content-between small pt-2 border-top" style={{ borderColor: 'var(--border-color)' }}>
+                                    <span className="text-sub font-mono" style={{ fontSize: '0.74rem' }}>
+                                        <i className="fa-solid fa-circle-info text-primary me-1"></i>Forces cortical visual cortex to integrate both eyes
+                                    </span>
+                                    <a href="/games" className="btn btn-xs btn-outline-primary py-0 px-2 fw-semibold font-mono" style={{ fontSize: '0.72rem' }}>
+                                        Test Anaglyph &rarr;
+                                    </a>
                                 </div>
                             </div>
                         </div>
@@ -657,84 +716,98 @@ export default class Dashboard extends React.Component {
                         >
                             <div className="d-flex align-items-center justify-content-between flex-wrap gap-2 mb-3">
                                 <div>
-                                    <span className="small text-uppercase tracking-wider fw-bold text-success font-mono">Session Volume Telemetry</span>
+                                    <div className="d-flex align-items-center gap-2">
+                                        <span className="small text-uppercase tracking-wider fw-bold text-success font-mono">Session Volume Telemetry</span>
+                                        <span className="badge bg-success-subtle text-success font-mono" style={{ fontSize: '0.7rem' }}>Cohort Average</span>
+                                    </div>
                                     <h5 className="fw-bold mb-0 text-main">Weekly Clinical Adherence</h5>
                                     <small className="text-sub">Daily therapeutic session volume across assigned patient cohort</small>
                                 </div>
-                                <div className="d-flex align-items-center gap-3">
-                                    <span className="badge bg-success-subtle text-success py-1 px-3 fw-bold font-mono rounded-pill">
+                                <div className="d-flex align-items-center gap-2">
+                                    <span className="badge bg-warning-subtle text-warning py-1 px-2 font-mono rounded-pill" style={{ fontSize: '0.75rem' }}>
+                                        <i className="fa-solid fa-bullseye me-1"></i>Target 70%
+                                    </span>
+                                    <span className="badge bg-success-subtle text-success py-1 px-3 fw-bold font-mono rounded-pill" style={{ fontSize: '0.78rem' }}>
                                         <i className="fa-solid fa-arrow-trend-up me-1"></i>+16.4% this week
                                     </span>
                                 </div>
                             </div>
 
-                            {/* Clean Responsive SVG Spline Chart */}
+                            {/* Clean Responsive Mathematically Aligned SVG Spline Chart */}
                             <div style={{ width: '100%', height: '140px', position: 'relative' }}>
-                                <svg viewBox="0 0 700 120" preserveAspectRatio="none" style={{ width: '100%', height: '100%' }}>
+                                <svg viewBox="0 0 700 120" style={{ width: '100%', height: '100%', display: 'block' }}>
                                     <defs>
                                         <linearGradient id="splineGradientCyan" x1="0" y1="0" x2="0" y2="1">
-                                            <stop offset="0%" stopColor="#06b6d4" stopOpacity="0.4" />
+                                            <stop offset="0%" stopColor="#06b6d4" stopOpacity="0.45" />
+                                            <stop offset="60%" stopColor="#06b6d4" stopOpacity="0.12" />
                                             <stop offset="100%" stopColor="#06b6d4" stopOpacity="0.0" />
                                         </linearGradient>
-                                        <linearGradient id="splineGradientBlue" x1="0" y1="0" x2="0" y2="1">
-                                            <stop offset="0%" stopColor="#3b82f6" stopOpacity="0.3" />
-                                            <stop offset="100%" stopColor="#3b82f6" stopOpacity="0.0" />
-                                        </linearGradient>
+                                        <filter id="splineGlow" x="-20%" y="-20%" width="140%" height="140%">
+                                            <feGaussianBlur stdDeviation="3" result="blur" />
+                                            <feComposite in="SourceGraphic" in2="blur" operator="over" />
+                                        </filter>
                                     </defs>
 
-                                    {/* Grid Lines */}
-                                    <line x1="0" y1="30" x2="700" y2="30" stroke="rgba(255,255,255,0.05)" strokeDasharray="4" />
-                                    <line x1="0" y1="70" x2="700" y2="70" stroke="rgba(255,255,255,0.05)" strokeDasharray="4" />
-                                    <line x1="0" y1="110" x2="700" y2="110" stroke="rgba(255,255,255,0.08)" />
+                                    {/* Subtle Horizontal Grid Lines */}
+                                    <line x1="50" y1="20" x2="650" y2="20" stroke="rgba(255,255,255,0.05)" strokeDasharray="3,3" />
+                                    <line x1="50" y1="60" x2="650" y2="60" stroke="rgba(255,255,255,0.05)" strokeDasharray="3,3" />
+                                    <line x1="50" y1="105" x2="650" y2="105" stroke="rgba(255,255,255,0.08)" />
 
-                                    {/* Spline Area Fill */}
+                                    {/* Clinical Target Line (70% = y: 45) */}
+                                    <line x1="50" y1="45" x2="650" y2="45" stroke="#f59e0b" strokeWidth="1.5" strokeDasharray="5,5" strokeOpacity="0.5" />
+                                    <text x="645" y="40" textAnchor="end" fill="#f59e0b" fontSize="9" fontFamily="monospace" opacity="0.8">Target 70%</text>
+
+                                    {/* Spline Area Fill (Passing through all 7 coordinates) */}
                                     <path 
-                                        d="M 50 70 C 150 20, 200 40, 300 15 C 400 30, 500 10, 650 90 L 650 110 L 50 110 Z" 
+                                        d="M 50,56.2 C 100,56.2 100,32.2 150,32.2 C 200,32.2 200,28.6 250,28.6 C 300,28.6 300,17.2 350,17.2 C 400,17.2 400,26.4 450,26.4 C 500,26.4 500,43.0 550,43.0 C 600,43.0 600,63.8 650,63.8 L 650,105 L 50,105 Z" 
                                         fill="url(#splineGradientCyan)" 
                                     />
+
                                     {/* Primary Spline Line */}
                                     <path 
-                                        d="M 50 70 C 150 20, 200 40, 300 15 C 400 30, 500 10, 650 90" 
+                                        d="M 50,56.2 C 100,56.2 100,32.2 150,32.2 C 200,32.2 200,28.6 250,28.6 C 300,28.6 300,17.2 350,17.2 C 400,17.2 400,26.4 450,26.4 C 500,26.4 500,43.0 550,43.0 C 600,43.0 600,63.8 650,63.8" 
                                         fill="none" 
                                         stroke="#06b6d4" 
-                                        strokeWidth="3.5" 
+                                        strokeWidth="3" 
                                         strokeLinecap="round" 
+                                        filter="url(#splineGlow)"
                                     />
 
-                                    {/* Secondary Benchmark Spline Line */}
-                                    <path 
-                                        d="M 50 95 C 150 60, 250 80, 350 40 C 450 65, 550 45, 650 60" 
-                                        fill="none" 
-                                        stroke="#f59e0b" 
-                                        strokeWidth="2.5" 
-                                        strokeDasharray="5"
-                                        strokeLinecap="round" 
-                                    />
-
-                                    {/* Data Points */}
-                                    <circle cx="50" cy="70" r="4" fill="#06b6d4" />
-                                    <circle cx="150" cy="28" r="4" fill="#06b6d4" />
-                                    <circle cx="300" cy="15" r="4" fill="#06b6d4" />
-                                    <circle cx="450" cy="22" r="4" fill="#06b6d4" />
-                                    <circle cx="650" cy="90" r="4" fill="#06b6d4" />
+                                    {/* 7 Aligned Data Node Circles */}
+                                    {[
+                                        { x: 50, y: 56.2, val: 48.5 },
+                                        { x: 150, y: 32.2, val: 78.5 },
+                                        { x: 250, y: 28.6, val: 83.0 },
+                                        { x: 350, y: 17.2, val: 97.2 },
+                                        { x: 450, y: 26.4, val: 85.7 },
+                                        { x: 550, y: 43.0, val: 65.0 },
+                                        { x: 650, y: 63.8, val: 39.0 }
+                                    ].map((pt, idx) => (
+                                        <g key={idx}>
+                                            <circle cx={pt.x} cy={pt.y} r="5" fill="#0D1117" stroke="#06b6d4" strokeWidth="2.5" />
+                                            <circle cx={pt.x} cy={pt.y} r="2" fill="#38bdf8" />
+                                        </g>
+                                    ))}
                                 </svg>
                             </div>
 
-                            {/* Spline X-Axis Day Labels */}
+                            {/* Spline X-Axis 7 Columns Aligned Directly with Nodes */}
                             <div className="d-flex justify-content-between text-sub small font-mono mt-2 pt-2 border-top" style={{ borderColor: 'var(--border-color)', fontSize: '0.8rem' }}>
                                 {splineData.map((d, i) => (
-                                    <div key={i} className="text-center">
-                                        <div className="fw-bold text-main">{d.day}</div>
-                                        <div className="text-muted" style={{ fontSize: '0.72rem' }}>{d.val}%</div>
+                                    <div key={i} className="text-center" style={{ flex: 1 }}>
+                                        <div className="fw-bold text-main" style={{ fontSize: '0.82rem' }}>{d.day}</div>
+                                        <span 
+                                            className={`badge rounded-pill font-mono mt-1 ${d.val >= 70 ? 'bg-success-subtle text-success' : 'bg-warning-subtle text-warning'}`}
+                                            style={{ fontSize: '0.72rem', border: d.val >= 70 ? '1px solid rgba(16, 185, 129, 0.25)' : '1px solid rgba(245, 158, 11, 0.25)' }}
+                                        >
+                                            {d.val}%
+                                        </span>
                                     </div>
                                 ))}
                             </div>
                         </div>
                     </div>
                 </div>
-
-                {/* Floating Iris Clinical Copilot */}
-                <IrisCopilotDrawer role={isDoctor ? 'doctor' : 'doctor'} />
             </div>
         );
     }

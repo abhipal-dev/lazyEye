@@ -128,10 +128,37 @@ function scrollToTable(categoryFn) {
 function formatUtcToLocal(utcString, format = 'DD MMM YYYY, hh:mm A') {
     if (!utcString) return 'Active';
     try {
+        let str = String(utcString).trim();
+        let iso = str.replace(' ', 'T');
+        if (!iso.endsWith('Z') && !iso.includes('+')) iso += 'Z';
+
         if (window.moment) {
-            return window.moment.utc(utcString).local().format(format);
+            let m = window.moment.utc(iso).local();
+            if (m.isValid()) return m.format(format);
         }
-        return new Date(utcString.endsWith('Z') ? utcString : utcString + 'Z').toLocaleString();
+
+        let d = new Date(iso);
+        if (isNaN(d.getTime())) {
+            d = new Date(str);
+        }
+
+        if (!isNaN(d.getTime())) {
+            let day = String(d.getDate()).padStart(2, '0');
+            let month = String(d.getMonth() + 1).padStart(2, '0');
+            let year = d.getFullYear();
+            if (format.includes('DD/MM/YYYY')) {
+                if (format.includes('hh:mm')) {
+                    let hours = d.getHours();
+                    let minutes = String(d.getMinutes()).padStart(2, '0');
+                    let ampm = hours >= 12 ? 'PM' : 'AM';
+                    hours = hours % 12 || 12;
+                    return `${day}/${month}/${year}, ${String(hours).padStart(2, '0')}:${minutes} ${ampm}`;
+                }
+                return `${day}/${month}/${year}`;
+            }
+            return d.toLocaleDateString('en-GB', { day: '2-digit', month: 'short', year: 'numeric' });
+        }
+        return utcString;
     } catch (e) {
         return utcString;
     }
@@ -283,17 +310,22 @@ $(document).on('change', '#adminTablePageSize', function () {
 // Row Renderers for each data category
 function renderRegisterRow(e, sliceIdx) {
     let localSubmitted = formatUtcToLocal(e.created_at, 'DD/MM/YYYY, hh:mm A');
+    let genderDisplay = (e.gender && e.gender !== 'null') ? e.gender : '—';
     $('#datatablesSimple tbody').append(`
         <tr class="patient-record-row cursor-pointer" data-index="` + sliceIdx + `" title="Click row to inspect registration dossier">
         <td class="font-mono">`+ e.reg_id + `</td>
         <td><strong>`+ e.fullname + `</strong></td>
         <td><span class="badge border font-mono small" style="background-color: var(--bg-surface-secondary); border-color: var(--border-color); color: var(--text-main);">`+ e.username + `</span></td>
         <td><span class="badge bg-warning-subtle text-warning font-mono"><i class="fa-solid fa-clock me-1"></i>Pending Approval</span></td>
-        <td>`+ e.gender + `</td>
+        <td>`+ genderDisplay + `</td>
         <td>`+ e.email + `</td>
         <td class="font-mono small">`+ localSubmitted + `</td>
-        <td class="text-center"><button class="btn btn-sm btn-success px-2 py-1" onclick="approveRegisters(`+ e.reg_id + `,'registers')"><i class="fa-solid fa-check me-1"></i>Approve</button></td>
-        <td class="text-center"><button class="btn btn-sm btn-outline-danger px-2 py-1" onclick="deleteData(`+ e.reg_id + `,'registers')"><i class="fa-solid fa-trash me-1"></i>Decline</button></td>
+        <td class="text-end pe-3 text-nowrap">
+            <div class="d-inline-flex align-items-center gap-1">
+                <button class="btn btn-xs btn-success px-2 py-1 rounded-2" onclick="approveRegisters(`+ e.reg_id + `,'registers')" title="Approve Registration"><i class="fa-solid fa-check me-1"></i>Approve</button>
+                <button class="btn btn-xs btn-outline-danger px-2 py-1 rounded-2" onclick="deleteData(`+ e.reg_id + `,'registers')" title="Decline Application"><i class="fa-solid fa-xmark me-1"></i>Decline</button>
+            </div>
+        </td>
         </tr>`
     );
 }
@@ -301,7 +333,7 @@ function renderRegisterRow(e, sliceIdx) {
 function fetchRegisters() {
     latestActiveCategory = 'fetchRegisters';
     updateFilterActive('fetchRegisters', true);
-    $('#datatablesSimple tbody').html('<tr><td colspan="9" class="text-center py-4 text-muted"><i class="fa-solid fa-spinner fa-spin me-2"></i>Loading registrations...</td></tr>');
+    $('#datatablesSimple tbody').html('<tr><td colspan="8" class="text-center py-4 text-muted"><i class="fa-solid fa-spinner fa-spin me-2"></i>Loading registrations...</td></tr>');
     $.ajax({
         url: "/fetchRegisters",
         type: "get",
@@ -318,7 +350,7 @@ function fetchRegisters() {
                 <th>Gender</th>
                 <th>Email</th>
                 <th>Submitted (Local)</th>
-                <th colspan="2" class="text-center">Action</th>
+                <th class="text-end pe-3">Action</th>
                 </tr>
             `);
             $('div.card-header span.fw-semibold').text('Applications -> Pending Patient Registrations');
@@ -333,18 +365,23 @@ function fetchRegisters() {
 
 function renderDoctorRow(e, sliceIdx) {
     let localJoined = formatUtcToLocal(e.created_at, 'DD/MM/YYYY');
+    let genderDisplay = (e.gender && e.gender !== 'null') ? e.gender : '—';
     $('#datatablesSimple tbody').append(`
         <tr class="patient-record-row cursor-pointer" data-index="` + sliceIdx + `" title="Click row to inspect clinical practitioner dossier">
         <td class="font-mono">`+ e.id + `</td>
         <td><strong>`+ e.fullname + `</strong></td>
         <td><span class="badge border font-mono small" style="background-color: var(--bg-surface-secondary); border-color: var(--border-color); color: var(--text-main);">`+ e.username + `</span></td>
         <td><span class="badge border font-mono small" style="background-color: var(--bg-surface-secondary); border-color: var(--border-color); color: var(--text-main);"><i class="fa-solid fa-user-doctor me-1"></i>Doctor</span></td>
-        <td>`+ e.gender + `</td>
+        <td>`+ genderDisplay + `</td>
         <td>`+ e.email + `</td>
         <td class="font-mono">`+ (e.user_playing_time || 20) + ` mins/day</td>
         <td class="font-mono small">`+ localJoined + `</td>
-        <td class="text-center"><button class="btn btn-sm btn-secondary px-2 py-1 edit" data-bs-toggle="modal" data-bs-target="#editModal" data-id="`+ e.id + `" data-fullname="`+ (e.fullname || '') + `" data-username="`+ (e.username || '') + `" data-email="`+ (e.email || '') + `" data-gender="`+ (e.gender || 'Male') + `" data-type="`+ (e.accounttype || 'doctor') + `" data-time="`+ (e.user_playing_time || 20) + `" data-speed="`+ (e.game_speed || "level-3") + `"><i class="fa-solid fa-pen-to-square me-1"></i>Edit</button></td>
-        <td class="text-center"><button class="btn btn-sm btn-outline-danger px-2 py-1" onclick="deleteData(`+ e.id + `,'doctors')"><i class="fa-solid fa-trash me-1"></i>Delete</button></td>
+        <td class="text-end pe-3 text-nowrap">
+            <div class="d-inline-flex align-items-center gap-1">
+                <button class="btn btn-xs btn-outline-secondary px-2 py-1 rounded-2 edit" data-bs-toggle="modal" data-bs-target="#editModal" data-id="`+ e.id + `" data-fullname="`+ (e.fullname || '') + `" data-username="`+ (e.username || '') + `" data-email="`+ (e.email || '') + `" data-gender="`+ (e.gender || 'Male') + `" data-type="`+ (e.accounttype || 'doctor') + `" data-time="`+ (e.user_playing_time || 20) + `" data-speed="`+ (e.game_speed || "level-3") + `" title="Edit Practitioner"><i class="fa-solid fa-pen"></i></button>
+                <button class="btn btn-xs btn-outline-danger px-2 py-1 rounded-2" onclick="deleteData(`+ e.id + `,'doctors')" title="Delete Doctor"><i class="fa-solid fa-trash"></i></button>
+            </div>
+        </td>
         </tr>`
     );
 }
@@ -352,7 +389,7 @@ function renderDoctorRow(e, sliceIdx) {
 function fetchDoctors() {
     latestActiveCategory = 'fetchDoctors';
     updateFilterActive('fetchDoctors', true);
-    $('#datatablesSimple tbody').html('<tr><td colspan="10" class="text-center py-4 text-muted"><i class="fa-solid fa-spinner fa-spin me-2"></i>Loading doctors and clinical staff...</td></tr>');
+    $('#datatablesSimple tbody').html('<tr><td colspan="9" class="text-center py-4 text-muted"><i class="fa-solid fa-spinner fa-spin me-2"></i>Loading doctors and clinical staff...</td></tr>');
     $.ajax({
         url: "/fetchDoctors",
         type: "get",
@@ -370,7 +407,7 @@ function fetchDoctors() {
                 <th>Email</th>
                 <th>Prescribed Target</th>
                 <th>Joined (Local)</th>
-                <th colspan="2" class="text-center">Action</th>
+                <th class="text-end pe-3">Action</th>
                 </tr>
             `);
             $('div.card-header span.fw-semibold').text('Clinical Staff -> Doctors & Vision Therapists');
@@ -378,7 +415,7 @@ function fetchDoctors() {
         },
         error: function() {
             if (latestActiveCategory !== 'fetchDoctors') return;
-            $('#datatablesSimple tbody').html('<tr><td colspan="10" class="text-center py-4 text-danger"><i class="fa-solid fa-triangle-exclamation me-2"></i>Failed to load doctor records. <button class="btn btn-sm btn-outline-primary ms-2" onclick="fetchDoctors()">Retry</button></td></tr>');
+            $('#datatablesSimple tbody').html('<tr><td colspan="9" class="text-center py-4 text-danger"><i class="fa-solid fa-triangle-exclamation me-2"></i>Failed to load doctor records. <button class="btn btn-sm btn-outline-primary ms-2" onclick="fetchDoctors()">Retry</button></td></tr>');
         }
     });
 }
@@ -389,18 +426,23 @@ function renderAdminRow(e, sliceIdx) {
         : '<span class="badge border font-mono small" style="background-color: var(--bg-surface-secondary); border-color: var(--border-color); color: var(--text-main);"><i class="fa-solid fa-user-shield me-1"></i>Clinic Admin</span>';
 
     let localJoined = formatUtcToLocal(e.created_at, 'DD/MM/YYYY');
+    let genderDisplay = (e.gender && e.gender !== 'null') ? e.gender : '—';
     $('#datatablesSimple tbody').append(`
         <tr class="patient-record-row cursor-pointer" data-index="` + sliceIdx + `" title="Click row to inspect administrator credentials">
         <td class="font-mono">`+ e.id + `</td>
         <td><strong>`+ e.fullname + `</strong></td>
         <td><span class="badge border font-mono small" style="background-color: var(--bg-surface-secondary); border-color: var(--border-color); color: var(--text-main);">`+ e.username + `</span></td>
         <td>`+ badge + `</td>
-        <td>`+ e.gender + `</td>
+        <td>`+ genderDisplay + `</td>
         <td>`+ e.email + `</td>
         <td>Full System Control</td>
         <td class="font-mono small">`+ localJoined + `</td>
-        <td class="text-center"><button class="btn btn-sm btn-secondary px-2 py-1 edit" data-bs-toggle="modal" data-bs-target="#editModal" data-id="`+ e.id + `" data-fullname="`+ (e.fullname || '') + `" data-username="`+ (e.username || '') + `" data-email="`+ (e.email || '') + `" data-gender="`+ (e.gender || 'Male') + `" data-type="`+ (e.accounttype || 'admin') + `" data-time="`+ (e.user_playing_time || 20) + `"><i class="fa-solid fa-pen-to-square me-1"></i>Edit</button></td>
-        <td class="text-center"><button class="btn btn-sm btn-outline-danger px-2 py-1" onclick="deleteData(`+ e.id + `,'admins')"><i class="fa-solid fa-trash me-1"></i>Delete</button></td>
+        <td class="text-end pe-3 text-nowrap">
+            <div class="d-inline-flex align-items-center gap-1">
+                <button class="btn btn-xs btn-outline-secondary px-2 py-1 rounded-2 edit" data-bs-toggle="modal" data-bs-target="#editModal" data-id="`+ e.id + `" data-fullname="`+ (e.fullname || '') + `" data-username="`+ (e.username || '') + `" data-email="`+ (e.email || '') + `" data-gender="`+ (e.gender || 'Male') + `" data-type="`+ (e.accounttype || 'admin') + `" data-time="`+ (e.user_playing_time || 20) + `" title="Edit Admin"><i class="fa-solid fa-pen"></i></button>
+                <button class="btn btn-xs btn-outline-danger px-2 py-1 rounded-2" onclick="deleteData(`+ e.id + `,'admins')" title="Delete Admin"><i class="fa-solid fa-trash"></i></button>
+            </div>
+        </td>
         </tr>`
     );
 }
@@ -426,7 +468,7 @@ function fetchAdmins() {
                 <th>Email</th>
                 <th>Access Level</th>
                 <th>Joined (Local)</th>
-                <th colspan="2" class="text-center">Action</th>
+                <th class="text-end pe-3">Action</th>
                 </tr>
             `);
             $('div.card-header span.fw-semibold').text('Administrative Staff -> System Administrators');
@@ -459,7 +501,7 @@ function renderUserRow(e, sliceIdx) {
     if (e.doctor_name) {
         doctorBadge = `
             <div class="d-flex align-items-center gap-1">
-                <span class="badge border font-mono small" style="background-color: var(--bg-surface-secondary); border-color: var(--border-color); color: var(--text-main);"><i class="fa-solid fa-user-doctor me-1"></i>`+ e.doctor_name + `</span>
+                <span class="badge border font-mono small text-truncate" style="max-width: 170px; background-color: var(--bg-surface-secondary); border-color: var(--border-color); color: var(--text-main);" title="`+ e.doctor_name + `"><i class="fa-solid fa-user-doctor me-1"></i>`+ e.doctor_name + `</span>
                 <button class="btn btn-xs btn-link text-main p-0 assign-doc-btn" data-patient-id="`+ e.id + `" data-patient-name="`+ (e.fullname || '') + `" data-doctor-id="`+ (e.doctor_id || '') + `" title="Change Doctor"><i class="fa-solid fa-arrows-rotate"></i></button>
             </div>`;
     } else {
@@ -471,6 +513,7 @@ function renderUserRow(e, sliceIdx) {
     }
 
     let localEnrolled = formatUtcToLocal(e.created_at, 'DD/MM/YYYY');
+    let genderDisplay = (e.gender && e.gender !== 'null') ? e.gender : '—';
 
     $('#datatablesSimple tbody').append(`
         <tr class="patient-record-row cursor-pointer" data-index="` + sliceIdx + `" title="Click row to inspect clinical patient dossier & calibration">
@@ -480,13 +523,25 @@ function renderUserRow(e, sliceIdx) {
         <td>`+ doctorBadge + `</td>
         <td>`+ badge + `</td>
         <td>`+ compliancePill + `</td>
-        <td>`+ e.gender + `</td>
+        <td>`+ genderDisplay + `</td>
         <td class="font-mono">`+ (e.user_playing_time || 20) + ` mins/day</td> 
         <td class="font-mono small">`+ localEnrolled + `</td>
-        <td class="text-center"><button class="btn btn-sm btn-secondary px-2 py-1 view-activity-btn" data-patient-id="`+ e.id + `" data-patient-name="`+ (e.fullname || '') + `" title="View Patient Activity Report & Heatmap"><i class="fa-solid fa-fire text-danger me-1"></i>Activity</button></td>
-        <td class="text-center"><button class="btn btn-sm btn-secondary px-2 py-1 log-review-btn" data-patient-id="`+ e.id + `" data-patient-name="`+ (e.fullname || '') + `" data-doctor-id="`+ (e.doctor_id || 23) + `" title="Log Clinical Review"><i class="fa-solid fa-stethoscope me-1"></i>Review</button></td>
-        <td class="text-center"><button class="btn btn-sm btn-secondary px-2 py-1 edit" data-bs-toggle="modal" data-bs-target="#editModal" data-id="`+ e.id + `" data-fullname="`+ (e.fullname || '') + `" data-username="`+ (e.username || '') + `" data-email="`+ (e.email || '') + `" data-gender="`+ (e.gender || 'Male') + `" data-type="`+ (e.accounttype || 'user') + `" data-time="`+ (e.user_playing_time || 20) + `" data-doctor="`+ (e.doctor_id || '') + `" data-speed="`+ (e.game_speed || 'level-3') + `"><i class="fa-solid fa-pen-to-square me-1"></i>Edit</button></td>
-        <td class="text-center"><button class="btn btn-sm btn-outline-danger px-2 py-1" onclick="deleteData(`+ e.id + `,'users')"><i class="fa-solid fa-trash me-1"></i>Delete</button></td>
+        <td class="text-end pe-3 text-nowrap">
+            <div class="d-inline-flex align-items-center gap-1">
+                <button class="btn btn-xs btn-outline-primary fw-semibold px-2 py-1 rounded-2 log-review-btn" data-patient-id="`+ e.id + `" data-patient-name="`+ (e.fullname || '') + `" data-doctor-id="`+ (e.doctor_id || 23) + `" title="Log Clinical Review">
+                    <i class="fa-solid fa-stethoscope me-1"></i>Review
+                </button>
+                <button class="btn btn-xs btn-outline-secondary px-2 py-1 rounded-2 view-activity-btn" data-patient-id="`+ e.id + `" data-patient-name="`+ (e.fullname || '') + `" title="View Patient Activity Report & Heatmap">
+                    <i class="fa-solid fa-chart-line"></i>
+                </button>
+                <button class="btn btn-xs btn-outline-secondary px-2 py-1 rounded-2 edit" data-bs-toggle="modal" data-bs-target="#editModal" data-id="`+ e.id + `" data-fullname="`+ (e.fullname || '') + `" data-username="`+ (e.username || '') + `" data-email="`+ (e.email || '') + `" data-gender="`+ (e.gender || 'Male') + `" data-type="`+ (e.accounttype || 'user') + `" data-time="`+ (e.user_playing_time || 20) + `" data-doctor="`+ (e.doctor_id || '') + `" data-speed="`+ (e.game_speed || 'level-3') + `" title="Edit Record">
+                    <i class="fa-solid fa-pen"></i>
+                </button>
+                <button class="btn btn-xs btn-outline-danger px-2 py-1 rounded-2" onclick="deleteData(`+ e.id + `,'users')" title="Delete Patient">
+                    <i class="fa-solid fa-trash"></i>
+                </button>
+            </div>
+        </td>
         </tr>`
     );
 }
@@ -496,7 +551,7 @@ function fetchUsers(silentPreload) {
         latestActiveCategory = 'fetchUsers';
         updateFilterActive('fetchUsers', true);
         if (!$('#table-section').is(':hidden')) {
-            $('#datatablesSimple tbody').html('<tr><td colspan="13" class="text-center py-4 text-muted"><i class="fa-solid fa-spinner fa-spin me-2"></i>Loading patients...</td></tr>');
+            $('#datatablesSimple tbody').html('<tr><td colspan="10" class="text-center py-4 text-muted"><i class="fa-solid fa-spinner fa-spin me-2"></i>Loading patients...</td></tr>');
         }
     }
     $.ajax({
@@ -535,7 +590,7 @@ function fetchUsers(silentPreload) {
                 <th>Gender</th>
                 <th>Target</th>
                 <th>Enrolled (Local)</th>
-                <th colspan="4" class="text-center">Action</th>
+                <th class="text-end pe-3">Action</th>
                 </tr>
             `);
             $('div.card-header span.fw-semibold').text('Patients -> Active Therapy Patients');
@@ -547,7 +602,7 @@ function fetchUsers(silentPreload) {
         },
         error: function() {
             if (latestActiveCategory !== 'fetchUsers' || silentPreload) return;
-            $('#datatablesSimple tbody').html('<tr><td colspan="13" class="text-center py-4 text-danger"><i class="fa-solid fa-triangle-exclamation me-2"></i>Failed to load patient records. <button class="btn btn-sm btn-outline-primary ms-2" onclick="fetchUsers()">Retry</button></td></tr>');
+            $('#datatablesSimple tbody').html('<tr><td colspan="10" class="text-center py-4 text-danger"><i class="fa-solid fa-triangle-exclamation me-2"></i>Failed to load patient records. <button class="btn btn-sm btn-outline-primary ms-2" onclick="fetchUsers()">Retry</button></td></tr>');
         }
     });
 }

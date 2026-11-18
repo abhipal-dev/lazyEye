@@ -8,6 +8,7 @@ import Table from './Table';
 import UserDetailsModal from './modals/UserDetailsModal';
 import ImageUploadModal from './modals/ImageUploadModal';
 import ThemeToggle from './ThemeToggle';
+import IrisCopilotDrawer from './IrisCopilotDrawer';
 export default class AdminDashboard extends React.Component {
     constructor(props) {
         super(props);
@@ -39,7 +40,7 @@ export default class AdminDashboard extends React.Component {
         window.addEventListener('lazyeye:profile-updated', (e) => {
             if (e && e.detail && (e.detail.image_address || e.detail.image_url)) {
                 const addr = e.detail.image_address;
-                const newImgPath = addr ? `storage/images/${addr}?v=${Date.now()}` : this.state.userProfileImage;
+                const newImgPath = addr ? `/storage/images/${addr}?v=${Date.now()}` : this.state.userProfileImage;
                 this.setState(prevState => ({
                     userProfileImage: newImgPath,
                     data: {
@@ -251,10 +252,10 @@ export default class AdminDashboard extends React.Component {
                                         </a>
                                     )}
 
-                                    {!isDoctor && (
+                                    {isRoot && (
                                         <a className={`nav-link fetchAdmins cursor-pointer ${this.state.activeView === 'table' && this.state.activeTableCategory === 'fetchAdmins' ? 'active' : ''}`} onClick={(e) => { e.preventDefault(); e.stopPropagation(); this.switchToTable('fetchAdmins'); }}>
                                             <div className="sb-nav-link-icon"><i className="fa-solid fa-user-shield text-success"></i></div>
-                                            Administrators
+                                            System Administrators
                                         </a>
                                     )}
 
@@ -861,6 +862,7 @@ export default class AdminDashboard extends React.Component {
 
                 <UserDetailsModal data={this.state.data} />
                 <ImageUploadModal data={this.state.data} />
+                <IrisCopilotDrawer role={isDoctor ? 'doctor' : 'doctor'} />
             </>
         )
     }

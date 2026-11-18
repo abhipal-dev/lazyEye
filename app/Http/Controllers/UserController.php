@@ -78,11 +78,17 @@ class UserController extends Controller
     public function fetchAdmins(Request $req){
         return self::safelyQuery(function() use ($req) {
             list($userId, $userType) = self::getAuthUser($req);
-            // Doctors are restricted from viewing administrators
-            if ($userType === 'doctor') {
+            // Strict Hierarchy: Super Admin (root) -> Clinic Admin (admin) -> Doctor -> Patients
+            if ($userType === 'doctor' || !in_array($userType, ['root', 'admin'])) {
                 return response()->json([]);
             }
-            $data = DB::table('users')->whereIn('accounttype', ['admin', 'root'])->get();
+            // Only Root Superadmin can view and manage other root superadmins
+            if ($userType === 'root') {
+                $data = DB::table('users')->whereIn('accounttype', ['admin', 'root'])->get();
+                return response()->json($data);
+            }
+            // Clinic Admin can ONLY see clinic admins (never root superadmin)
+            $data = DB::table('users')->where('accounttype', 'admin')->get();
             return response()->json($data);
         });
     }

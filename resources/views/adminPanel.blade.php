@@ -32,12 +32,9 @@
         </head>
         <body>
         <section id="admin" data-id="{{$user_id}}" data-role="{{$user_type ?? 'admin'}}"></section>  
-        <script src="{{ asset('js/app.js') }}?v={{ time() }}"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.29.4/moment-with-locales.min.js" integrity="sha512-42PE0rd+wZ2hNXftlM78BSehIGzezNeQuzihiBCvUEB3CVxHvsShF86wBWwQORNxNINlBPuq7rG4WWhNiTVHFg==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
         <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.8.0/Chart.min.js" crossorigin="anonymous"></script>
-            <!-- <script src="assets/demo/chart-area-demo.js"></script> -->
-            <!-- <script src="assets/demo/chart-bar-demo.js"></script> -->
+        <script src="{{ asset('js/app.js') }}?v={{ time() }}"></script>
         <script src="{{ asset('js/adminScript.js') }}?v={{ file_exists(public_path('js/adminScript.js')) ? filemtime(public_path('js/adminScript.js')) : time() }}"></script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.29.4/moment-with-locales.min.js" integrity="sha512-42PE0rd+wZ2hNXftlM78BSehIGzezNeQuzihiBCvUEB3CVxHvsShF86wBWwQORNxNINlBPuq7rG4WWhNiTVHFg==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
-
         </body>
         </html>
