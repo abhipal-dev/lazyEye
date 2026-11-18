@@ -9,15 +9,12 @@ export default function IrisCopilotDrawer({ currentPatientId = null, role = 'doc
                localStorage.getItem('lazyeye-theme') === 'dark';
     });
 
-    const [activePatient, setActivePatient] = useState({
-        id: currentPatientId || 18,
-        name: currentPatientId ? `Patient #${currentPatientId}` : 'Puneet Kushwaha'
-    });
+    const [activePatientId, setActivePatientId] = useState(currentPatientId || null);
 
     const [messages, setMessages] = useState([
         {
             role: 'model',
-            text: `👋 Hello Doctor, I am **Iris** — your Autonomous Clinical AI Vision Copilot.\n\nI monitor patient compliance adherence, evaluate suppression scotoma telemetry, and can dynamically adjust dichoptic red-cyan contrast filters.\n\nClick any quick prompt below or ask me any question!`,
+            text: `👋 Hello Doctor, I am **Iris** — your Autonomous Clinical AI Vision Copilot.\n\nI monitor patient compliance adherence, evaluate suppression scotoma telemetry, and can dynamically adjust dichoptic red-cyan contrast filters.\n\nClick any quick action below or ask me about any patient or cohort metric!`,
             tools: []
         }
     ]);
@@ -50,13 +47,12 @@ export default function IrisCopilotDrawer({ currentPatientId = null, role = 'doc
         };
     }, []);
 
+    // 4 clean, wrapped quick prompts with ZERO horizontal scrolling needed
     const quickPrompts = [
-        { label: '📊 Cohort Compliance Radar', prompt: 'Summarize cohort compliance radar and tell me how many patients are at risk.' },
-        { label: `👤 Patient #18 (Puneet)`, prompt: 'Give me clinical progress report for Patient #18.' },
-        { label: '📈 Activity Evaluation', prompt: 'Are his activities good or not?' },
-        { label: '🎯 Contrast Adjustment', prompt: `Analyze and recommend dichoptic contrast adjustments for current patient.` },
-        { label: '📝 Draft SOAP Note', prompt: `Generate a formal SOAP clinical note for current patient.` },
-        { label: '⚠️ At-Risk Inactivity Check', prompt: 'Which patients have been inactive for more than 7 days and need intervention?' },
+        { label: '📊 Cohort Radar', prompt: 'Summarize cohort compliance radar and tell me how many patients are at risk.' },
+        { label: '📝 Draft SOAP Note', prompt: 'Generate a formal SOAP clinical note.' },
+        { label: '🎯 Contrast Adjustment', prompt: 'Analyze and recommend dichoptic contrast adjustments.' },
+        { label: '⚠️ At-Risk Check', prompt: 'Which patients have been inactive for more than 7 days and need intervention?' },
     ];
 
     const scrollToBottom = () => {
@@ -97,7 +93,7 @@ export default function IrisCopilotDrawer({ currentPatientId = null, role = 'doc
                         body: JSON.stringify({
                             message: query,
                             role: activeRole,
-                            patient_id: activePatient.id,
+                            patient_id: activePatientId,
                             history: messages.slice(-8).map(m => ({
                                 role: m.role === 'model' ? 'model' : 'user',
                                 text: m.text
@@ -115,10 +111,7 @@ export default function IrisCopilotDrawer({ currentPatientId = null, role = 'doc
 
             if (data && data.success) {
                 if (data.patient_id) {
-                    setActivePatient({
-                        id: data.patient_id,
-                        name: data.patient_name || `Patient #${data.patient_id}`
-                    });
+                    setActivePatientId(data.patient_id);
                 }
                 setMessages([...newMessages, {
                     role: 'model',
@@ -244,24 +237,24 @@ export default function IrisCopilotDrawer({ currentPatientId = null, role = 'doc
 
     return (
         <>
-            {/* Inline CSS to eradicate horizontal scrollbar completely and style smoothly */}
+            {/* Inline CSS for clean visible scrollbar in messages */}
             <style>{`
-                .iris-chips-scroll {
-                    -ms-overflow-style: none;
-                    scrollbar-width: none;
-                }
-                .iris-chips-scroll::-webkit-scrollbar {
-                    display: none;
+                .iris-messages-scroll {
+                    scrollbar-width: thin;
+                    scrollbar-color: ${isDark ? '#30363D #0D1117' : '#cbd5e1 #ffffff'};
                 }
                 .iris-messages-scroll::-webkit-scrollbar {
-                    width: 5px;
+                    width: 6px;
                 }
                 .iris-messages-scroll::-webkit-scrollbar-track {
-                    background: transparent;
+                    background: ${isDark ? '#0D1117' : '#ffffff'};
                 }
                 .iris-messages-scroll::-webkit-scrollbar-thumb {
-                    background: ${isDark ? 'rgba(255, 255, 255, 0.15)' : 'rgba(0, 0, 0, 0.15)'};
+                    background: ${isDark ? '#30363D' : '#cbd5e1'};
                     border-radius: 4px;
+                }
+                .iris-messages-scroll::-webkit-scrollbar-thumb:hover {
+                    background: ${isDark ? '#58A6FF' : '#94a3b8'};
                 }
                 @keyframes irisGlowPulse {
                     0% { box-shadow: 0 0 0 0 rgba(37, 99, 235, 0.6); }
@@ -276,8 +269,8 @@ export default function IrisCopilotDrawer({ currentPatientId = null, role = 'doc
                     onClick={() => setIsOpen(true)}
                     style={{
                         position: 'fixed',
-                        bottom: '24px',
-                        right: '24px',
+                        bottom: '20px',
+                        right: '20px',
                         display: 'flex',
                         alignItems: 'center',
                         gap: '10px',
@@ -320,12 +313,12 @@ export default function IrisCopilotDrawer({ currentPatientId = null, role = 'doc
                 <div
                     style={{
                         position: 'fixed',
-                        bottom: '24px',
-                        right: '24px',
-                        width: '430px',
+                        bottom: '20px',
+                        right: '20px',
+                        width: '420px',
                         maxWidth: 'calc(100vw - 32px)',
-                        height: '630px',
-                        maxHeight: 'calc(100vh - 48px)',
+                        height: '590px',
+                        maxHeight: 'calc(100vh - 40px)',
                         borderRadius: '18px',
                         backgroundColor: isDark ? '#0D1117' : '#ffffff',
                         border: isDark ? '1px solid rgba(56, 139, 253, 0.3)' : '1px solid rgba(226, 232, 240, 0.9)',
@@ -339,7 +332,7 @@ export default function IrisCopilotDrawer({ currentPatientId = null, role = 'doc
                         fontFamily: 'Inter, system-ui, -apple-system, sans-serif',
                     }}
                 >
-                    {/* Drawer Header */}
+                    {/* Drawer Header (Clean, no hardcoded patient tabs) */}
                     <div
                         style={{
                             padding: '14px 18px',
@@ -351,6 +344,7 @@ export default function IrisCopilotDrawer({ currentPatientId = null, role = 'doc
                             alignItems: 'center',
                             justifyContent: 'space-between',
                             borderBottom: isDark ? '1px solid #30363D' : '1px solid rgba(255, 255, 255, 0.1)',
+                            flexShrink: 0,
                         }}
                     >
                         <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
@@ -381,28 +375,13 @@ export default function IrisCopilotDrawer({ currentPatientId = null, role = 'doc
                         </div>
 
                         <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-                            {/* Active Patient Focus Tag */}
-                            <span
-                                style={{
-                                    fontSize: '11px',
-                                    padding: '3px 8px',
-                                    borderRadius: '6px',
-                                    backgroundColor: isDark ? 'rgba(56, 139, 253, 0.15)' : '#eff6ff',
-                                    color: isDark ? '#79C0FF' : '#1d4ed8',
-                                    border: isDark ? '1px solid rgba(56, 139, 253, 0.3)' : '1px solid #bfdbfe',
-                                    fontWeight: 600,
-                                }}
-                            >
-                                Focus: #{activePatient.id}
-                            </span>
-
                             {/* Role Toggle */}
                             <button
                                 onClick={() => setActiveRole(activeRole === 'doctor' ? 'patient' : 'doctor')}
                                 title="Toggle Role (Doctor Mode vs Patient Buddy)"
                                 style={{
                                     fontSize: '11px',
-                                    padding: '3px 8px',
+                                    padding: '4px 10px',
                                     borderRadius: '6px',
                                     backgroundColor: activeRole === 'doctor' ? '#1f6feb' : '#238636',
                                     color: '#ffffff',
@@ -432,17 +411,17 @@ export default function IrisCopilotDrawer({ currentPatientId = null, role = 'doc
                         </div>
                     </div>
 
-                    {/* Quick Prompts Bar (Scrollbar completely hidden) */}
+                    {/* Quick Prompts Bar (Flex wrap - 100% visible, no horizontal scrolling needed!) */}
                     <div
-                        className="iris-chips-scroll"
                         style={{
-                            padding: '8px 12px',
+                            padding: '10px 14px',
                             backgroundColor: isDark ? '#161B22' : '#f8fafc',
                             borderBottom: isDark ? '1px solid #30363D' : '1px solid #e2e8f0',
                             display: 'flex',
+                            flexWrap: 'wrap',
                             gap: '6px',
-                            overflowX: 'auto',
-                            whiteSpace: 'nowrap',
+                            alignItems: 'center',
+                            flexShrink: 0,
                         }}
                     >
                         {quickPrompts.map((qp, idx) => (
@@ -452,15 +431,14 @@ export default function IrisCopilotDrawer({ currentPatientId = null, role = 'doc
                                 disabled={loading}
                                 style={{
                                     padding: '5px 12px',
-                                    borderRadius: '9999px',
+                                    borderRadius: '8px',
                                     backgroundColor: isDark ? '#21262D' : '#ffffff',
                                     border: isDark ? '1px solid #30363D' : '1px solid #cbd5e1',
-                                    fontSize: '11px',
+                                    fontSize: '12px',
                                     fontWeight: 600,
                                     color: isDark ? '#E6EDF3' : '#334155',
                                     cursor: loading ? 'not-allowed' : 'pointer',
                                     transition: 'all 0.15s ease',
-                                    flexShrink: 0,
                                 }}
                                 onMouseEnter={(e) => {
                                     e.currentTarget.style.borderColor = '#1f6feb';
@@ -476,7 +454,7 @@ export default function IrisCopilotDrawer({ currentPatientId = null, role = 'doc
                         ))}
                     </div>
 
-                    {/* Messages Body */}
+                    {/* Messages Body (Clean visible vertical scrollbar) */}
                     <div
                         className="iris-messages-scroll"
                         style={{
@@ -561,7 +539,7 @@ export default function IrisCopilotDrawer({ currentPatientId = null, role = 'doc
                         <div ref={messagesEndRef} />
                     </div>
 
-                    {/* Chat Input Bar */}
+                    {/* Chat Input Bar (Always anchored at bottom) */}
                     <div
                         style={{
                             padding: '12px 14px',
@@ -570,6 +548,7 @@ export default function IrisCopilotDrawer({ currentPatientId = null, role = 'doc
                             display: 'flex',
                             gap: '8px',
                             alignItems: 'center',
+                            flexShrink: 0,
                         }}
                     >
                         <input
@@ -577,7 +556,7 @@ export default function IrisCopilotDrawer({ currentPatientId = null, role = 'doc
                             value={input}
                             onChange={(e) => setInput(e.target.value)}
                             onKeyDown={(e) => e.key === 'Enter' && handleSend()}
-                            placeholder={activeRole === 'doctor' ? `Ask Iris about Patient #${activePatient.id}, cohort, or contrast...` : "Ask Iris anything about games and vision..."}
+                            placeholder={activeRole === 'doctor' ? "Ask Iris about cohort, patient #18, or contrast..." : "Ask Iris anything about games and vision..."}
                             disabled={loading}
                             style={{
                                 flex: 1,
@@ -607,6 +586,7 @@ export default function IrisCopilotDrawer({ currentPatientId = null, role = 'doc
                                 fontWeight: 600,
                                 fontSize: '13px',
                                 transition: 'all 0.15s ease',
+                                flexShrink: 0,
                             }}
                         >
                             Send
