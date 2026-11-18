@@ -2611,3 +2611,24 @@ tr.patient-record-row:hover td {
 
 .swal2-container .swal2-popup.swal2-hide, .swal2-popup.swal2-hide { animation: swal2-hide 0.15s forwards !important; display: none !important; }
 .swal2-container.swal2-backdrop-hide { display: none !important; }
+
+
+/* ========================================================
+   OBSIDIAN DARK THEME: CLINICAL SIDEBAR ACTIVE LINK
+   ======================================================== */
+[data-theme="dark"] #layoutSidenav_nav .sb-sidenav .sb-sidenav-menu .nav .nav-link.active,
+[data-theme="dark"] .sb-sidenav .sb-sidenav-menu .nav .nav-link.active,
+[data-theme="dark"] .sb-sidenav .nav-link.active,
+[data-theme="dark"] .sb-sidenav-dark .sb-sidenav-menu .nav .nav-link.active {
+  background: rgba(31, 111, 235, 0.15) !important;
+  color: #58A6FF !important;
+  border: 1px solid rgba(56, 139, 253, 0.35) !important;
+  box-shadow: 0 0 14px rgba(31, 111, 235, 0.18) !important;
+}
+
+[data-theme="dark"] #layoutSidenav_nav .sb-sidenav .sb-sidenav-menu .nav .nav-link.active .sb-nav-link-icon,
+[data-theme="dark"] .sb-sidenav .sb-sidenav-menu .nav .nav-link.active .sb-nav-link-icon,
+[data-theme="dark"] .sb-sidenav .nav-link.active .sb-nav-link-icon,
+[data-theme="dark"] .sb-sidenav-dark .sb-sidenav-menu .nav .nav-link.active .sb-nav-link-icon {
+  color: #58A6FF !important;
+}

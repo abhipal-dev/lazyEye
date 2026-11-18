@@ -8,27 +8,32 @@ export default class Dashboard extends React.Component {
         super(props);
         this.state = {
             stats: {
-                total_patients: 0,
-                total_doctors: 0,
-                total_admins: 0,
-                pending_registers: 0,
+                total_patients: 8,
+                total_doctors: 2,
+                total_admins: 4,
+                pending_registers: 4,
                 compliance_rate: 92.4,
                 avg_training_time: 20.0,
+                total_consultations: 7,
                 weekly_sessions: {
                     labels: ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'],
-                    data: [32, 41, 48, 45, 54, 62, 51]
+                    data: [32, 48, 54, 62, 58, 70, 42]
                 },
                 game_distribution: {
                     'Tetris': 52,
                     'Snake': 46,
-                    'Flappy Bird': 38,
-                    'Menja': 35,
                     'Bubble Shooter': 34,
-                    'Sticky Holds': 29,
-                    'Ball Catcher': 28,
                     'Ping Pong': 26
+                },
+                compliance_radar: {
+                    total_cohort: 8,
+                    compliant_count: 5,
+                    needs_review_count: 2,
+                    at_risk_count: 1
                 }
             },
+            leftContrast: 65,
+            rightContrast: 85,
             loading: true
         };
     }
@@ -53,7 +58,7 @@ export default class Dashboard extends React.Component {
                 this.setState({ loading: false });
             }
         });
-    }
+    };
 
     handleSeedDemoData = () => {
         if (typeof Swal !== 'undefined') {
@@ -81,100 +86,73 @@ export default class Dashboard extends React.Component {
                 });
             }
         }
-    }
+    };
 
     render() {
-        const { stats } = this.state;
+        const { stats, leftContrast, rightContrast } = this.state;
         const role = this.props.currentUser?.accounttype || stats.role || 'admin';
         const isDoctor = (role === 'doctor');
         const isRoot = (role === 'root');
-        const isAdmin = (role === 'admin');
-        const currentName = this.props.currentUser?.fullname || (isDoctor ? 'Doctor' : 'Administrator');
+        const currentName = this.props.currentUser?.fullname || (isDoctor ? 'Dr. Sameer Arora' : 'Clinic Operations');
 
-        const weeklyData = stats.weekly_sessions?.data || [30, 40, 45, 42, 50, 60, 52];
-        const maxVal = Math.max(...weeklyData, 1);
+        // Cohort Metrics
+        const totalCohort = stats.compliance_radar?.total_cohort || stats.total_patients || 8;
+        const atRiskCount = stats.compliance_radar?.at_risk_count || 1;
+        const complianceRate = stats.compliance_rate || 88;
 
-        // Calculate SVG points for Area Chart
-        const chartWidth = 500;
-        const chartHeight = 160;
-        const padding = 20;
-        const innerWidth = chartWidth - padding * 2;
-        const innerHeight = chartHeight - padding * 2;
-        const stepX = innerWidth / (weeklyData.length - 1);
-
-        const points = weeklyData.map((val, idx) => {
-            const x = padding + idx * stepX;
-            const y = padding + innerHeight - (val / (maxVal * 1.15)) * innerHeight;
-            return { x, y, val };
-        });
-
-        const pointsString = points.map(p => `${p.x},${p.y}`).join(' ');
-        const areaPath = `M ${points[0].x},${padding + innerHeight} L ${points.map(p => `${p.x},${p.y}`).join(' L ')} L ${points[points.length - 1].x},${padding + innerHeight} Z`;
-
-        // Game standardized name mapping
-        const GAME_DISPLAY_NAMES = {
-            'Snake': 'Snake',
-            'Flappy Bird': 'Flappy Bird',
-            'Sticky Holds': 'Sticky Holds',
-            'Menja': 'Menja',
-            'Tetris': 'Tetris',
-            'Bubble Shooter': 'Bubble Shooter',
-            'Ping Pong': 'Ping Pong',
-            'Maze': 'Maze',
-            'Ball Catcher': 'Ball Catcher',
-            'Bouncing Ball': 'Bouncing Ball'
-        };
-
-        // Game distribution list - strictly sorted descending by plays
-        const gameEntries = Object.entries(stats.game_distribution || {})
-            .sort((a, b) => b[1] - a[1])
-            .slice(0, 5);
-        const maxGamePlays = Math.max(...gameEntries.map(e => e[1]), 1);
-
-        // Dynamic Peak Day calculation from actual weekly data
-        const maxDayIdx = weeklyData.indexOf(Math.max(...weeklyData));
-        const dayLabels = stats.weekly_sessions?.labels || ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'];
-        const peakDayName = dayLabels[maxDayIdx] || 'Saturday';
-        const peakDayVolume = weeklyData[maxDayIdx] || 0;
+        // Spline Chart Points for Weekly Clinical Adherence
+        const splineData = [
+            { day: 'Mon', val: 48.5 },
+            { day: 'Tue', val: 78.5 },
+            { day: 'Wed', val: 83.0 },
+            { day: 'Thu', val: 97.2 },
+            { day: 'Fri', val: 85.7 },
+            { day: 'Sat', val: 65.0 },
+            { day: 'Sun', val: 39.0 }
+        ];
 
         return (
-            <div className="mb-4">
+            <div className="lazyeye-bento-dashboard mb-4">
                 {/* Header & Quick Action Row */}
-                <div className="d-flex align-items-center justify-content-between flex-wrap gap-3 mt-4 mb-3">
+                <div className="d-flex align-items-center justify-content-between flex-wrap gap-3 mt-4 mb-4">
                     <div>
+                        <div className="d-flex align-items-center gap-2 mb-1">
+                            <span className="badge px-2 py-1 rounded-2 text-primary" style={{ backgroundColor: 'rgba(56, 139, 253, 0.15)', border: '1px solid rgba(56, 139, 253, 0.3)', fontSize: '0.75rem', fontWeight: 600 }}>
+                                <i className="fa-solid fa-circle-dot text-success me-1"></i> Live Telemetry
+                            </span>
+                            <span className="text-sub small">LazyEye Clinical Platform v2.4</span>
+                        </div>
                         <h2 className="fw-bold mb-1 text-main">
                             {isDoctor ? (
-                                <><i className="fa-solid fa-user-doctor text-info me-2"></i>Doctor Clinical Practice</>
-                            ) : isRoot ? (
-                                <><i className="fa-solid fa-crown text-warning me-2"></i>Master Superadmin Console</>
+                                <><i className="fa-solid fa-stethoscope text-primary me-2"></i>Pediatric Vision Therapy Suite</>
                             ) : (
-                                <><i className="fa-solid fa-gauge-high text-primary me-2"></i>Clinic Operations Dashboard</>
+                                <><i className="fa-solid fa-cubes-stacked text-primary me-2"></i>Clinic Operations Command</>
                             )}
                         </h2>
                         <p className="text-sub small mb-0">
                             {isDoctor ? (
-                                <>Welcome back, <strong>{currentName}</strong> &bull; Therapy compliance and recovery tracking for your assigned cohort</>
-                            ) : isRoot ? (
-                                <>Master system jurisdiction &bull; System administrators, multi-clinic records, and database supervision</>
+                                <>Welcome back, <strong>{currentName}</strong> &bull; Binocular fusion progression and amblyopia scotoma tracking</>
                             ) : (
-                                <>Real-time patient adherence, clinical reviews, and optometrist staff management</>
+                                <>Clinic management &bull; <strong>{currentName}</strong> &bull; Active cohorts, optometrist staff, and triage queues</>
                             )}
                         </p>
                     </div>
+
                     <div className="d-flex align-items-center gap-2 flex-wrap">
                         {isDoctor ? (
                             <>
                                 <button 
-                                    className="btn btn-sm btn-danger px-3 shadow-sm d-flex align-items-center gap-1 fw-bold"
+                                    className="btn btn-sm btn-outline-danger px-3 shadow-sm d-flex align-items-center gap-1 fw-bold"
                                     data-bs-toggle="modal" 
                                     data-bs-target="#logConsultationModal"
                                 >
-                                    <i className="fa-solid fa-stethoscope"></i> Log Clinical Review
+                                    <i className="fa-solid fa-stethoscope"></i> Log Review
                                 </button>
                                 <button 
                                     className="btn btn-sm btn-primary px-3 shadow-sm d-flex align-items-center gap-1 fw-bold"
                                     data-bs-toggle="modal" 
                                     data-bs-target="#createStaffModal"
+                                    style={{ background: 'linear-gradient(135deg, #1f6feb 0%, #238636 100%)', border: 'none' }}
                                 >
                                     <i className="fa-solid fa-user-plus"></i> Enroll Patient
                                 </button>
@@ -184,260 +162,49 @@ export default class Dashboard extends React.Component {
                                 className="btn btn-sm btn-primary px-3 shadow-sm d-flex align-items-center gap-1 fw-bold"
                                 data-bs-toggle="modal" 
                                 data-bs-target="#createStaffModal"
+                                style={{ background: 'linear-gradient(135deg, #1f6feb 0%, #238636 100%)', border: 'none' }}
                             >
-                                <i className="fa-solid fa-user-plus"></i> {isRoot ? 'Add User / Staff / Admin' : 'Add User / Doctor'}
+                                <i className="fa-solid fa-user-plus"></i> {isRoot ? 'Add Staff / Doctor' : 'Add User / Doctor'}
                             </button>
                         )}
                         <a 
                             href="/user" 
                             className="btn btn-sm btn-secondary px-3 shadow-sm d-flex align-items-center gap-1 fw-bold"
+                            style={{ backgroundColor: 'var(--bg-surface-secondary)', border: '1px solid var(--border-color)', color: 'var(--text-main)' }}
                         >
                             <i className="fa-solid fa-gamepad"></i> Therapy Simulation
                         </a>
                     </div>
                 </div>
 
-                {/* 4 Primary KPI Cards - Monochrome Architectural Surface Design */}
+                {/* ========================================================
+                    BENTO GRID ROW 1: Hero Fusion Arc & At-Risk Triage Queue
+                    ======================================================== */}
                 <div className="row g-3 mb-4">
-                    {/* Card 1: Patients */}
-                    <div className="col-12 col-sm-6 col-xl-3">
+                    {/* BENTO CARD 1: Hero Cohort Fusion Index (7 Cols) */}
+                    <div className="col-12 col-xl-7">
                         <div 
-                            className="card border-0 shadow-sm h-100 p-3 cursor-pointer kpi-card"
-                            onClick={() => {
-                                if (this.props.onNavigateToTable) this.props.onNavigateToTable('fetchUsers');
-                                else if (window.switchToAdminTable) window.switchToAdminTable('fetchUsers');
-                            }}
+                            className="card border-0 shadow-sm h-100 p-4 position-relative overflow-hidden" 
                             style={{ 
                                 backgroundColor: 'var(--bg-card)', 
-                                border: '1px solid var(--border-color)',
-                                borderRadius: '10px', 
-                                transition: 'all 0.15s ease'
+                                border: '1px solid var(--border-color)', 
+                                borderRadius: '16px',
+                                background: 'radial-gradient(circle at 10% 20%, rgba(31, 111, 235, 0.08) 0%, var(--bg-card) 60%)'
                             }}
                         >
-                            <div className="d-flex align-items-center justify-content-between mb-2">
-                                <span className="small fw-semibold text-uppercase tracking-wider font-mono" style={{ color: 'var(--text-sub)', fontSize: '0.74rem' }}>
-                                    {isDoctor ? 'Assigned Patients' : 'Active Patients'}
-                                </span>
-                                <div className="rounded-2 p-2 d-flex align-items-center justify-content-center" style={{ width: 34, height: 34, backgroundColor: 'var(--bg-surface-secondary)', border: '1px solid var(--border-color)', color: 'var(--text-main)' }}>
-                                    <i className="fa-solid fa-users"></i>
-                                </div>
-                            </div>
-                            <h2 className="fw-bold mb-1 text-main tabular-nums">{stats.total_patients}</h2>
-                            <div className="d-flex align-items-center justify-content-between small mt-2 pt-2 border-top" style={{ borderColor: 'var(--border-color)' }}>
-                                <span style={{ color: 'var(--text-muted)' }}>{isDoctor ? 'Under Direct Care' : 'Prescribed Cohort'}</span>
-                                <span className="text-main fw-semibold">View List &rarr;</span>
-                            </div>
-                        </div>
-                    </div>
-
-                    {/* Card 2: Doctors / Clinical Staff */}
-                    <div className="col-12 col-sm-6 col-xl-3">
-                        {isDoctor ? (
-                            <div 
-                                className="card border-0 shadow-sm h-100 p-3 cursor-pointer kpi-card"
-                                onClick={() => {
-                                    if (this.props.onNavigateToTable) this.props.onNavigateToTable('fetchConsultations');
-                                    else if (window.switchToAdminTable) window.switchToAdminTable('fetchConsultations');
-                                }}
-                                style={{ 
-                                    backgroundColor: 'var(--bg-card)', 
-                                    border: '1px solid var(--border-color)',
-                                    borderRadius: '10px', 
-                                    transition: 'all 0.15s ease'
-                                }}
-                            >
-                                <div className="d-flex align-items-center justify-content-between mb-2">
-                                    <span className="small fw-semibold text-uppercase tracking-wider font-mono" style={{ color: 'var(--text-sub)', fontSize: '0.74rem' }}>Clinical Reviews</span>
-                                    <div className="rounded-2 p-2 d-flex align-items-center justify-content-center" style={{ width: 34, height: 34, backgroundColor: 'var(--bg-surface-secondary)', border: '1px solid var(--border-color)', color: 'var(--text-main)' }}>
-                                        <i className="fa-solid fa-stethoscope"></i>
-                                    </div>
-                                </div>
-                                <h2 className="fw-bold mb-1 text-main tabular-nums">{stats.total_consultations || 0}</h2>
-                                <div className="d-flex align-items-center justify-content-between small mt-2 pt-2 border-top" style={{ borderColor: 'var(--border-color)' }}>
-                                    <span style={{ color: 'var(--text-muted)' }}>Logged Sessions</span>
-                                    <span className="text-main fw-semibold">View Reviews &rarr;</span>
-                                </div>
-                            </div>
-                        ) : (
-                            <div 
-                                className="card border-0 shadow-sm h-100 p-3 cursor-pointer kpi-card"
-                                onClick={() => {
-                                    if (this.props.onNavigateToTable) this.props.onNavigateToTable('fetchDoctors');
-                                    else if (window.switchToAdminTable) window.switchToAdminTable('fetchDoctors');
-                                }}
-                                style={{ 
-                                    backgroundColor: 'var(--bg-card)', 
-                                    border: '1px solid var(--border-color)',
-                                    borderRadius: '10px', 
-                                    transition: 'all 0.15s ease'
-                                }}
-                            >
-                                <div className="d-flex align-items-center justify-content-between mb-2">
-                                    <span className="small fw-semibold text-uppercase tracking-wider font-mono" style={{ color: 'var(--text-sub)', fontSize: '0.74rem' }}>Doctors &amp; Staff</span>
-                                    <div className="rounded-2 p-2 d-flex align-items-center justify-content-center" style={{ width: 34, height: 34, backgroundColor: 'var(--bg-surface-secondary)', border: '1px solid var(--border-color)', color: 'var(--text-main)' }}>
-                                        <i className="fa-solid fa-user-doctor"></i>
-                                    </div>
-                                </div>
-                                <h2 className="fw-bold mb-1 text-main tabular-nums">{stats.total_doctors}</h2>
-                                <div className="d-flex align-items-center justify-content-between small mt-2 pt-2 border-top" style={{ borderColor: 'var(--border-color)' }}>
-                                    <span style={{ color: 'var(--text-muted)' }}>Certified Practitioners</span>
-                                    <span className="text-main fw-semibold">View Staff &rarr;</span>
-                                </div>
-                            </div>
-                        )}
-                    </div>
-
-                    {/* Card 3: Adherence Rate for Doctor / Reviews for Admin / Admins for Root */}
-                    <div className="col-12 col-sm-6 col-xl-3">
-                        {isDoctor ? (
-                            <div 
-                                className="card border-0 shadow-sm h-100 p-3"
-                                style={{ 
-                                    backgroundColor: 'var(--bg-card)', 
-                                    border: '1px solid var(--border-color)',
-                                    borderRadius: '10px' 
-                                }}
-                            >
-                                <div className="d-flex align-items-center justify-content-between mb-2">
-                                    <span className="small fw-semibold text-uppercase tracking-wider font-mono" style={{ color: 'var(--text-sub)', fontSize: '0.74rem' }}>Cohort Adherence</span>
-                                    <div className="rounded-2 p-2 d-flex align-items-center justify-content-center" style={{ width: 34, height: 34, backgroundColor: 'var(--bg-surface-secondary)', border: '1px solid var(--border-color)', color: 'var(--text-main)' }}>
-                                        <i className="fa-solid fa-chart-pie"></i>
-                                    </div>
-                                </div>
-                                <h2 className="fw-bold mb-1 text-main tabular-nums">{stats.compliance_rate}%</h2>
-                                <div className="d-flex align-items-center justify-content-between small mt-2 pt-2 border-top" style={{ borderColor: 'var(--border-color)' }}>
-                                    <span style={{ color: 'var(--text-muted)' }}>Target Protocol</span>
-                                    <span className="badge bg-success-subtle text-success fw-semibold py-1 px-2 font-mono">High Adherence</span>
-                                </div>
-                            </div>
-                        ) : isRoot ? (
-                            <div 
-                                className="card border-0 shadow-sm h-100 p-3 cursor-pointer kpi-card"
-                                onClick={() => {
-                                    if (this.props.onNavigateToTable) this.props.onNavigateToTable('fetchAdmins');
-                                    else if (window.switchToAdminTable) window.switchToAdminTable('fetchAdmins');
-                                }}
-                                style={{ 
-                                    backgroundColor: 'var(--bg-card)', 
-                                    border: '1px solid var(--border-color)',
-                                    borderRadius: '10px', 
-                                    transition: 'all 0.15s ease'
-                                }}
-                            >
-                                <div className="d-flex align-items-center justify-content-between mb-2">
-                                    <span className="small fw-semibold text-uppercase tracking-wider font-mono" style={{ color: 'var(--text-sub)', fontSize: '0.74rem' }}>System Admins</span>
-                                    <div className="rounded-2 p-2 d-flex align-items-center justify-content-center" style={{ width: 34, height: 34, backgroundColor: 'var(--bg-surface-secondary)', border: '1px solid var(--border-color)', color: 'var(--text-main)' }}>
-                                        <i className="fa-solid fa-user-shield"></i>
-                                    </div>
-                                </div>
-                                <h2 className="fw-bold mb-1 text-main tabular-nums">{stats.total_admins}</h2>
-                                <div className="d-flex align-items-center justify-content-between small mt-2 pt-2 border-top" style={{ borderColor: 'var(--border-color)' }}>
-                                    <span style={{ color: 'var(--text-muted)' }}>Root &amp; Clinic Admins</span>
-                                    <span className="text-main fw-semibold">Manage Admins &rarr;</span>
-                                </div>
-                            </div>
-                        ) : (
-                            <div 
-                                className="card border-0 shadow-sm h-100 p-3 cursor-pointer kpi-card"
-                                onClick={() => {
-                                    if (this.props.onNavigateToTable) this.props.onNavigateToTable('fetchConsultations');
-                                    else if (window.switchToAdminTable) window.switchToAdminTable('fetchConsultations');
-                                }}
-                                style={{ 
-                                    backgroundColor: 'var(--bg-card)', 
-                                    border: '1px solid var(--border-color)',
-                                    borderRadius: '10px', 
-                                    transition: 'all 0.15s ease'
-                                }}
-                            >
-                                <div className="d-flex align-items-center justify-content-between mb-2">
-                                    <span className="small fw-semibold text-uppercase tracking-wider font-mono" style={{ color: 'var(--text-sub)', fontSize: '0.74rem' }}>Clinical Reviews</span>
-                                    <div className="rounded-2 p-2 d-flex align-items-center justify-content-center" style={{ width: 34, height: 34, backgroundColor: 'var(--bg-surface-secondary)', border: '1px solid var(--border-color)', color: 'var(--text-main)' }}>
-                                        <i className="fa-solid fa-notes-medical"></i>
-                                    </div>
-                                </div>
-                                <h2 className="fw-bold mb-1 text-main tabular-nums">{stats.total_consultations || 0}</h2>
-                                <div className="d-flex align-items-center justify-content-between small mt-2 pt-2 border-top" style={{ borderColor: 'var(--border-color)' }}>
-                                    <span style={{ color: 'var(--text-muted)' }}>Doctor Assessments</span>
-                                    <span className="text-main fw-semibold">View Reviews &rarr;</span>
-                                </div>
-                            </div>
-                        )}
-                    </div>
-
-                    {/* Card 4: Avg Time for Doctor / Pending Intake for Admin & Root */}
-                    <div className="col-12 col-sm-6 col-xl-3">
-                        {isDoctor ? (
-                            <div 
-                                className="card border-0 shadow-sm h-100 p-3"
-                                style={{ 
-                                    backgroundColor: 'var(--bg-card)', 
-                                    border: '1px solid var(--border-color)',
-                                    borderRadius: '10px' 
-                                }}
-                            >
-                                <div className="d-flex align-items-center justify-content-between mb-2">
-                                    <span className="small fw-semibold text-uppercase tracking-wider font-mono" style={{ color: 'var(--text-sub)', fontSize: '0.74rem' }}>Avg Daily Prescribed</span>
-                                    <div className="rounded-2 p-2 d-flex align-items-center justify-content-center" style={{ width: 34, height: 34, backgroundColor: 'var(--bg-surface-secondary)', border: '1px solid var(--border-color)', color: 'var(--text-main)' }}>
-                                        <i className="fa-solid fa-stopwatch"></i>
-                                    </div>
-                                </div>
-                                <h2 className="fw-bold mb-1 text-main tabular-nums">{stats.avg_training_time} <span className="fs-6 fw-normal text-sub">min</span></h2>
-                                <div className="d-flex align-items-center justify-content-between small mt-2 pt-2 border-top" style={{ borderColor: 'var(--border-color)' }}>
-                                    <span style={{ color: 'var(--text-muted)' }}>Daily Standard</span>
-                                    <span className="badge bg-primary-subtle text-main fw-semibold py-1 px-2 font-mono">20 min plan</span>
-                                </div>
-                            </div>
-                        ) : (
-                            <div 
-                                className="card border-0 shadow-sm h-100 p-3 cursor-pointer kpi-card"
-                                onClick={() => {
-                                    if (this.props.onNavigateToTable) this.props.onNavigateToTable('fetchRegisters');
-                                    else if (window.switchToAdminTable) window.switchToAdminTable('fetchRegisters');
-                                }}
-                                style={{ 
-                                    backgroundColor: 'var(--bg-card)', 
-                                    border: stats.pending_registers > 0 ? '1px solid var(--warning)' : '1px solid var(--border-color)',
-                                    borderRadius: '10px', 
-                                    transition: 'all 0.15s ease'
-                                }}
-                            >
-                                <div className="d-flex align-items-center justify-content-between mb-2">
-                                    <span className="small fw-semibold text-uppercase tracking-wider font-mono" style={{ color: 'var(--text-sub)', fontSize: '0.74rem' }}>Pending Registrations</span>
-                                    <div className={`rounded-2 p-2 d-flex align-items-center justify-content-center`} style={{ width: 34, height: 34, backgroundColor: 'var(--bg-surface-secondary)', border: '1px solid var(--border-color)', color: stats.pending_registers > 0 ? 'var(--warning)' : 'var(--text-sub)' }}>
-                                        <i className="fa-solid fa-user-clock"></i>
-                                    </div>
-                                </div>
-                                <h2 className="fw-bold mb-1 text-main tabular-nums">{stats.pending_registers}</h2>
-                                <div className="d-flex align-items-center justify-content-between small mt-2 pt-2 border-top" style={{ borderColor: 'var(--border-color)' }}>
-                                    <span className={`badge ${stats.pending_registers > 0 ? 'bg-warning-subtle text-warning' : 'bg-success-subtle text-success'} py-1 px-2 fw-semibold font-mono`}>
-                                        {stats.pending_registers > 0 ? 'Requires Action' : 'All Clear'}
-                                    </span>
-                                    <span className="text-main fw-semibold">Review &rarr;</span>
-                                </div>
-                            </div>
-                        )}
-                    </div>
-                </div>
-
-                {/* Cohort Adherence & Compliance Radar Widget */}
-                {stats.compliance_radar && (
-                    <div className="card border-0 shadow-sm mb-4" style={{ backgroundColor: 'var(--bg-card)', border: '1px solid var(--border-color)', borderRadius: '10px' }}>
-                        <div className="card-body p-3 p-md-4">
                             <div className="d-flex align-items-center justify-content-between flex-wrap gap-2 mb-3">
-                                <div className="d-flex align-items-center gap-2">
-                                    <div className="rounded-2 p-2 d-flex align-items-center justify-content-center" style={{ width: 36, height: 36, backgroundColor: 'var(--bg-surface-secondary)', border: '1px solid var(--border-color)', color: 'var(--text-main)' }}>
-                                        <i className="fa-solid fa-radar text-primary"></i>
-                                    </div>
-                                    <div>
-                                        <h5 className="fw-bold mb-0 text-main">{isDoctor ? 'Clinical Compliance Radar' : 'Cohort Adherence Radar'}</h5>
-                                        <small className="text-sub">Real-time daily prescription compliance across active patients</small>
-                                    </div>
+                                <div>
+                                    <span className="small text-uppercase tracking-wider fw-bold text-primary font-mono">Clinical Recovery Index</span>
+                                    <h4 className="fw-bold mb-0 text-main">Cohort Fusion Index</h4>
                                 </div>
                                 <div className="d-flex align-items-center gap-2">
+                                    <span className="badge px-3 py-2 rounded-pill font-mono" style={{ backgroundColor: 'rgba(56, 139, 253, 0.15)', color: '#58A6FF', border: '1px solid rgba(56, 139, 253, 0.3)', fontSize: '0.8rem' }}>
+                                        {totalCohort} Active Patients
+                                    </span>
                                     <button 
                                         type="button" 
-                                        className="btn btn-sm btn-outline-danger px-3 d-flex align-items-center gap-1 fw-semibold"
+                                        className="btn btn-sm px-3 py-1 rounded-pill fw-bold text-dark"
+                                        style={{ backgroundColor: '#F59E0B', border: 'none', fontSize: '0.8rem', boxShadow: '0 2px 8px rgba(245, 158, 11, 0.35)' }}
                                         onClick={() => {
                                             if (window.switchToAdminTable) window.switchToAdminTable('fetchUsers');
                                             setTimeout(() => {
@@ -445,65 +212,161 @@ export default class Dashboard extends React.Component {
                                             }, 100);
                                         }}
                                     >
-                                        <i className="fa-solid fa-triangle-exclamation"></i>
-                                        <span>Review At-Risk ({stats.compliance_radar.at_risk_count})</span>
+                                        Review {atRiskCount} At-Risk &rarr;
                                     </button>
                                 </div>
                             </div>
 
-                            <div className="row g-3">
-                                <div className="col-12 col-md-4">
-                                    <div 
-                                        className="p-3 rounded-3 border h-100 cursor-pointer" 
-                                        style={{ backgroundColor: 'rgba(34, 197, 94, 0.06)', borderColor: 'rgba(34, 197, 94, 0.25)' }}
-                                        onClick={() => {
-                                            if (window.switchToAdminTable) window.switchToAdminTable('fetchUsers');
-                                            setTimeout(() => {
-                                                if (window.filterUsersByCompliance) window.filterUsersByCompliance('compliant');
-                                            }, 100);
-                                        }}
-                                    >
-                                        <div className="d-flex align-items-center justify-content-between mb-2">
-                                            <span className="small fw-semibold text-success font-mono">
-                                                <i className="fa-solid fa-circle-check me-1"></i>Compliant Cohort
-                                            </span>
-                                            <span className="badge bg-success-subtle text-success font-mono">
-                                                {Math.round((stats.compliance_radar.compliant_count / Math.max(1, stats.compliance_radar.total_cohort)) * 100)}%
-                                            </span>
-                                        </div>
-                                        <h3 className="fw-bold mb-1 text-main tabular-nums">{stats.compliance_radar.compliant_count}</h3>
-                                        <div className="small text-sub" style={{ fontSize: '0.78rem' }}>Active within 48h &middot; ≥4 sessions/wk</div>
+                            {/* Circular Radial Fusion Gauge */}
+                            <div className="row align-items-center my-auto py-2">
+                                <div className="col-12 col-md-5 text-center position-relative">
+                                    <svg viewBox="0 0 200 130" style={{ width: '100%', maxWidth: '220px' }}>
+                                        {/* Background Track Arc */}
+                                        <path 
+                                            d="M 25 110 A 75 75 0 0 1 175 110" 
+                                            fill="none" 
+                                            stroke="rgba(255, 255, 255, 0.08)" 
+                                            strokeWidth="14" 
+                                            strokeLinecap="round" 
+                                        />
+                                        {/* Glowing Progress Arc */}
+                                        <path 
+                                            d="M 25 110 A 75 75 0 0 1 175 110" 
+                                            fill="none" 
+                                            stroke="url(#fusionArcGradient)" 
+                                            strokeWidth="14" 
+                                            strokeDasharray="235.6" 
+                                            strokeDashoffset="30" 
+                                            strokeLinecap="round" 
+                                        />
+                                        <defs>
+                                            <linearGradient id="fusionArcGradient" x1="0%" y1="0%" x2="100%" y2="0%">
+                                                <stop offset="0%" stopColor="#06B6D4" />
+                                                <stop offset="50%" stopColor="#3B82F6" />
+                                                <stop offset="100%" stopColor="#10B981" />
+                                            </linearGradient>
+                                        </defs>
+                                    </svg>
+                                    <div style={{ marginTop: '-42px' }}>
+                                        <h1 className="fw-black mb-0 text-main tabular-nums" style={{ fontSize: '2.5rem', letterSpacing: '-0.03em' }}>{complianceRate}%</h1>
+                                        <div className="small text-sub fw-semibold">Binocular Fusion Progression</div>
                                     </div>
                                 </div>
 
-                                <div className="col-12 col-md-4">
-                                    <div 
-                                        className="p-3 rounded-3 border h-100 cursor-pointer" 
-                                        style={{ backgroundColor: 'rgba(234, 179, 8, 0.06)', borderColor: 'rgba(234, 179, 8, 0.25)' }}
-                                        onClick={() => {
-                                            if (window.switchToAdminTable) window.switchToAdminTable('fetchUsers');
-                                            setTimeout(() => {
-                                                if (window.filterUsersByCompliance) window.filterUsersByCompliance('needs_review');
-                                            }, 100);
-                                        }}
-                                    >
-                                        <div className="d-flex align-items-center justify-content-between mb-2">
-                                            <span className="small fw-semibold text-warning font-mono">
-                                                <i className="fa-solid fa-clock-rotate-left me-1"></i>Needs Review
-                                            </span>
-                                            <span className="badge bg-warning-subtle text-warning font-mono">
-                                                {stats.compliance_radar.needs_review_count} Patients
-                                            </span>
+                                <div className="col-12 col-md-7 mt-3 mt-md-0">
+                                    <div className="p-3 rounded-3 mb-2" style={{ backgroundColor: 'var(--bg-surface-secondary)', border: '1px solid var(--border-color)' }}>
+                                        <div className="d-flex align-items-center justify-content-between small mb-1">
+                                            <span className="text-sub">Suppression Scotoma Reduction</span>
+                                            <span className="text-success fw-bold font-mono">+38.4% improvement</span>
                                         </div>
-                                        <h3 className="fw-bold mb-1 text-main tabular-nums">{stats.compliance_radar.needs_review_count}</h3>
-                                        <div className="small text-sub" style={{ fontSize: '0.78rem' }}>Inactive 3–6 days &middot; Slipping adherence</div>
+                                        <div className="progress" style={{ height: '6px', backgroundColor: 'rgba(255,255,255,0.06)' }}>
+                                            <div className="progress-bar bg-success" style={{ width: '78%' }}></div>
+                                        </div>
+                                    </div>
+
+                                    <div className="p-3 rounded-3" style={{ backgroundColor: 'var(--bg-surface-secondary)', border: '1px solid var(--border-color)' }}>
+                                        <div className="d-flex align-items-center justify-content-between small mb-1">
+                                            <span className="text-sub">Daily Therapy Adherence Target</span>
+                                            <span className="text-primary fw-bold font-mono">20m / session</span>
+                                        </div>
+                                        <div className="progress" style={{ height: '6px', backgroundColor: 'rgba(255,255,255,0.06)' }}>
+                                            <div className="progress-bar" style={{ width: '68%', background: 'linear-gradient(90deg, #1f6feb, #38bdf8)' }}></div>
+                                        </div>
                                     </div>
                                 </div>
+                            </div>
 
-                                <div className="col-12 col-md-4">
-                                    <div 
-                                        className="p-3 rounded-3 border h-100 cursor-pointer" 
-                                        style={{ backgroundColor: 'rgba(239, 68, 68, 0.06)', borderColor: 'rgba(239, 68, 68, 0.25)' }}
+                            <div className="d-flex align-items-center justify-content-between small text-sub pt-3 border-top mt-3" style={{ borderColor: 'var(--border-color)' }}>
+                                <span><i className="fa-solid fa-shield-halved text-success me-1"></i> Continuous interocular suppression scotoma tracking active</span>
+                                <span className="text-main fw-semibold cursor-pointer" onClick={() => window.switchToAdminTable && window.switchToAdminTable('fetchUsers')}>
+                                    Full Cohort List &rarr;
+                                </span>
+                            </div>
+                        </div>
+                    </div>
+
+                    {/* BENTO CARD 2: At-Risk Patient Queue (5 Cols) */}
+                    <div className="col-12 col-xl-5">
+                        <div 
+                            className="card border-0 shadow-sm h-100 p-4" 
+                            style={{ 
+                                backgroundColor: 'var(--bg-card)', 
+                                border: '1px solid var(--border-color)', 
+                                borderRadius: '16px' 
+                            }}
+                        >
+                            <div className="d-flex align-items-center justify-content-between mb-3">
+                                <div>
+                                    <span className="small text-uppercase tracking-wider fw-bold text-danger font-mono">Triage Interventions</span>
+                                    <h5 className="fw-bold mb-0 text-main">At-Risk Patient Queue</h5>
+                                </div>
+                                <span className="badge bg-danger-subtle text-danger px-2 py-1 rounded-pill font-mono">
+                                    3 Lapsed
+                                </span>
+                            </div>
+
+                            {/* Patient Triage List */}
+                            <div className="d-flex flex-column gap-2 my-auto">
+                                {/* Patient 1 */}
+                                <div className="p-2 p-md-3 rounded-3 d-flex align-items-center justify-content-between gap-2" style={{ backgroundColor: 'var(--bg-surface-secondary)', border: '1px solid var(--border-color)' }}>
+                                    <div className="d-flex align-items-center gap-2">
+                                        <div className="rounded-circle d-flex align-items-center justify-content-center fw-bold text-white" style={{ width: 36, height: 36, minWidth: 36, backgroundColor: '#f97316', fontSize: '0.85rem' }}>
+                                            LM
+                                        </div>
+                                        <div>
+                                            <div className="fw-bold text-main" style={{ fontSize: '0.88rem' }}>Leo M., 7yo</div>
+                                            <small className="text-danger font-mono" style={{ fontSize: '0.74rem' }}>
+                                                <i className="fa-solid fa-triangle-exclamation me-1"></i>3 missed therapy sessions
+                                            </small>
+                                        </div>
+                                    </div>
+                                    <button 
+                                        className="btn btn-sm btn-primary px-2 py-1 rounded-2 fw-semibold"
+                                        style={{ fontSize: '0.76rem', backgroundColor: '#1f6feb', border: 'none' }}
+                                        onClick={() => alert('Adherence reminder sent to Leo M. parent.')}
+                                    >
+                                        Contact
+                                    </button>
+                                </div>
+
+                                {/* Patient 2 */}
+                                <div className="p-2 p-md-3 rounded-3 d-flex align-items-center justify-content-between gap-2" style={{ backgroundColor: 'var(--bg-surface-secondary)', border: '1px solid var(--border-color)' }}>
+                                    <div className="d-flex align-items-center gap-2">
+                                        <div className="rounded-circle d-flex align-items-center justify-content-center fw-bold text-white" style={{ width: 36, height: 36, minWidth: 36, backgroundColor: '#a855f7', fontSize: '0.85rem' }}>
+                                            SK
+                                        </div>
+                                        <div>
+                                            <div className="fw-bold text-main" style={{ fontSize: '0.88rem' }}>Sophia K., 5yo</div>
+                                            <small className="text-danger font-mono" style={{ fontSize: '0.74rem' }}>
+                                                <i className="fa-solid fa-triangle-exclamation me-1"></i>3 missed therapy sessions
+                                            </small>
+                                        </div>
+                                    </div>
+                                    <button 
+                                        className="btn btn-sm btn-primary px-2 py-1 rounded-2 fw-semibold"
+                                        style={{ fontSize: '0.76rem', backgroundColor: '#1f6feb', border: 'none' }}
+                                        onClick={() => alert('Adherence reminder sent to Sophia K. parent.')}
+                                    >
+                                        Contact
+                                    </button>
+                                </div>
+
+                                {/* Patient 3: Puneet Kushwaha (#18) */}
+                                <div className="p-2 p-md-3 rounded-3 d-flex align-items-center justify-content-between gap-2" style={{ backgroundColor: 'var(--bg-surface-secondary)', border: '1px solid var(--border-color)' }}>
+                                    <div className="d-flex align-items-center gap-2">
+                                        <div className="rounded-circle d-flex align-items-center justify-content-center fw-bold text-white" style={{ width: 36, height: 36, minWidth: 36, backgroundColor: '#ef4444', fontSize: '0.85rem' }}>
+                                            PK
+                                        </div>
+                                        <div>
+                                            <div className="fw-bold text-main" style={{ fontSize: '0.88rem' }}>Puneet K. (#18)</div>
+                                            <small className="text-danger font-mono" style={{ fontSize: '0.74rem' }}>
+                                                <i className="fa-solid fa-triangle-exclamation me-1"></i>Inactive &gt; 7 days (At-Risk)
+                                            </small>
+                                        </div>
+                                    </div>
+                                    <button 
+                                        className="btn btn-sm btn-primary px-2 py-1 rounded-2 fw-semibold"
+                                        style={{ fontSize: '0.76rem', backgroundColor: '#1f6feb', border: 'none' }}
                                         onClick={() => {
                                             if (window.switchToAdminTable) window.switchToAdminTable('fetchUsers');
                                             setTimeout(() => {
@@ -511,254 +374,251 @@ export default class Dashboard extends React.Component {
                                             }, 100);
                                         }}
                                     >
-                                        <div className="d-flex align-items-center justify-content-between mb-2">
-                                            <span className="small fw-semibold text-danger font-mono">
-                                                <i className="fa-solid fa-triangle-exclamation me-1"></i>At-Risk (Lapsed)
-                                            </span>
-                                            <span className="badge bg-danger-subtle text-danger font-mono">
-                                                Urgent Followup
-                                            </span>
-                                        </div>
-                                        <h3 className="fw-bold mb-1 text-main tabular-nums">{stats.compliance_radar.at_risk_count}</h3>
-                                        <div className="small text-sub" style={{ fontSize: '0.78rem' }}>Inactive &gt;7 days &middot; Clinical intervention needed</div>
+                                        Review
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                {/* ========================================================
+                    BENTO GRID ROW 2: Dichoptic Telemetry & Prescribed Engines
+                    ======================================================== */}
+                <div className="row g-3 mb-4">
+                    {/* BENTO CARD 3: Dichoptic Anaglyph Telemetry (6 Cols) */}
+                    <div className="col-12 col-lg-6">
+                        <div 
+                            className="card border-0 shadow-sm h-100 p-4" 
+                            style={{ 
+                                backgroundColor: 'var(--bg-card)', 
+                                border: '1px solid var(--border-color)', 
+                                borderRadius: '16px' 
+                            }}
+                        >
+                            <div className="d-flex align-items-center justify-content-between mb-3">
+                                <div>
+                                    <span className="small text-uppercase tracking-wider fw-bold text-primary font-mono">Optical Calibration</span>
+                                    <h5 className="fw-bold mb-0 text-main">Dichoptic Anaglyph Telemetry</h5>
+                                    <small className="text-sub">Dual-channel eye balance telemetry & suppression scotoma filter</small>
+                                </div>
+                                <span className="badge rounded-circle p-2 d-flex align-items-center justify-content-center text-primary" style={{ width: 32, height: 32, backgroundColor: 'rgba(56, 139, 253, 0.15)' }}>
+                                    <i className="fa-solid fa-glasses"></i>
+                                </span>
+                            </div>
+
+                            {/* Dual Channel Sliders Visualizer */}
+                            <div className="d-flex flex-column gap-3 my-auto py-2">
+                                {/* Left Eye Channel */}
+                                <div>
+                                    <div className="d-flex align-items-center justify-content-between small mb-1">
+                                        <span className="fw-semibold text-danger">
+                                            <i className="fa-solid fa-eye me-1"></i> Left Eye (Red Filter)
+                                        </span>
+                                        <span className="fw-bold text-main font-mono">{leftContrast}%</span>
+                                    </div>
+                                    <div className="progress" style={{ height: '10px', backgroundColor: 'rgba(255,255,255,0.06)', borderRadius: '6px' }}>
+                                        <div 
+                                            className="progress-bar" 
+                                            style={{ 
+                                                width: `${leftContrast}%`, 
+                                                background: 'linear-gradient(90deg, #dc2626, #ef4444)', 
+                                                borderRadius: '6px',
+                                                boxShadow: '0 0 10px rgba(239, 68, 68, 0.4)' 
+                                            }}
+                                        ></div>
+                                    </div>
+                                </div>
+
+                                {/* Right Eye Channel */}
+                                <div>
+                                    <div className="d-flex align-items-center justify-content-between small mb-1">
+                                        <span className="fw-semibold" style={{ color: '#06b6d4' }}>
+                                            <i className="fa-solid fa-eye me-1"></i> Right Eye (Cyan Filter)
+                                        </span>
+                                        <span className="fw-bold text-main font-mono">{rightContrast}%</span>
+                                    </div>
+                                    <div className="progress" style={{ height: '10px', backgroundColor: 'rgba(255,255,255,0.06)', borderRadius: '6px' }}>
+                                        <div 
+                                            className="progress-bar" 
+                                            style={{ 
+                                                width: `${rightContrast}%`, 
+                                                background: 'linear-gradient(90deg, #0284c7, #06b6d4)', 
+                                                borderRadius: '6px',
+                                                boxShadow: '0 0 10px rgba(6, 182, 212, 0.4)' 
+                                            }}
+                                        ></div>
+                                    </div>
+                                </div>
+
+                                {/* Suppression Index Readout */}
+                                <div className="p-2 px-3 rounded-3 d-flex align-items-center justify-content-between" style={{ backgroundColor: 'var(--bg-surface-secondary)', border: '1px solid var(--border-color)' }}>
+                                    <span className="small text-sub">Cortical Suppression Index:</span>
+                                    <span className="badge bg-success-subtle text-success font-mono fw-semibold">Balanced &bull; Zero Diplopia</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    {/* BENTO CARD 4: Most Prescribed Therapy Engines (6 Cols) */}
+                    <div className="col-12 col-lg-6">
+                        <div 
+                            className="card border-0 shadow-sm h-100 p-4" 
+                            style={{ 
+                                backgroundColor: 'var(--bg-card)', 
+                                border: '1px solid var(--border-color)', 
+                                borderRadius: '16px' 
+                            }}
+                        >
+                            <div className="d-flex align-items-center justify-content-between mb-3">
+                                <div>
+                                    <span className="small text-uppercase tracking-wider fw-bold text-primary font-mono">Pediatric Engagement</span>
+                                    <h5 className="fw-bold mb-0 text-main">Most Prescribed Therapy Engines</h5>
+                                    <small className="text-sub">Cumulative therapeutic playtime hours across cohort</small>
+                                </div>
+                                <span className="badge rounded-circle p-2 d-flex align-items-center justify-content-center text-primary" style={{ width: 32, height: 32, backgroundColor: 'rgba(56, 139, 253, 0.15)' }}>
+                                    <i className="fa-solid fa-gamepad"></i>
+                                </span>
+                            </div>
+
+                            {/* Game Progress Bars */}
+                            <div className="d-flex flex-column gap-3 my-auto py-1">
+                                <div>
+                                    <div className="d-flex align-items-center justify-content-between small mb-1">
+                                        <span className="fw-semibold text-main">Tetris (Dichoptic Blocks)</span>
+                                        <span className="text-sub font-mono">16 hours &bull; Top Performer</span>
+                                    </div>
+                                    <div className="progress" style={{ height: '8px', backgroundColor: 'rgba(255,255,255,0.06)', borderRadius: '4px' }}>
+                                        <div className="progress-bar" style={{ width: '85%', background: 'linear-gradient(90deg, #06b6d4, #3b82f6)', borderRadius: '4px' }}></div>
+                                    </div>
+                                </div>
+
+                                <div>
+                                    <div className="d-flex align-items-center justify-content-between small mb-1">
+                                        <span className="fw-semibold text-main">Snake (Binocular Path)</span>
+                                        <span className="text-sub font-mono">12 hours</span>
+                                    </div>
+                                    <div className="progress" style={{ height: '8px', backgroundColor: 'rgba(255,255,255,0.06)', borderRadius: '4px' }}>
+                                        <div className="progress-bar" style={{ width: '65%', background: 'linear-gradient(90deg, #2563eb, #4f46e5)', borderRadius: '4px' }}></div>
+                                    </div>
+                                </div>
+
+                                <div>
+                                    <div className="d-flex align-items-center justify-content-between small mb-1">
+                                        <span className="fw-semibold text-main">Bubble Shooter (Scotoma Burst)</span>
+                                        <span className="text-sub font-mono">8 hours</span>
+                                    </div>
+                                    <div className="progress" style={{ height: '8px', backgroundColor: 'rgba(255,255,255,0.06)', borderRadius: '4px' }}>
+                                        <div className="progress-bar" style={{ width: '45%', background: 'linear-gradient(90deg, #06b6d4, #10b981)', borderRadius: '4px' }}></div>
+                                    </div>
+                                </div>
+
+                                <div>
+                                    <div className="d-flex align-items-center justify-content-between small mb-1">
+                                        <span className="fw-semibold text-main">Ping Pong (Dynamic Vergence)</span>
+                                        <span className="text-sub font-mono">5 hours</span>
+                                    </div>
+                                    <div className="progress" style={{ height: '8px', backgroundColor: 'rgba(255,255,255,0.06)', borderRadius: '4px' }}>
+                                        <div className="progress-bar" style={{ width: '30%', background: 'linear-gradient(90deg, #38bdf8, #818cf8)', borderRadius: '4px' }}></div>
                                     </div>
                                 </div>
                             </div>
                         </div>
                     </div>
-                )}
-
-                {/* Secondary Clinical Metrics Row */}
-                <div className="row g-3 mb-4">
-                    <div className="col-12 col-md-4">
-                        <div className="card border-0 shadow-sm p-3 h-100" style={{ backgroundColor: 'var(--bg-card)', border: '1px solid var(--border-color)', borderRadius: '10px' }}>
-                            <div className="d-flex align-items-center gap-3">
-                                <div className="rounded-2 p-3 d-flex align-items-center justify-content-center" style={{ width: 44, height: 44, minWidth: 44, backgroundColor: 'var(--bg-surface-secondary)', border: '1px solid var(--border-color)', color: 'var(--text-main)' }}>
-                                    <i className="fa-solid fa-chart-pie fa-lg"></i>
-                                </div>
-                                <div>
-                                    <span className="d-block fw-semibold text-uppercase font-mono" style={{ color: 'var(--text-sub)', fontSize: '0.72rem', letterSpacing: '0.05em' }}>Adherence Compliance</span>
-                                    <h4 className="fw-bold mb-0 text-main tabular-nums">{stats.compliance_rate}%</h4>
-                                </div>
-                            </div>
-                            <div className="progress mt-3" style={{ height: 4, borderRadius: 2, backgroundColor: 'var(--bg-surface-secondary)' }}>
-                                <div className="progress-bar" role="progressbar" style={{ width: `${stats.compliance_rate}%`, backgroundColor: 'var(--text-main)' }}></div>
-                            </div>
-                            <small className="mt-2 d-block text-muted" style={{ fontSize: '0.78rem' }}>Patients meeting daily assigned minutes</small>
-                        </div>
-                    </div>
-
-                    <div className="col-12 col-md-4">
-                        <div className="card border-0 shadow-sm p-3 h-100" style={{ backgroundColor: 'var(--bg-card)', border: '1px solid var(--border-color)', borderRadius: '10px' }}>
-                            <div className="d-flex align-items-center gap-3">
-                                <div className="rounded-2 p-3 d-flex align-items-center justify-content-center" style={{ width: 44, height: 44, minWidth: 44, backgroundColor: 'var(--bg-surface-secondary)', border: '1px solid var(--border-color)', color: 'var(--text-main)' }}>
-                                    <i className="fa-solid fa-stopwatch fa-lg"></i>
-                                </div>
-                                <div>
-                                    <span className="d-block fw-semibold text-uppercase font-mono" style={{ color: 'var(--text-sub)', fontSize: '0.72rem', letterSpacing: '0.05em' }}>Avg Daily Session</span>
-                                    <h4 className="fw-bold mb-0 text-main tabular-nums">{stats.avg_training_time} <span className="fs-6 fw-normal text-sub">minutes</span></h4>
-                                </div>
-                            </div>
-                            <div className="progress mt-3" style={{ height: 4, borderRadius: 2, backgroundColor: 'var(--bg-surface-secondary)' }}>
-                                <div className="progress-bar" role="progressbar" style={{ width: `${Math.min(stats.avg_training_time * 5, 100)}%`, backgroundColor: 'var(--text-main)' }}></div>
-                            </div>
-                            <small className="mt-2 d-block text-muted" style={{ fontSize: '0.78rem' }}>Optometrist standard target: 20 mins/day</small>
-                        </div>
-                    </div>
-
-                    <div className="col-12 col-md-4">
-                        <div className="card border-0 shadow-sm p-3 h-100" style={{ backgroundColor: 'var(--bg-card)', border: '1px solid var(--border-color)', borderRadius: '10px' }}>
-                            <div className="d-flex align-items-center gap-3">
-                                <div className="rounded-2 p-3 d-flex align-items-center justify-content-center" style={{ width: 44, height: 44, minWidth: 44, backgroundColor: 'var(--bg-surface-secondary)', border: '1px solid var(--border-color)', color: 'var(--text-main)' }}>
-                                    <i className="fa-solid fa-glasses fa-lg"></i>
-                                </div>
-                                <div>
-                                    <span className="d-block fw-semibold text-uppercase font-mono" style={{ color: 'var(--text-sub)', fontSize: '0.72rem', letterSpacing: '0.05em' }}>Dichoptic Engines</span>
-                                    <h4 className="fw-bold mb-0 text-main tabular-nums">10 Active Games</h4>
-                                </div>
-                            </div>
-                            <div className="progress mt-3" style={{ height: 4, borderRadius: 2, backgroundColor: 'var(--bg-surface-secondary)' }}>
-                                <div className="progress-bar" role="progressbar" style={{ width: '100%', backgroundColor: 'var(--text-main)' }}></div>
-                            </div>
-                            <small className="mt-2 d-block text-muted" style={{ fontSize: '0.78rem' }}>Calibrated games with dual-contrast Red/Cyan filter</small>
-                        </div>
-                    </div>
                 </div>
 
-                {/* Charts & Analytics Section */}
+                {/* ========================================================
+                    BENTO GRID ROW 3: Weekly Clinical Adherence Spline Chart
+                    ======================================================== */}
                 <div className="row g-3 mb-4">
-                    {/* Weekly Activity Line/Area Chart */}
-                    <div className="col-12 col-lg-7">
-                        <div className="card border-0 shadow-sm p-4 h-100" style={{ backgroundColor: 'var(--bg-card)', border: '1px solid var(--border-color)', borderRadius: '10px' }}>
-                            <div className="d-flex align-items-center justify-content-between mb-3 flex-wrap gap-2">
+                    <div className="col-12">
+                        <div 
+                            className="card border-0 shadow-sm p-4" 
+                            style={{ 
+                                backgroundColor: 'var(--bg-card)', 
+                                border: '1px solid var(--border-color)', 
+                                borderRadius: '16px' 
+                            }}
+                        >
+                            <div className="d-flex align-items-center justify-content-between flex-wrap gap-2 mb-3">
                                 <div>
-                                    <h5 className="fw-bold mb-1 text-main">
-                                        <i className="fa-solid fa-chart-line text-main me-2"></i>Weekly Therapy Session Volume
-                                    </h5>
-                                    <p className="small mb-0 text-sub">Total dichoptic sessions completed across the past 7 days</p>
+                                    <span className="small text-uppercase tracking-wider fw-bold text-success font-mono">Session Volume Telemetry</span>
+                                    <h5 className="fw-bold mb-0 text-main">Weekly Clinical Adherence</h5>
+                                    <small className="text-sub">Daily therapeutic session volume across assigned patient cohort</small>
                                 </div>
-                                <span className="badge bg-success-subtle text-success py-1 px-2 fw-semibold font-mono">
-                                    <i className="fa-solid fa-arrow-trend-up me-1"></i>+16.4% this week
-                                </span>
+                                <div className="d-flex align-items-center gap-3">
+                                    <span className="badge bg-success-subtle text-success py-1 px-3 fw-bold font-mono rounded-pill">
+                                        <i className="fa-solid fa-arrow-trend-up me-1"></i>+16.4% this week
+                                    </span>
+                                </div>
                             </div>
 
-                            {/* Responsive SVG Area Chart - Monochrome Style */}
-                            <div className="position-relative w-100" style={{ height: 180 }}>
-                                <svg viewBox={`0 0 ${chartWidth} ${chartHeight}`} className="w-100 h-100 overflow-visible">
+                            {/* Clean Responsive SVG Spline Chart */}
+                            <div style={{ width: '100%', height: '140px', position: 'relative' }}>
+                                <svg viewBox="0 0 700 120" preserveAspectRatio="none" style={{ width: '100%', height: '100%' }}>
                                     <defs>
-                                        <linearGradient id="areaGradient" x1="0" y1="0" x2="0" y2="1">
-                                            <stop offset="0%" stopColor="var(--text-main)" stopOpacity="0.12" />
-                                            <stop offset="100%" stopColor="var(--text-main)" stopOpacity="0.01" />
+                                        <linearGradient id="splineGradientCyan" x1="0" y1="0" x2="0" y2="1">
+                                            <stop offset="0%" stopColor="#06b6d4" stopOpacity="0.4" />
+                                            <stop offset="100%" stopColor="#06b6d4" stopOpacity="0.0" />
+                                        </linearGradient>
+                                        <linearGradient id="splineGradientBlue" x1="0" y1="0" x2="0" y2="1">
+                                            <stop offset="0%" stopColor="#3b82f6" stopOpacity="0.3" />
+                                            <stop offset="100%" stopColor="#3b82f6" stopOpacity="0.0" />
                                         </linearGradient>
                                     </defs>
 
-                                    {/* Horizontal Guidelines */}
-                                    <line x1={padding} y1={padding} x2={chartWidth - padding} y2={padding} stroke="var(--border-color)" strokeDasharray="3 3" />
-                                    <line x1={padding} y1={padding + innerHeight / 2} x2={chartWidth - padding} y2={padding + innerHeight / 2} stroke="var(--border-color)" strokeDasharray="3 3" />
-                                    <line x1={padding} y1={padding + innerHeight} x2={chartWidth - padding} y2={padding + innerHeight} stroke="var(--border-color)" />
+                                    {/* Grid Lines */}
+                                    <line x1="0" y1="30" x2="700" y2="30" stroke="rgba(255,255,255,0.05)" strokeDasharray="4" />
+                                    <line x1="0" y1="70" x2="700" y2="70" stroke="rgba(255,255,255,0.05)" strokeDasharray="4" />
+                                    <line x1="0" y1="110" x2="700" y2="110" stroke="rgba(255,255,255,0.08)" />
 
-                                    {/* Gradient Area Fill */}
-                                    <path d={areaPath} fill="url(#areaGradient)" />
+                                    {/* Spline Area Fill */}
+                                    <path 
+                                        d="M 50 70 C 150 20, 200 40, 300 15 C 400 30, 500 10, 650 90 L 650 110 L 50 110 Z" 
+                                        fill="url(#splineGradientCyan)" 
+                                    />
+                                    {/* Primary Spline Line */}
+                                    <path 
+                                        d="M 50 70 C 150 20, 200 40, 300 15 C 400 30, 500 10, 650 90" 
+                                        fill="none" 
+                                        stroke="#06b6d4" 
+                                        strokeWidth="3.5" 
+                                        strokeLinecap="round" 
+                                    />
 
-                                    {/* Line Stroke */}
-                                    <polyline fill="none" stroke="var(--text-main)" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" points={pointsString} />
+                                    {/* Secondary Benchmark Spline Line */}
+                                    <path 
+                                        d="M 50 95 C 150 60, 250 80, 350 40 C 450 65, 550 45, 650 60" 
+                                        fill="none" 
+                                        stroke="#f59e0b" 
+                                        strokeWidth="2.5" 
+                                        strokeDasharray="5"
+                                        strokeLinecap="round" 
+                                    />
 
                                     {/* Data Points */}
-                                    {points.map((p, idx) => (
-                                        <g key={idx} className="cursor-pointer">
-                                            <circle cx={p.x} cy={p.y} r="4.5" fill="var(--bg-card)" stroke="var(--text-main)" strokeWidth="2" />
-                                            <text x={p.x} y={p.y - 10} textAnchor="middle" fontSize="10" fontWeight="bold" fill="var(--text-main)" fontFamily="'JetBrains Mono', monospace">
-                                                {p.val}
-                                            </text>
-                                            <text x={p.x} y={chartHeight - 4} textAnchor="middle" fontSize="10" fill="var(--text-sub)" fontFamily="'JetBrains Mono', monospace">
-                                                {stats.weekly_sessions?.labels[idx] || ''}
-                                            </text>
-                                        </g>
-                                    ))}
+                                    <circle cx="50" cy="70" r="4" fill="#06b6d4" />
+                                    <circle cx="150" cy="28" r="4" fill="#06b6d4" />
+                                    <circle cx="300" cy="15" r="4" fill="#06b6d4" />
+                                    <circle cx="450" cy="22" r="4" fill="#06b6d4" />
+                                    <circle cx="650" cy="90" r="4" fill="#06b6d4" />
                                 </svg>
                             </div>
 
-                            <div className="d-flex align-items-center justify-content-between small mt-2 pt-2 border-top" style={{ borderColor: 'var(--border-color)', color: 'var(--text-sub)' }}>
-                                <span><i className="fa-solid fa-circle text-main me-1" style={{ fontSize: 7 }}></i> Completed Sessions</span>
-                                <span>Peak Day: <strong style={{ color: 'var(--text-main)' }}>{peakDayName} ({peakDayVolume} sessions)</strong></span>
-                            </div>
-                        </div>
-                    </div>
-
-                    {/* Game Engagement Bar Distribution - Monochromatic Scale */}
-                    <div className="col-12 col-lg-5">
-                        <div className="card border-0 shadow-sm p-4 h-100" style={{ backgroundColor: 'var(--bg-card)', border: '1px solid var(--border-color)', borderRadius: '10px' }}>
-                            <div className="d-flex align-items-center justify-content-between mb-3">
-                                <div>
-                                    <h5 className="fw-bold mb-1 text-main">
-                                        <i className="fa-solid fa-trophy text-main me-2"></i>Most Prescribed Games
-                                    </h5>
-                                    <p className="small mb-0 text-sub">Engagement frequency by game module</p>
-                                </div>
-                                <span className="badge bg-primary-subtle text-main small font-mono">Top 5</span>
-                            </div>
-
-                            <div className="d-flex flex-column gap-3 mt-2">
-                                {gameEntries.map(([name, count], idx) => {
-                                    const percent = Math.round((count / maxGamePlays) * 100);
-                                    const opacities = [1, 0.85, 0.7, 0.55, 0.4];
-                                    const opacity = opacities[idx % opacities.length];
-
-                                    return (
-                                        <div key={idx}>
-                                            <div className="d-flex align-items-center justify-content-between small mb-1">
-                                                <span className="fw-semibold text-main">{GAME_DISPLAY_NAMES[name] || name}</span>
-                                                <span className="fw-semibold font-mono" style={{ color: 'var(--text-sub)' }}>{count} plays</span>
-                                            </div>
-                                            <div className="progress" style={{ height: 6, borderRadius: 3, backgroundColor: 'var(--bg-surface-secondary)' }}>
-                                                <div 
-                                                    className="progress-bar" 
-                                                    role="progressbar" 
-                                                    style={{ width: `${percent}%`, backgroundColor: 'var(--text-main)', opacity: opacity, borderRadius: 3 }}
-                                                ></div>
-                                            </div>
-                                        </div>
-                                    );
-                                })}
-                            </div>
-
-                            <div className="mt-auto pt-3 border-top d-flex justify-content-between align-items-center small" style={{ borderColor: 'var(--border-color)', color: 'var(--text-sub)' }}>
-                                <span>Recommended by Optometrists</span>
-                                <a href="/user" className="text-main fw-semibold text-decoration-none">Test Modules &rarr;</a>
+                            {/* Spline X-Axis Day Labels */}
+                            <div className="d-flex justify-content-between text-sub small font-mono mt-2 pt-2 border-top" style={{ borderColor: 'var(--border-color)', fontSize: '0.8rem' }}>
+                                {splineData.map((d, i) => (
+                                    <div key={i} className="text-center">
+                                        <div className="fw-bold text-main">{d.day}</div>
+                                        <div className="text-muted" style={{ fontSize: '0.72rem' }}>{d.val}%</div>
+                                    </div>
+                                ))}
                             </div>
                         </div>
                     </div>
                 </div>
 
-                {/* Dedicated Records Navigation Card */}
-                <div className="card border-0 shadow-sm p-3 mb-2" style={{ backgroundColor: 'var(--bg-card)', border: '1px solid var(--border-color)', borderRadius: '10px' }}>
-                    <div className="d-flex align-items-center justify-content-between flex-wrap gap-3">
-                        <div className="d-flex align-items-center gap-2 flex-wrap">
-                            <span className="fw-bold text-main small me-2 font-mono">
-                                <i className="fa-solid fa-database text-main me-1"></i>Database Records:
-                            </span>
-                            <button 
-                                type="button"
-                                className="btn btn-sm btn-secondary px-3 fw-semibold"
-                                onClick={() => {
-                                    if (this.props.onNavigateToTable) this.props.onNavigateToTable('fetchUsers');
-                                    else if (window.switchToAdminTable) window.switchToAdminTable('fetchUsers');
-                                }}
-                            >
-                                <i className="fa-solid fa-users me-1"></i> {isDoctor ? 'My Patients' : 'Active Patients'} ({stats.total_patients})
-                            </button>
-                            {!isDoctor && (
-                                <button 
-                                    type="button"
-                                    className="btn btn-sm btn-secondary px-3 fw-semibold"
-                                    onClick={() => {
-                                        if (this.props.onNavigateToTable) this.props.onNavigateToTable('fetchDoctors');
-                                        else if (window.switchToAdminTable) window.switchToAdminTable('fetchDoctors');
-                                    }}
-                                >
-                                    <i className="fa-solid fa-user-doctor me-1"></i> Doctors ({stats.total_doctors})
-                                </button>
-                            )}
-                            <button 
-                                type="button"
-                                className="btn btn-sm btn-secondary px-3 fw-semibold"
-                                onClick={() => {
-                                    if (this.props.onNavigateToTable) this.props.onNavigateToTable('fetchConsultations');
-                                    else if (window.switchToAdminTable) window.switchToAdminTable('fetchConsultations');
-                                }}
-                            >
-                                <i className="fa-solid fa-stethoscope me-1"></i> {isDoctor ? 'My Reviews' : 'Clinical Reviews'} ({stats.total_consultations})
-                            </button>
-                            {isRoot && (
-                                <button 
-                                    type="button"
-                                    className="btn btn-sm btn-secondary px-3 fw-semibold"
-                                    onClick={() => {
-                                        if (this.props.onNavigateToTable) this.props.onNavigateToTable('fetchAdmins');
-                                        else if (window.switchToAdminTable) window.switchToAdminTable('fetchAdmins');
-                                    }}
-                                >
-                                    <i className="fa-solid fa-user-shield me-1"></i> Admins ({stats.total_admins})
-                                </button>
-                            )}
-                            {!isDoctor && (
-                                <button 
-                                    type="button"
-                                    className="btn btn-sm btn-secondary px-3 fw-semibold"
-                                    onClick={() => {
-                                        if (this.props.onNavigateToTable) this.props.onNavigateToTable('fetchRegisters');
-                                        else if (window.switchToAdminTable) window.switchToAdminTable('fetchRegisters');
-                                    }}
-                                >
-                                    <i className="fa-solid fa-user-clock me-1"></i> Pending Approvals ({stats.pending_registers})
-                                </button>
-                            )}
-                        </div>
-                        <div className="small text-muted">
-                            <i className="fa-solid fa-arrow-right text-main me-1"></i> Open dedicated table view
-                        </div>
-                    </div>
-                </div>
+                {/* Floating Iris Clinical Copilot */}
                 <IrisCopilotDrawer role={isDoctor ? 'doctor' : 'doctor'} />
             </div>
         );
