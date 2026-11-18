@@ -32,7 +32,9 @@ export default class Games extends React.Component {
             art: g.icon,
             desc: g.desc,
             time: g.time,
-            gameKey: g.id
+            gameKey: g.id,
+            bannerBg: g.bannerBg,
+            bg: g.bg
         }));
     }
 
@@ -360,17 +362,34 @@ export default class Games extends React.Component {
                                     <div 
                                         className="game-cover-banner" 
                                         style={{ 
-                                            height: '140px',
+                                            height: '160px',
                                             backgroundColor: 'var(--bg-surface-secondary)',
+                                            background: game.bannerBg 
+                                                ? `${game.bannerBg}, var(--bg-surface-secondary)` 
+                                                : 'var(--bg-surface-secondary)',
                                             borderBottom: '1px solid var(--border-color)',
                                             display: 'flex',
                                             alignItems: 'center',
                                             justifyContent: 'center',
                                             position: 'relative',
-                                            padding: '12px',
+                                            padding: '10px',
                                             overflow: 'hidden'
                                         }}
                                     >
+                                        {/* Ambient radial glow spotlight behind mascot */}
+                                        <div 
+                                            style={{
+                                                position: 'absolute',
+                                                width: '130px',
+                                                height: '130px',
+                                                borderRadius: '50%',
+                                                background: game.bannerBg || 'radial-gradient(circle, rgba(56, 189, 248, 0.25) 0%, transparent 70%)',
+                                                filter: 'blur(22px)',
+                                                opacity: 0.85,
+                                                pointerEvents: 'none'
+                                            }}
+                                        />
+
                                         <img 
                                             src={game.art} 
                                             alt={game.name} 
@@ -380,14 +399,18 @@ export default class Games extends React.Component {
                                                 e.currentTarget.style.display = 'none';
                                             }}
                                             style={{
-                                                maxHeight: '100px',
-                                                maxWidth: '130px',
+                                                width: '135px',
+                                                height: '135px',
+                                                maxHeight: '135px',
+                                                maxWidth: '155px',
                                                 objectFit: 'contain',
-                                                filter: 'drop-shadow(0 4px 10px rgba(0,0,0,0.18))',
-                                                transition: 'transform 0.2s ease'
+                                                transform: 'scale(1.22)',
+                                                filter: 'drop-shadow(0 8px 18px rgba(0, 0, 0, 0.45))',
+                                                transition: 'transform 0.3s cubic-bezier(0.34, 1.56, 0.64, 1)',
+                                                zIndex: 1
                                             }}
                                         />
-                                        <span className={`badge ${game.badgeClass}`} style={{ position: 'absolute', top: 10, left: 10 }}>
+                                        <span className={`badge ${game.badgeClass}`} style={{ position: 'absolute', top: 10, left: 10, zIndex: 2 }}>
                                             {game.badge}
                                         </span>
                                         <span 
@@ -396,9 +419,11 @@ export default class Games extends React.Component {
                                                 position: 'absolute', 
                                                 top: 10, 
                                                 right: 10, 
-                                                backgroundColor: isGoalMet ? '#059669' : playedSeconds > 0 ? '#d97706' : 'rgba(15, 23, 42, 0.7)', 
+                                                backgroundColor: isGoalMet ? '#059669' : playedSeconds > 0 ? '#d97706' : 'rgba(15, 23, 42, 0.8)', 
                                                 color: '#fff', 
-                                                fontSize: '0.72rem' 
+                                                fontSize: '0.72rem',
+                                                zIndex: 2,
+                                                backdropFilter: 'blur(4px)'
                                             }}
                                         >
                                             {playedSeconds === 0 ? `Target: ${prescribedMinutes}m` : isGoalMet ? 'Goal Met 🎉' : remainingMinutes > 0 ? `${remainingMinutes}m left` : `${remainingSeconds}s left`}
