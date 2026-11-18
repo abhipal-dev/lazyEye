@@ -86,9 +86,7 @@ export default class AdminDashboard extends React.Component {
 
     switchToTable = (categoryFn) => {
         const cat = categoryFn || 'fetchUsers';
-        if (this.state.activeView === 'table' && this.state.activeTableCategory === cat) {
-            return;
-        }
+        const viewChanged = (this.state.activeView !== 'table' || this.state.activeTableCategory !== cat);
         this.setState({ activeView: 'table', activeTableCategory: cat }, () => {
             $('#dashboard-section').hide().addClass('d-none');
             $('#table-section').show().removeClass('d-none');
@@ -99,7 +97,9 @@ export default class AdminDashboard extends React.Component {
             $('#layoutSidenav_nav .nav-link.' + cat).addClass('active');
             $('.table-filter-btn').removeClass('active');
             $('.table-filter-btn.' + cat).addClass('active');
-            window.scrollTo({ top: 0, behavior: 'instant' });
+            if (viewChanged) {
+                window.scrollTo({ top: 0, behavior: 'instant' });
+            }
         });
     };
     render() {

@@ -178,6 +178,121 @@ export default class Dashboard extends React.Component {
                 </div>
 
                 {/* ========================================================
+                    BENTO METRICS ROW: Live Registry & Clinical Staff Hub
+                    ======================================================== */}
+                <div className="row g-3 mb-4">
+                    {/* Active Patients */}
+                    <div className="col-6 col-lg-3">
+                        <div 
+                            className="card border-0 shadow-sm h-100 p-3 cursor-pointer"
+                            style={{ backgroundColor: 'var(--bg-card)', border: '1px solid var(--border-color)', borderRadius: '14px' }}
+                            onClick={() => {
+                                if (this.props.onNavigateToTable) this.props.onNavigateToTable('fetchUsers');
+                                else if (window.switchToAdminTable) window.switchToAdminTable('fetchUsers');
+                            }}
+                        >
+                            <div className="d-flex align-items-center justify-content-between mb-2">
+                                <span className="small text-uppercase tracking-wider fw-bold text-sub font-mono" style={{ fontSize: '0.72rem' }}>
+                                    {isDoctor ? 'My Patients' : 'Active Patients'}
+                                </span>
+                                <span className="badge rounded-circle p-2 d-flex align-items-center justify-content-center text-primary" style={{ width: 28, height: 28, backgroundColor: 'rgba(56, 139, 253, 0.15)' }}>
+                                    <i className="fa-solid fa-users" style={{ fontSize: '0.75rem' }}></i>
+                                </span>
+                            </div>
+                            <h3 className="fw-black mb-1 text-main font-mono">{stats.total_patients || 0}</h3>
+                            <div className="d-flex align-items-center justify-content-between small text-sub" style={{ fontSize: '0.78rem' }}>
+                                <span>Prescribed Cohort</span>
+                                <span className="text-primary fw-semibold">View List &rarr;</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    {/* Doctors & Staff */}
+                    <div className="col-6 col-lg-3">
+                        <div 
+                            className="card border-0 shadow-sm h-100 p-3 cursor-pointer"
+                            style={{ backgroundColor: 'var(--bg-card)', border: '1px solid var(--border-color)', borderRadius: '14px' }}
+                            onClick={() => {
+                                if (!isDoctor) {
+                                    if (this.props.onNavigateToTable) this.props.onNavigateToTable('fetchDoctors');
+                                    else if (window.switchToAdminTable) window.switchToAdminTable('fetchDoctors');
+                                }
+                            }}
+                        >
+                            <div className="d-flex align-items-center justify-content-between mb-2">
+                                <span className="small text-uppercase tracking-wider fw-bold text-sub font-mono" style={{ fontSize: '0.72rem' }}>
+                                    Doctors &amp; Staff
+                                </span>
+                                <span className="badge rounded-circle p-2 d-flex align-items-center justify-content-center text-info" style={{ width: 28, height: 28, backgroundColor: 'rgba(6, 182, 212, 0.15)' }}>
+                                    <i className="fa-solid fa-user-doctor" style={{ fontSize: '0.75rem' }}></i>
+                                </span>
+                            </div>
+                            <h3 className="fw-black mb-1 text-main font-mono">{stats.total_doctors || 0}</h3>
+                            <div className="d-flex align-items-center justify-content-between small text-sub" style={{ fontSize: '0.78rem' }}>
+                                <span>Certified Vision Staff</span>
+                                <span className="text-info fw-semibold">{isDoctor ? 'Active' : 'View Staff \u2192'}</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    {/* Clinical Reviews */}
+                    <div className="col-6 col-lg-3">
+                        <div 
+                            className="card border-0 shadow-sm h-100 p-3 cursor-pointer"
+                            style={{ backgroundColor: 'var(--bg-card)', border: '1px solid var(--border-color)', borderRadius: '14px' }}
+                            onClick={() => {
+                                if (this.props.onNavigateToTable) this.props.onNavigateToTable('fetchConsultations');
+                                else if (window.switchToAdminTable) window.switchToAdminTable('fetchConsultations');
+                            }}
+                        >
+                            <div className="d-flex align-items-center justify-content-between mb-2">
+                                <span className="small text-uppercase tracking-wider fw-bold text-sub font-mono" style={{ fontSize: '0.72rem' }}>
+                                    {isDoctor ? 'My Reviews' : 'Clinical Reviews'}
+                                </span>
+                                <span className="badge rounded-circle p-2 d-flex align-items-center justify-content-center text-danger" style={{ width: 28, height: 28, backgroundColor: 'rgba(239, 68, 68, 0.15)' }}>
+                                    <i className="fa-solid fa-stethoscope" style={{ fontSize: '0.75rem' }}></i>
+                                </span>
+                            </div>
+                            <h3 className="fw-black mb-1 text-main font-mono">{stats.total_consultations || 0}</h3>
+                            <div className="d-flex align-items-center justify-content-between small text-sub" style={{ fontSize: '0.78rem' }}>
+                                <span>Doctor Assessments</span>
+                                <span className="text-danger fw-semibold">View Reviews &rarr;</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    {/* Pending Registrations (or Protocol for Doctor) */}
+                    <div className="col-6 col-lg-3">
+                        <div 
+                            className="card border-0 shadow-sm h-100 p-3 cursor-pointer"
+                            style={{ backgroundColor: 'var(--bg-card)', border: '1px solid var(--border-color)', borderRadius: '14px' }}
+                            onClick={() => {
+                                if (!isDoctor) {
+                                    if (this.props.onNavigateToTable) this.props.onNavigateToTable('fetchRegisters');
+                                    else if (window.switchToAdminTable) window.switchToAdminTable('fetchRegisters');
+                                }
+                            }}
+                        >
+                            <div className="d-flex align-items-center justify-content-between mb-2">
+                                <span className="small text-uppercase tracking-wider fw-bold text-sub font-mono" style={{ fontSize: '0.72rem' }}>
+                                    {isDoctor ? 'Protocol Target' : 'Pending Registrations'}
+                                </span>
+                                <span className="badge rounded-circle p-2 d-flex align-items-center justify-content-center text-warning" style={{ width: 28, height: 28, backgroundColor: 'rgba(245, 158, 11, 0.15)' }}>
+                                    <i className={`fa-solid ${isDoctor ? 'fa-bullseye' : 'fa-user-clock'}`} style={{ fontSize: '0.75rem' }}></i>
+                                </span>
+                            </div>
+                            <h3 className="fw-black mb-1 text-main font-mono">
+                                {isDoctor ? `${stats.avg_training_time || 20}m` : (stats.pending_registers || 0)}
+                            </h3>
+                            <div className="d-flex align-items-center justify-content-between small text-sub" style={{ fontSize: '0.78rem' }}>
+                                <span>{isDoctor ? 'Daily Target' : 'Requires Review'}</span>
+                                <span className="text-warning fw-semibold">{isDoctor ? 'Standard' : 'Review \u2192'}</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                {/* ========================================================
                     BENTO GRID ROW 1: Hero Fusion Arc & At-Risk Triage Queue
                     ======================================================== */}
                 <div className="row g-3 mb-4">

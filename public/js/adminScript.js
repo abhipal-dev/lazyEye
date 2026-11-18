@@ -301,11 +301,13 @@ function renderRegisterRow(e, sliceIdx) {
 function fetchRegisters() {
     latestActiveCategory = 'fetchRegisters';
     updateFilterActive('fetchRegisters', true);
+    $('#datatablesSimple tbody').html('<tr><td colspan="9" class="text-center py-4 text-muted"><i class="fa-solid fa-spinner fa-spin me-2"></i>Loading registrations...</td></tr>');
     $.ajax({
         url: "/fetchRegisters",
         type: "get",
         success: function (data) {
             if (latestActiveCategory !== 'fetchRegisters') return;
+            let list = Array.isArray(data) ? data : (data.data || []);
             activeTableContentType = 'Registers';
             $('#datatablesSimple thead').html(`
                 <tr>
@@ -320,7 +322,11 @@ function fetchRegisters() {
                 </tr>
             `);
             $('div.card-header span.fw-semibold').text('Applications -> Pending Patient Registrations');
-            setupAdminTableData('Registers', data, renderRegisterRow);
+            setupAdminTableData('Registers', list, renderRegisterRow);
+        },
+        error: function() {
+            if (latestActiveCategory !== 'fetchRegisters') return;
+            $('#datatablesSimple tbody').html('<tr><td colspan="9" class="text-center py-4 text-danger"><i class="fa-solid fa-triangle-exclamation me-2"></i>Failed to load registrations. <button class="btn btn-sm btn-outline-primary ms-2" onclick="fetchRegisters()">Retry</button></td></tr>');
         }
     });
 }
@@ -346,11 +352,13 @@ function renderDoctorRow(e, sliceIdx) {
 function fetchDoctors() {
     latestActiveCategory = 'fetchDoctors';
     updateFilterActive('fetchDoctors', true);
+    $('#datatablesSimple tbody').html('<tr><td colspan="10" class="text-center py-4 text-muted"><i class="fa-solid fa-spinner fa-spin me-2"></i>Loading doctors and clinical staff...</td></tr>');
     $.ajax({
         url: "/fetchDoctors",
         type: "get",
         success: function (data) {
             if (latestActiveCategory !== 'fetchDoctors') return;
+            let list = Array.isArray(data) ? data : (data.data || []);
             activeTableContentType = "Doctors";
             $('#datatablesSimple thead').html(`
                 <tr>
@@ -366,7 +374,11 @@ function fetchDoctors() {
                 </tr>
             `);
             $('div.card-header span.fw-semibold').text('Clinical Staff -> Doctors & Vision Therapists');
-            setupAdminTableData('Doctors', data, renderDoctorRow);
+            setupAdminTableData('Doctors', list, renderDoctorRow);
+        },
+        error: function() {
+            if (latestActiveCategory !== 'fetchDoctors') return;
+            $('#datatablesSimple tbody').html('<tr><td colspan="10" class="text-center py-4 text-danger"><i class="fa-solid fa-triangle-exclamation me-2"></i>Failed to load doctor records. <button class="btn btn-sm btn-outline-primary ms-2" onclick="fetchDoctors()">Retry</button></td></tr>');
         }
     });
 }
@@ -396,11 +408,13 @@ function renderAdminRow(e, sliceIdx) {
 function fetchAdmins() {
     latestActiveCategory = 'fetchAdmins';
     updateFilterActive('fetchAdmins', true);
+    $('#datatablesSimple tbody').html('<tr><td colspan="9" class="text-center py-4 text-muted"><i class="fa-solid fa-spinner fa-spin me-2"></i>Loading administrators...</td></tr>');
     $.ajax({
         url: "/fetchAdmins",
         type: "get",
         success: function (data) {
             if (latestActiveCategory !== 'fetchAdmins') return;
+            let list = Array.isArray(data) ? data : (data.data || []);
             activeTableContentType = "Admins";
             $('#datatablesSimple thead').html(`
                 <tr>
@@ -416,7 +430,11 @@ function fetchAdmins() {
                 </tr>
             `);
             $('div.card-header span.fw-semibold').text('Administrative Staff -> System Administrators');
-            setupAdminTableData('Admins', data, renderAdminRow);
+            setupAdminTableData('Admins', list, renderAdminRow);
+        },
+        error: function() {
+            if (latestActiveCategory !== 'fetchAdmins') return;
+            $('#datatablesSimple tbody').html('<tr><td colspan="9" class="text-center py-4 text-danger"><i class="fa-solid fa-triangle-exclamation me-2"></i>Failed to load administrator records. <button class="btn btn-sm btn-outline-primary ms-2" onclick="fetchAdmins()">Retry</button></td></tr>');
         }
     });
 }
@@ -477,6 +495,9 @@ function fetchUsers(silentPreload) {
     if (!silentPreload) {
         latestActiveCategory = 'fetchUsers';
         updateFilterActive('fetchUsers', true);
+        if (!$('#table-section').is(':hidden')) {
+            $('#datatablesSimple tbody').html('<tr><td colspan="13" class="text-center py-4 text-muted"><i class="fa-solid fa-spinner fa-spin me-2"></i>Loading patients...</td></tr>');
+        }
     }
     $.ajax({
         url: "/fetchUsers",
@@ -523,6 +544,10 @@ function fetchUsers(silentPreload) {
                 displayList = userList.filter(u => u.compliance_status === window.currentComplianceFilter);
             }
             setupAdminTableData('Users', displayList, renderUserRow);
+        },
+        error: function() {
+            if (latestActiveCategory !== 'fetchUsers' || silentPreload) return;
+            $('#datatablesSimple tbody').html('<tr><td colspan="13" class="text-center py-4 text-danger"><i class="fa-solid fa-triangle-exclamation me-2"></i>Failed to load patient records. <button class="btn btn-sm btn-outline-primary ms-2" onclick="fetchUsers()">Retry</button></td></tr>');
         }
     });
 }
@@ -561,11 +586,13 @@ function renderConsultationRow(e, sliceIdx) {
 function fetchConsultations() {
     latestActiveCategory = 'fetchConsultations';
     updateFilterActive('fetchConsultations', true);
+    $('#datatablesSimple tbody').html('<tr><td colspan="8" class="text-center py-4 text-muted"><i class="fa-solid fa-spinner fa-spin me-2"></i>Loading clinical reviews...</td></tr>');
     $.ajax({
         url: "/fetchConsultations",
         type: "get",
         success: function (data) {
             if (latestActiveCategory !== 'fetchConsultations') return;
+            let list = Array.isArray(data) ? data : (data.data || []);
             activeTableContentType = "Consultations";
             $('#datatablesSimple thead').html(`
                 <tr>
@@ -580,7 +607,11 @@ function fetchConsultations() {
                 </tr>
             `);
             $('div.card-header span.fw-semibold').text('Clinical Staff -> Doctor Reviews & Patient Consultations');
-            setupAdminTableData('Consultations', data, renderConsultationRow);
+            setupAdminTableData('Consultations', list, renderConsultationRow);
+        },
+        error: function() {
+            if (latestActiveCategory !== 'fetchConsultations') return;
+            $('#datatablesSimple tbody').html('<tr><td colspan="8" class="text-center py-4 text-danger"><i class="fa-solid fa-triangle-exclamation me-2"></i>Failed to load clinical reviews. <button class="btn btn-sm btn-outline-primary ms-2" onclick="fetchConsultations()">Retry</button></td></tr>');
         }
     });
 }
@@ -1456,7 +1487,6 @@ $(document).on('submit', 'form[name="imageUpload"]', function (e) {
             });
         }
     });
-});
 });
 
 // Auto-close sidebar on mobile when navigating or tapping backdrop

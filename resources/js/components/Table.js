@@ -14,6 +14,19 @@ export default class Table extends React.Component{
         window.updateTableFilterUI = (filter) => {
             this.setState({ complianceFilter: filter });
         };
+        const cat = this.props.activeCategory || 'fetchUsers';
+        if (typeof window[cat] === 'function') {
+            window[cat]();
+        }
+    }
+
+    componentDidUpdate(prevProps) {
+        if (prevProps.activeCategory !== this.props.activeCategory) {
+            const cat = this.props.activeCategory || 'fetchUsers';
+            if (typeof window[cat] === 'function') {
+                window[cat]();
+            }
+        }
     }
 
     componentWillUnmount() {
