@@ -17,6 +17,16 @@ class IrisAgentController extends Controller
     public function __construct()
     {
         $this->apiKey = env('GEMINI_API_KEY');
+        if (empty($this->apiKey) && file_exists(base_path('.env'))) {
+            $lines = file(base_path('.env'), FILE_IGNORE_NEW_LINES | FILE_SKIP_EMPTY_LINES);
+            foreach ($lines as $line) {
+                $trimmed = trim($line);
+                if (strpos($trimmed, 'GEMINI_API_KEY=') === 0) {
+                    $this->apiKey = trim(substr($trimmed, strlen('GEMINI_API_KEY=')));
+                    break;
+                }
+            }
+        }
         $this->model = env('GEMINI_MODEL', 'gemini-3.5-flash-lite');
         $this->endpoint = "https://generativelanguage.googleapis.com/v1beta/models/{$this->model}:generateContent?key={$this->apiKey}";
     }

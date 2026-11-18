@@ -41,40 +41,57 @@ export default function IrisCopilotDrawer({ currentPatientId = null, role = 'doc
         setLoading(true);
 
         try {
-            const res = await fetch('/iris/chat', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                    'Accept': 'application/json'
-                },
-                body: JSON.stringify({
-                    message: query,
-                    role: activeRole,
-                    patient_id: currentPatientId || 4,
-                    history: messages.slice(-6).map(m => ({
-                        role: m.role === 'model' ? 'model' : 'user',
-                        text: m.text
-                    }))
-                })
-            });
+            const csrfToken = document.querySelector('meta[name="csrf-token"]')?.getAttribute('content') || '';
+            const endpoints = ['/iris/chat', '/api/iris/chat'];
+            let res = null;
+            let data = null;
 
-            const data = await res.json();
-            if (data.success) {
+            for (const ep of endpoints) {
+                try {
+                    res = await fetch(ep, {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                            'Accept': 'application/json',
+                            'X-CSRF-TOKEN': csrfToken,
+                            'X-Requested-With': 'XMLHttpRequest'
+                        },
+                        body: JSON.stringify({
+                            message: query,
+                            role: activeRole,
+                            patient_id: currentPatientId || 4,
+                            history: messages.slice(-6).map(m => ({
+                                role: m.role === 'model' ? 'model' : 'user',
+                                text: m.text
+                            }))
+                        })
+                    });
+                    if (res.ok) {
+                        data = await res.json();
+                        break;
+                    }
+                } catch (e) {
+                    console.warn(`Failed calling ${ep}:`, e);
+                }
+            }
+
+            if (data && data.success) {
                 setMessages([...newMessages, {
                     role: 'model',
                     text: data.reply,
                     tools: data.tools_executed || []
                 }]);
             } else {
+                const errDetail = (data && (data.error || data.message)) || (res ? `HTTP ${res.status}: ${res.statusText}` : 'Unable to connect to Iris intelligence.');
                 setMessages([...newMessages, {
                     role: 'model',
-                    text: `⚠️ **Error:** ${data.error || 'Unable to connect to Iris intelligence.'}`
+                    text: `⚠️ **Error:** ${errDetail}`
                 }]);
             }
         } catch (err) {
             setMessages([...newMessages, {
                 role: 'model',
-                text: `⚠️ **Connection Error:** Could not contact clinical service. Please verify your connection.`
+                text: `⚠️ **Connection Error:** Could not contact clinical service (${err.message}). Please verify your connection.`
             }]);
         } finally {
             setLoading(false);

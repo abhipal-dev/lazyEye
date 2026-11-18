@@ -21,6 +21,10 @@ class VerifyCsrfToken extends Middleware
         '/Update',
         '/createUser',
         '/Delete',
-        '/Approve'
+        '/Approve',
+        '/iris/chat',
+        '/iris/*',
+        'iris/*',
+        'api/iris/*'
     ];
 }
