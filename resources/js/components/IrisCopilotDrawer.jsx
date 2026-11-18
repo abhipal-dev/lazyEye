@@ -16,8 +16,8 @@ export default function IrisCopilotDrawer({ currentPatientId = null, role = 'doc
 
     const quickPrompts = [
         { label: '📊 Cohort Compliance Radar', prompt: 'Summarize cohort compliance radar and tell me how many patients are at risk.' },
-        { label: '📝 Draft SOAP Note', prompt: `Generate a formal SOAP clinical note for patient #${currentPatientId || 4}.` },
-        { label: '🎯 Contrast Adjustment', prompt: `Analyze and recommend dichoptic contrast adjustments for patient #${currentPatientId || 4}.` },
+        { label: '📝 Draft SOAP Note', prompt: `Generate a formal SOAP clinical note for patient #${currentPatientId || 22}.` },
+        { label: '🎯 Contrast Adjustment', prompt: `Analyze and recommend dichoptic contrast adjustments for patient #${currentPatientId || 22}.` },
         { label: '⚠️ At-Risk Inactivity Check', prompt: 'Which patients have been inactive for more than 7 days and need intervention?' },
     ];
 
@@ -59,7 +59,7 @@ export default function IrisCopilotDrawer({ currentPatientId = null, role = 'doc
                         body: JSON.stringify({
                             message: query,
                             role: activeRole,
-                            patient_id: currentPatientId || 4,
+                            patient_id: currentPatientId || 22,
                             history: messages.slice(-6).map(m => ({
                                 role: m.role === 'model' ? 'model' : 'user',
                                 text: m.text
