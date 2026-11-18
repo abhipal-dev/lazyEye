@@ -374,7 +374,7 @@ export default class Home extends React.Component {
 
                         <div className="row g-4">
                             {filteredGames.map((game) => (
-                                <div key={game.id} className="col-12 col-md-6 col-lg-4">
+                                <div key={game.id} className="col-12 col-md-6 col-lg-4 col-xl-3">
                                     <div className="modern-card h-100 d-flex flex-column justify-content-between p-4">
                                         <div>
                                             <div className="d-flex align-items-center justify-content-between mb-3">

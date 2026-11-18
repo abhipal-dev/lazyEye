@@ -344,7 +344,7 @@ export default class Games extends React.Component {
                                 : `${playedMinutes} / ${prescribedMinutes}m (${progressPercent}%)`);
 
                         return (
-                            <div key={game.id} className="col-12 col-md-6 col-xl-4">
+                            <div key={game.id} className="col-12 col-sm-6 col-lg-4 col-xl-3">
                                 <div 
                                     className="therapy-game-card h-100"
                                     style={{
