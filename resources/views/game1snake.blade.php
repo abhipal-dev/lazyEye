@@ -543,13 +543,13 @@
     document.getElementById('btnLeft').addEventListener('click', turnLeft);
     document.getElementById('btnRight').addEventListener('click', turnRight);
 
-    // Touch screen detection
+    // Touch screen detection & D-Pad visibility
     const isTouchDevice = ('ontouchstart' in window) || (navigator.maxTouchPoints > 0) || (window.matchMedia && window.matchMedia('(pointer: coarse)').matches);
     const dpad = document.querySelector('.mobile-dpad');
     const keysBtn = document.getElementById('snakeKeysToggleBtn');
 
-    // Only show on-screen keys if touch is NOT available, or if user explicitly toggles keys
-    let showKeys = !isTouchDevice;
+    // Default on-screen controls to ON for touch/mobile devices
+    let showKeys = isTouchDevice;
     function updateKeysVisibility() {
       if (dpad) {
         if (showKeys) {
@@ -563,6 +563,32 @@
       }
     }
     updateKeysVisibility();
+
+    // Direct touch swipe gestures on the canvas
+    let touchStartX = 0;
+    let touchStartY = 0;
+    canvas.addEventListener('touchstart', function(e) {
+      if (e.touches && e.touches.length > 0) {
+        touchStartX = e.touches[0].clientX;
+        touchStartY = e.touches[0].clientY;
+      }
+    }, { passive: true });
+
+    canvas.addEventListener('touchend', function(e) {
+      if (e.changedTouches && e.changedTouches.length > 0) {
+        let dx = e.changedTouches[0].clientX - touchStartX;
+        let dy = e.changedTouches[0].clientY - touchStartY;
+        if (Math.abs(dx) > 25 || Math.abs(dy) > 25) {
+          if (Math.abs(dx) > Math.abs(dy)) {
+            if (dx > 0) turnRight();
+            else turnLeft();
+          } else {
+            if (dy > 0) turnDown();
+            else turnUp();
+          }
+        }
+      }
+    }, { passive: true });
 
     if (keysBtn) {
       keysBtn.addEventListener('click', () => {

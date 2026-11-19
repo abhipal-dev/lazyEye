@@ -1,0 +1,17 @@
+{
+  "name": "LazyEye Vision Therapy",
+  "short_name": "LazyEye",
+  "start_url": "/userPanel",
+  "display": "standalone",
+  "background_color": "#0d1117",
+  "theme_color": "#1f6feb",
+  "orientation": "any",
+  "icons": [
+    {
+      "src": "/images/lazyeye-icon.svg",
+      "sizes": "192x192 512x512",
+      "type": "image/svg+xml",
+      "purpose": "any maskable"
+    }
+  ]
+}

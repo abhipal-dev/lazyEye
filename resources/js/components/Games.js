@@ -318,14 +318,23 @@ export default class Games extends React.Component {
                 </div>
 
                 {/* Section Subheading */}
-                <div className="d-flex align-items-center justify-content-between mb-3 mt-4">
+                <div className="d-flex align-items-center justify-content-between mb-3 mt-4 flex-wrap gap-2">
                     <div>
                         <h5 className="fw-bold text-main mb-0">All Prescribed Therapy Games</h5>
                         <p className="text-muted small mb-0">Play anytime in full sessions or multiple short bursts—your daily time is tracked continuously.</p>
                     </div>
-                    <span className="badge bg-primary-subtle text-primary small px-3 py-1 fw-semibold font-mono">
-                        {prescribedMinutes}m Daily Goal
-                    </span>
+                    <div className="d-flex align-items-center gap-2">
+                        <span 
+                            className="badge font-mono px-3 py-1 d-inline-flex align-items-center gap-1 rounded-pill"
+                            style={{ backgroundColor: 'rgba(249, 115, 22, 0.15)', color: '#f97316', border: '1px solid rgba(249, 115, 22, 0.35)', fontSize: '0.78rem' }}
+                            title="Consistent daily sessions logged"
+                        >
+                            <i className="fa-solid fa-fire text-danger"></i> 5-Day Streak
+                        </span>
+                        <span className="badge bg-primary-subtle text-primary small px-3 py-1 fw-semibold font-mono rounded-pill">
+                            {prescribedMinutes}m Daily Goal
+                        </span>
+                    </div>
                 </div>
 
                 {/* Games Grid with Clean Architectural Cards & Real Game Thumbnails */}
@@ -339,6 +348,7 @@ export default class Games extends React.Component {
                         const isGoalMet = playedSeconds >= prescribedSeconds;
                         const progressPercent = Math.min(100, Math.round((playedSeconds / prescribedSeconds) * 100));
                         const displayScore = Number(stats.total_score !== undefined ? stats.total_score : (stats.best_score || 0));
+                        const starsCount = isGoalMet ? 3 : playedMinutes >= Math.max(1, Math.floor(prescribedMinutes / 2)) ? 2 : playedMinutes >= 1 ? 1 : 0;
                         const durationText = isGoalMet 
                             ? `${prescribedMinutes} / ${prescribedMinutes}m (100%)` 
                             : (playedMinutes === 0 && playedSeconds > 0 
@@ -432,7 +442,23 @@ export default class Games extends React.Component {
 
                                     {/* Card Body Details */}
                                     <div className="p-3 d-flex flex-column flex-grow-1" style={{ color: 'var(--text-main)' }}>
-                                        <h5 className="fw-bold mb-1 text-main">{game.name}</h5>
+                                        <div className="d-flex align-items-center justify-content-between mb-1">
+                                            <h5 className="fw-bold mb-0 text-main" style={{ fontSize: '1rem' }}>{game.name}</h5>
+                                            <div className="d-flex align-items-center gap-1 font-mono" title={`${starsCount}/3 Stars Earned Today`}>
+                                                {[1, 2, 3].map(s => (
+                                                    <i 
+                                                        key={s} 
+                                                        className="fa-solid fa-star" 
+                                                        style={{ 
+                                                            fontSize: '0.72rem', 
+                                                            color: s <= starsCount ? '#f59e0b' : 'rgba(255, 255, 255, 0.15)',
+                                                            filter: s <= starsCount ? 'drop-shadow(0 0 4px rgba(245, 158, 11, 0.6))' : 'none',
+                                                            transition: 'all 0.2s ease'
+                                                        }}
+                                                    />
+                                                ))}
+                                            </div>
+                                        </div>
                                         <p className="small text-muted mb-3" style={{ lineHeight: 1.45, minHeight: 42 }}>
                                             {game.desc}
                                         </p>

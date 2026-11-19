@@ -10,16 +10,132 @@ export default class GameSessionHUD extends React.Component {
     constructor(props) {
         super(props);
 
+        const isTouch = typeof window !== 'undefined' && (
+            'ontouchstart' in window || 
+            (navigator && navigator.maxTouchPoints > 0) || 
+            (window.matchMedia && window.matchMedia('(pointer: coarse)').matches)
+        );
+
         this.state = {
             elapsedSeconds: 0,
             currentScore: 0,
             isRotated: false,
-            showPauseModal: false
+            showPauseModal: false,
+            showTouchControls: isTouch,
+            leftContrast: 65,
+            rightContrast: 85,
+            soundHapticsEnabled: true
         };
 
         this.timer = null;
+        this.touchStartX = null;
+        this.touchStartY = null;
         this.containerRef = React.createRef();
+        this.audioCtx = null;
     }
+
+    triggerVirtualKey = (keyCode, key) => {
+        if (this.state.soundHapticsEnabled) {
+            if (typeof navigator !== 'undefined' && navigator.vibrate) {
+                navigator.vibrate(25);
+            }
+            this.playVirtualKeySound();
+        }
+
+        const iframe = document.getElementById('session-game-iframe');
+        if (iframe && iframe.contentWindow) {
+            try {
+                const doc = iframe.contentDocument || iframe.contentWindow.document;
+                const evDown = new KeyboardEvent('keydown', {
+                    key: key,
+                    code: key,
+                    which: keyCode,
+                    keyCode: keyCode,
+                    bubbles: true,
+                    cancelable: true
+                });
+                doc.dispatchEvent(evDown);
+                iframe.contentWindow.dispatchEvent(evDown);
+
+                setTimeout(() => {
+                    const evUp = new KeyboardEvent('keyup', {
+                        key: key,
+                        code: key,
+                        which: keyCode,
+                        keyCode: keyCode,
+                        bubbles: true,
+                        cancelable: true
+                    });
+                    doc.dispatchEvent(evUp);
+                    iframe.contentWindow.dispatchEvent(evUp);
+                }, 60);
+            } catch (e) {}
+
+            try {
+                iframe.contentWindow.postMessage({ type: 'KEYDOWN', key: key, keyCode: keyCode }, '*');
+            } catch (e) {}
+        }
+    };
+
+    playVirtualKeySound = () => {
+        try {
+            const AudioContext = window.AudioContext || window.webkitAudioContext;
+            if (!AudioContext) return;
+            if (!this.audioCtx) this.audioCtx = new AudioContext();
+            if (this.audioCtx.state === 'suspended') this.audioCtx.resume();
+            const osc = this.audioCtx.createOscillator();
+            const gain = this.audioCtx.createGain();
+            osc.type = 'sine';
+            osc.frequency.setValueAtTime(520, this.audioCtx.currentTime);
+            osc.frequency.exponentialRampToValueAtTime(880, this.audioCtx.currentTime + 0.04);
+            gain.gain.setValueAtTime(0.08, this.audioCtx.currentTime);
+            gain.gain.exponentialRampToValueAtTime(0.001, this.audioCtx.currentTime + 0.05);
+            osc.connect(gain);
+            gain.connect(this.audioCtx.destination);
+            osc.start();
+            osc.stop(this.audioCtx.currentTime + 0.05);
+        } catch (e) {}
+    };
+
+    handleTouchStart = (e) => {
+        if (e.touches && e.touches.length > 0) {
+            this.touchStartX = e.touches[0].clientX;
+            this.touchStartY = e.touches[0].clientY;
+        }
+    };
+
+    handleTouchEnd = (e) => {
+        if (e.changedTouches && e.changedTouches.length > 0 && this.touchStartX !== null) {
+            const dx = e.changedTouches[0].clientX - this.touchStartX;
+            const dy = e.changedTouches[0].clientY - this.touchStartY;
+            if (Math.abs(dx) > 28 || Math.abs(dy) > 28) {
+                if (Math.abs(dx) > Math.abs(dy)) {
+                    if (dx > 0) this.triggerVirtualKey(39, 'ArrowRight');
+                    else this.triggerVirtualKey(37, 'ArrowLeft');
+                } else {
+                    if (dy > 0) this.triggerVirtualKey(40, 'ArrowDown');
+                    else this.triggerVirtualKey(38, 'ArrowUp');
+                }
+            }
+            this.touchStartX = null;
+            this.touchStartY = null;
+        }
+    };
+
+    adjustContrast = (eye, delta) => {
+        this.setState(prev => {
+            let left = prev.leftContrast;
+            let right = prev.rightContrast;
+            if (eye === 'left') {
+                left = Math.max(10, Math.min(100, left + delta));
+            } else {
+                right = Math.max(10, Math.min(100, right + delta));
+            }
+            return { leftContrast: left, rightContrast: right };
+        }, () => {
+            this.postCalibrationToIframe();
+        });
+    };
 
     componentDidMount() {
         this.startTimer();
@@ -321,35 +437,63 @@ export default class GameSessionHUD extends React.Component {
                         <span>{this.formatTime(elapsedSeconds)}</span>
                     </div>
 
-                    {/* Right: Single-Line Stop Game Button (Never wraps) */}
-                    <button 
-                        type="button" 
-                        onClick={this.togglePauseModal}
-                        style={{
-                            backgroundColor: '#dc2626',
-                            color: '#ffffff',
-                            border: 'none',
-                            borderRadius: '6px',
-                            padding: '6px 14px',
-                            fontSize: '0.85rem',
-                            fontWeight: 700,
-                            cursor: 'pointer',
-                            display: 'flex',
-                            alignItems: 'center',
-                            gap: '6px',
-                            whiteSpace: 'nowrap',
-                            boxShadow: '0 2px 6px rgba(220, 38, 38, 0.4)',
-                            transition: 'background-color 0.15s ease'
-                        }}
-                        title="Pause Game & View Options"
-                    >
-                        <i className="fa-solid fa-pause"></i>
-                        <span>Stop Game</span>
-                    </button>
+                    {/* Right: Touch Controls Toggle & Stop Game Button */}
+                    <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                        <button 
+                            type="button" 
+                            onClick={() => this.setState(prev => ({ showTouchControls: !prev.showTouchControls }))}
+                            style={{
+                                backgroundColor: this.state.showTouchControls ? 'rgba(37, 99, 235, 0.35)' : '#1e293b',
+                                color: this.state.showTouchControls ? '#60a5fa' : '#94a3b8',
+                                border: this.state.showTouchControls ? '1px solid #3b82f6' : '1px solid #334155',
+                                borderRadius: '6px',
+                                padding: '6px 10px',
+                                fontSize: '0.78rem',
+                                fontWeight: 700,
+                                cursor: 'pointer',
+                                display: 'flex',
+                                alignItems: 'center',
+                                gap: '5px',
+                                whiteSpace: 'nowrap',
+                                transition: 'all 0.15s ease'
+                            }}
+                            title="Toggle On-Screen Touch Gamepad"
+                        >
+                            <i className="fa-solid fa-gamepad"></i>
+                            <span className="d-none d-sm-inline">{this.state.showTouchControls ? 'Pad: ON' : 'Pad'}</span>
+                        </button>
+
+                        <button 
+                            type="button" 
+                            onClick={this.togglePauseModal}
+                            style={{
+                                backgroundColor: '#dc2626',
+                                color: '#ffffff',
+                                border: 'none',
+                                borderRadius: '6px',
+                                padding: '6px 14px',
+                                fontSize: '0.85rem',
+                                fontWeight: 700,
+                                cursor: 'pointer',
+                                display: 'flex',
+                                alignItems: 'center',
+                                gap: '6px',
+                                whiteSpace: 'nowrap',
+                                boxShadow: '0 2px 6px rgba(220, 38, 38, 0.4)',
+                                transition: 'background-color 0.15s ease'
+                            }}
+                            title="Pause Game & View Options"
+                        >
+                            <i className="fa-solid fa-pause"></i>
+                            <span>Stop Game</span>
+                        </button>
+                    </div>
                 </header>
 
-                {/* Game Canvas Container with Instant Rotation Support */}
+                {/* Game Canvas Container with Gesture Swipe & Touch Support */}
                 <div 
+                    onTouchStart={this.handleTouchStart}
+                    onTouchEnd={this.handleTouchEnd}
                     style={{
                         flex: 1,
                         width: '100%',
@@ -384,9 +528,115 @@ export default class GameSessionHUD extends React.Component {
                             display: 'block'
                         }}
                     />
+
+                    {/* On-Screen Virtual Touch Controller Overlay for Mobile Devices */}
+                    {this.state.showTouchControls && (
+                        <div 
+                            className="session-virtual-controls"
+                            style={{
+                                position: 'absolute',
+                                bottom: '20px',
+                                left: '16px',
+                                right: '16px',
+                                display: 'flex',
+                                justifyContent: 'space-between',
+                                alignItems: 'flex-end',
+                                pointerEvents: 'none',
+                                zIndex: 99999
+                            }}
+                        >
+                            {/* Directional D-Pad (Left Corner) */}
+                            <div 
+                                style={{
+                                    display: 'grid',
+                                    gridTemplateColumns: 'repeat(3, 46px)',
+                                    gridTemplateRows: 'repeat(3, 46px)',
+                                    gap: '6px',
+                                    pointerEvents: 'auto',
+                                    userSelect: 'none',
+                                    touchAction: 'none'
+                                }}
+                            >
+                                <div />
+                                <button 
+                                    type="button" 
+                                    onPointerDown={(e) => { e.preventDefault(); this.triggerVirtualKey(38, 'ArrowUp'); }} 
+                                    style={virtualBtnStyle}
+                                    aria-label="Up"
+                                >
+                                    <i className="fa-solid fa-chevron-up"></i>
+                                </button>
+                                <div />
+
+                                <button 
+                                    type="button" 
+                                    onPointerDown={(e) => { e.preventDefault(); this.triggerVirtualKey(37, 'ArrowLeft'); }} 
+                                    style={virtualBtnStyle}
+                                    aria-label="Left"
+                                >
+                                    <i className="fa-solid fa-chevron-left"></i>
+                                </button>
+                                <div style={{ backgroundColor: 'rgba(255, 255, 255, 0.06)', borderRadius: '10px' }} />
+                                <button 
+                                    type="button" 
+                                    onPointerDown={(e) => { e.preventDefault(); this.triggerVirtualKey(39, 'ArrowRight'); }} 
+                                    style={virtualBtnStyle}
+                                    aria-label="Right"
+                                >
+                                    <i className="fa-solid fa-chevron-right"></i>
+                                </button>
+
+                                <div />
+                                <button 
+                                    type="button" 
+                                    onPointerDown={(e) => { e.preventDefault(); this.triggerVirtualKey(40, 'ArrowDown'); }} 
+                                    style={virtualBtnStyle}
+                                    aria-label="Down"
+                                >
+                                    <i className="fa-solid fa-chevron-down"></i>
+                                </button>
+                                <div />
+                            </div>
+
+                            {/* Action Button (Right Corner) */}
+                            <div 
+                                style={{
+                                    pointerEvents: 'auto',
+                                    userSelect: 'none',
+                                    touchAction: 'none'
+                                }}
+                            >
+                                <button 
+                                    type="button" 
+                                    onPointerDown={(e) => { e.preventDefault(); this.triggerVirtualKey(32, 'Space'); }} 
+                                    style={{
+                                        width: '64px',
+                                        height: '64px',
+                                        borderRadius: '50%',
+                                        backgroundColor: 'rgba(37, 99, 235, 0.65)',
+                                        border: '2px solid rgba(147, 197, 253, 0.7)',
+                                        color: '#ffffff',
+                                        display: 'flex',
+                                        flexDirection: 'column',
+                                        alignItems: 'center',
+                                        justifyContent: 'center',
+                                        boxShadow: '0 6px 16px rgba(37, 99, 235, 0.45)',
+                                        backdropFilter: 'blur(8px)',
+                                        WebkitBackdropFilter: 'blur(8px)',
+                                        cursor: 'pointer',
+                                        touchAction: 'none'
+                                    }}
+                                    aria-label="Action"
+                                >
+                                    <i className="fa-solid fa-circle-dot" style={{ fontSize: '1.1rem' }}></i>
+                                    <span style={{ fontSize: '0.65rem', fontWeight: 800, marginTop: '2px' }}>ACTION</span>
+                                </button>
+                            </div>
+                        </div>
+                    )}
                 </div>
 
-                {/* Elegant Mid-Screen Pause & Options Modal */}
+                {/* Mid-Screen Pause & Clinical Tuning Modal */}
                 {this.state.showPauseModal && (
                     <div 
                         style={{
@@ -395,7 +645,7 @@ export default class GameSessionHUD extends React.Component {
                             left: 0,
                             width: '100vw',
                             height: '100vh',
-                            backgroundColor: 'rgba(0, 0, 0, 0.78)',
+                            backgroundColor: 'rgba(0, 0, 0, 0.82)',
                             backdropFilter: 'blur(8px)',
                             WebkitBackdropFilter: 'blur(8px)',
                             zIndex: 9999999,
@@ -408,21 +658,21 @@ export default class GameSessionHUD extends React.Component {
                         <div 
                             style={{
                                 width: '100%',
-                                maxWidth: '340px',
+                                maxWidth: '360px',
                                 backgroundColor: '#0f172a',
                                 border: '1px solid rgba(255, 255, 255, 0.15)',
                                 borderRadius: '16px',
-                                padding: '24px',
+                                padding: '22px',
                                 boxShadow: '0 25px 50px -12px rgba(0, 0, 0, 0.9)',
                                 color: '#ffffff',
                                 display: 'flex',
                                 flexDirection: 'column',
-                                gap: '14px',
+                                gap: '12px',
                                 textAlign: 'center'
                             }}
                         >
                             <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '8px', color: '#38bdf8' }}>
-                                <i className="fa-solid fa-circle-pause" style={{ fontSize: '1.4rem' }}></i>
+                                <i className="fa-solid fa-circle-pause" style={{ fontSize: '1.3rem' }}></i>
                                 <h3 style={{ margin: 0, fontSize: '1.15rem', fontWeight: 800, letterSpacing: '0.5px' }}>GAME PAUSED</h3>
                             </div>
 
@@ -438,6 +688,72 @@ export default class GameSessionHUD extends React.Component {
                             }}>
                                 <div>Time: <b style={{ color: '#f59e0b' }}>{this.formatTime(elapsedSeconds)}</b></div>
                                 <div>Score: <b style={{ color: '#38bdf8' }}>{currentScore}</b></div>
+                            </div>
+
+                            {/* In-Game Live Contrast Adjuster */}
+                            <div style={{
+                                backgroundColor: '#1e293b',
+                                border: '1px solid #334155',
+                                borderRadius: '10px',
+                                padding: '12px',
+                                textAlign: 'left'
+                            }}>
+                                <div style={{ fontSize: '0.74rem', color: '#94a3b8', textTransform: 'uppercase', fontWeight: 700, letterSpacing: '0.5px', marginBottom: '8px', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                                    <span>Live Dichoptic Contrast</span>
+                                    <span style={{ color: '#10b981', fontSize: '0.7rem' }}>Real-time</span>
+                                </div>
+
+                                {/* Red Lens */}
+                                <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '6px' }}>
+                                    <span style={{ fontSize: '0.8rem', color: '#ef4444', fontWeight: 600 }}>
+                                        <i className="fa-solid fa-eye me-1"></i> Left (Red):
+                                    </span>
+                                    <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
+                                        <button 
+                                            type="button" 
+                                            onClick={() => this.adjustContrast('left', -5)}
+                                            style={miniAdjBtnStyle}
+                                        >
+                                            -
+                                        </button>
+                                        <span style={{ minWidth: '36px', textAlign: 'center', fontFamily: 'monospace', fontWeight: 700, fontSize: '0.85rem' }}>
+                                            {this.state.leftContrast}%
+                                        </span>
+                                        <button 
+                                            type="button" 
+                                            onClick={() => this.adjustContrast('left', 5)}
+                                            style={miniAdjBtnStyle}
+                                        >
+                                            +
+                                        </button>
+                                    </div>
+                                </div>
+
+                                {/* Cyan Lens */}
+                                <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+                                    <span style={{ fontSize: '0.8rem', color: '#06b6d4', fontWeight: 600 }}>
+                                        <i className="fa-solid fa-eye me-1"></i> Right (Cyan):
+                                    </span>
+                                    <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
+                                        <button 
+                                            type="button" 
+                                            onClick={() => this.adjustContrast('right', -5)}
+                                            style={miniAdjBtnStyle}
+                                        >
+                                            -
+                                        </button>
+                                        <span style={{ minWidth: '36px', textAlign: 'center', fontFamily: 'monospace', fontWeight: 700, fontSize: '0.85rem' }}>
+                                            {this.state.rightContrast}%
+                                        </span>
+                                        <button 
+                                            type="button" 
+                                            onClick={() => this.adjustContrast('right', 5)}
+                                            style={miniAdjBtnStyle}
+                                        >
+                                            +
+                                        </button>
+                                    </div>
+                                </div>
                             </div>
 
                             {/* Option 1: Resume Game */}
@@ -473,8 +789,8 @@ export default class GameSessionHUD extends React.Component {
                                     color: '#38bdf8',
                                     border: '1px solid #334155',
                                     borderRadius: '8px',
-                                    padding: '11px 16px',
-                                    fontSize: '0.85rem',
+                                    padding: '10px 16px',
+                                    fontSize: '0.82rem',
                                     fontWeight: 600,
                                     cursor: 'pointer',
                                     display: 'flex',
@@ -517,3 +833,36 @@ export default class GameSessionHUD extends React.Component {
         );
     }
 }
+
+const virtualBtnStyle = {
+    width: '46px',
+    height: '46px',
+    borderRadius: '12px',
+    backgroundColor: 'rgba(15, 23, 42, 0.72)',
+    border: '1px solid rgba(255, 255, 255, 0.25)',
+    color: '#ffffff',
+    display: 'flex',
+    alignItems: 'center',
+    justifyContent: 'center',
+    fontSize: '1rem',
+    backdropFilter: 'blur(8px)',
+    WebkitBackdropFilter: 'blur(8px)',
+    boxShadow: '0 4px 12px rgba(0, 0, 0, 0.5)',
+    cursor: 'pointer',
+    touchAction: 'none'
+};
+
+const miniAdjBtnStyle = {
+    backgroundColor: '#334155',
+    color: '#ffffff',
+    border: 'none',
+    borderRadius: '4px',
+    width: '24px',
+    height: '24px',
+    fontSize: '0.85rem',
+    fontWeight: 700,
+    cursor: 'pointer',
+    display: 'flex',
+    alignItems: 'center',
+    justifyContent: 'center'
+};
