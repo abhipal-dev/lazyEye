@@ -16,6 +16,12 @@ export default class GameSessionHUD extends React.Component {
             (window.matchMedia && window.matchMedia('(pointer: coarse)').matches)
         );
 
+        let initialSoundHaptics = true;
+        try {
+            const saved = localStorage.getItem('lazyeye_sound_haptics');
+            if (saved !== null) initialSoundHaptics = saved !== 'false';
+        } catch (e) {}
+
         this.state = {
             elapsedSeconds: 0,
             currentScore: 0,
@@ -24,7 +30,8 @@ export default class GameSessionHUD extends React.Component {
             showTouchControls: isTouch,
             leftContrast: 65,
             rightContrast: 85,
-            soundHapticsEnabled: true
+            soundHapticsEnabled: initialSoundHaptics,
+            goalMilestoneReached: false
         };
 
         this.timer = null;
@@ -33,6 +40,16 @@ export default class GameSessionHUD extends React.Component {
         this.containerRef = React.createRef();
         this.audioCtx = null;
     }
+
+    toggleSoundHaptics = () => {
+        this.setState(prev => {
+            const nextVal = !prev.soundHapticsEnabled;
+            try {
+                localStorage.setItem('lazyeye_sound_haptics', String(nextVal));
+            } catch (e) {}
+            return { soundHapticsEnabled: nextVal };
+        });
+    };
 
     triggerVirtualKey = (keyCode, key) => {
         if (this.state.soundHapticsEnabled) {
@@ -229,9 +246,24 @@ export default class GameSessionHUD extends React.Component {
     startTimer = () => {
         this.stopTimer();
         this.timer = setInterval(() => {
-            this.setState(prev => ({
-                elapsedSeconds: prev.elapsedSeconds + 1
-            }));
+            this.setState(prev => {
+                const nextElapsed = prev.elapsedSeconds + 1;
+                const prescribedSecs = (Number(this.props.prescribedMinutes) || 20) * 60;
+                const totalPlayedSecs = (Number(this.props.alreadyPlayedSecondsToday) || 0) + nextElapsed;
+                const reachedGoalNow = !prev.goalMilestoneReached && totalPlayedSecs >= prescribedSecs;
+
+                if (reachedGoalNow && prev.soundHapticsEnabled) {
+                    if (typeof navigator !== 'undefined' && navigator.vibrate) {
+                        navigator.vibrate([40, 60, 80]);
+                    }
+                    this.playVirtualKeySound();
+                }
+
+                return {
+                    elapsedSeconds: nextElapsed,
+                    goalMilestoneReached: prev.goalMilestoneReached || reachedGoalNow
+                };
+            });
         }, 1000);
     };
 
@@ -424,21 +456,49 @@ export default class GameSessionHUD extends React.Component {
                         display: 'flex',
                         alignItems: 'center',
                         gap: '6px',
-                        backgroundColor: '#1e293b',
-                        border: '1px solid #334155',
+                        backgroundColor: this.state.goalMilestoneReached ? 'rgba(245, 158, 11, 0.15)' : '#1e293b',
+                        border: this.state.goalMilestoneReached ? '1px solid rgba(245, 158, 11, 0.5)' : '1px solid #334155',
                         borderRadius: '20px',
                         padding: '3px 12px',
-                        color: '#38bdf8',
+                        color: this.state.goalMilestoneReached ? '#fbbf24' : '#38bdf8',
                         fontFamily: 'ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace',
                         fontWeight: 600,
-                        fontSize: '0.85rem'
+                        fontSize: '0.85rem',
+                        transition: 'all 0.3s ease'
                     }}>
-                        <i className="fa-regular fa-clock" style={{ fontSize: '0.8rem', color: '#f59e0b' }}></i>
+                        <i className={`fa-regular ${this.state.goalMilestoneReached ? 'fa-circle-check' : 'fa-clock'}`} style={{ fontSize: '0.8rem', color: this.state.goalMilestoneReached ? '#fbbf24' : '#f59e0b' }}></i>
                         <span>{this.formatTime(elapsedSeconds)}</span>
+                        {this.state.goalMilestoneReached && (
+                            <span className="badge bg-warning text-dark p-0 px-1 rounded" style={{ fontSize: '0.62rem', fontWeight: 800 }}>GOAL</span>
+                        )}
                     </div>
 
-                    {/* Right: Touch Controls Toggle & Stop Game Button */}
+                    {/* Right: Sound, Touch Controls & Stop Game Button */}
                     <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                        <button 
+                            type="button" 
+                            onClick={this.toggleSoundHaptics}
+                            style={{
+                                backgroundColor: this.state.soundHapticsEnabled ? 'rgba(16, 185, 129, 0.25)' : '#1e293b',
+                                color: this.state.soundHapticsEnabled ? '#34d399' : '#94a3b8',
+                                border: this.state.soundHapticsEnabled ? '1px solid #10b981' : '1px solid #334155',
+                                borderRadius: '6px',
+                                padding: '6px 10px',
+                                fontSize: '0.78rem',
+                                fontWeight: 700,
+                                cursor: 'pointer',
+                                display: 'flex',
+                                alignItems: 'center',
+                                gap: '5px',
+                                whiteSpace: 'nowrap',
+                                transition: 'all 0.15s ease'
+                            }}
+                            title={this.state.soundHapticsEnabled ? "Sound & Haptics: ON" : "Sound & Haptics: Muted"}
+                        >
+                            <i className={`fa-solid ${this.state.soundHapticsEnabled ? 'fa-volume-high' : 'fa-volume-xmark'}`}></i>
+                            <span className="d-none d-md-inline">{this.state.soundHapticsEnabled ? 'SFX: ON' : 'SFX: OFF'}</span>
+                        </button>
+
                         <button 
                             type="button" 
                             onClick={() => this.setState(prev => ({ showTouchControls: !prev.showTouchControls }))}

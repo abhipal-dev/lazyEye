@@ -44,6 +44,10 @@ export default class UserDashboard extends React.Component {
             current_component: 'user',
             date_format: "DD/MM/YYYY",
             activeSession: null,
+            isOffline: typeof navigator !== 'undefined' ? !navigator.onLine : false,
+            showOnlineRestored: false,
+            showGoalCelebration: false,
+            celebrationData: null,
             calibration: {
                 leftEyeColor: 'red',
                 rightEyeColor: 'cyan',
@@ -54,6 +58,47 @@ export default class UserDashboard extends React.Component {
             }
         }
     }
+
+    handleOfflineStatus = () => {
+        this.setState({ isOffline: true });
+    };
+
+    handleOnlineStatus = () => {
+        this.setState({ isOffline: false, showOnlineRestored: true });
+        this.fetchUserData();
+        setTimeout(() => {
+            this.setState({ showOnlineRestored: false });
+        }, 4000);
+    };
+
+    playGoalCelebrationFanfare = () => {
+        try {
+            const AudioCtx = window.AudioContext || window.webkitAudioContext;
+            if (!AudioCtx) return;
+            const ctx = new AudioCtx();
+            if (ctx.state === 'suspended') ctx.resume();
+            const notes = [
+                { f: 523.25, d: 0.14 }, // C5
+                { f: 659.25, d: 0.14 }, // E5
+                { f: 783.99, d: 0.16 }, // G5
+                { f: 1046.50, d: 0.42 } // C6
+            ];
+            let now = ctx.currentTime + 0.05;
+            notes.forEach(n => {
+                const osc = ctx.createOscillator();
+                const gain = ctx.createGain();
+                osc.type = 'triangle';
+                osc.frequency.setValueAtTime(n.f, now);
+                gain.gain.setValueAtTime(0.18, now);
+                gain.gain.exponentialRampToValueAtTime(0.001, now + n.d);
+                osc.connect(gain);
+                gain.connect(ctx.destination);
+                osc.start(now);
+                osc.stop(now + n.d);
+                now += n.d * 0.85;
+            });
+        } catch (e) {}
+    };
     
     handleStartSession = (game) => {
         this.setState({ activeSession: game });
@@ -147,6 +192,12 @@ export default class UserDashboard extends React.Component {
         });
 
         let token = $('meta[name="csrf-token"]').attr('content');
+        const prevCompleted = this.getTodayCompletedSeconds();
+        const sessionSeconds = Number(result.durationSeconds) || 0;
+        const newCompleted = prevCompleted + sessionSeconds;
+        const targetSeconds = (parseInt(this.state.data?.user_playing_time, 10) || 20) * 60;
+        const crossedGoal = (prevCompleted < targetSeconds && newCompleted >= targetSeconds);
+
         $.ajax({
             url: "/SaveGameRecords",
             type: "post",
@@ -162,7 +213,19 @@ export default class UserDashboard extends React.Component {
             success: (data) => {
                 this.fetchUserData();
 
-                if (typeof Swal !== 'undefined') {
+                if (crossedGoal) {
+                    this.playGoalCelebrationFanfare();
+                    this.setState({
+                        showGoalCelebration: true,
+                        celebrationData: {
+                            gameName: gameName,
+                            sessionScore: result.score || 0,
+                            sessionDuration: result.elapsedFormatted || '00:01',
+                            targetMinutes: Math.round(targetSeconds / 60),
+                            totalCompletedMinutes: Math.round(newCompleted / 60)
+                        }
+                    });
+                } else if (typeof Swal !== 'undefined') {
                     Swal.fire({
                         title: 'Therapy Session Logged!',
                         html: `You completed <strong>${result.elapsedFormatted || '00:01'}</strong> in <strong>${gameName}</strong>.<br><br><span class="badge bg-primary fs-6" style="padding: 6px 16px; border-radius: 9999px; background: rgba(16, 185, 129, 0.2); color: #10b981; font-weight: 700;">+${result.score || 0} pts</span>`,
@@ -177,7 +240,19 @@ export default class UserDashboard extends React.Component {
             },
             error: () => {
                 this.fetchUserData();
-                if (typeof Swal !== 'undefined') {
+                if (crossedGoal) {
+                    this.playGoalCelebrationFanfare();
+                    this.setState({
+                        showGoalCelebration: true,
+                        celebrationData: {
+                            gameName: gameName,
+                            sessionScore: result.score || 0,
+                            sessionDuration: result.elapsedFormatted || '00:01',
+                            targetMinutes: Math.round(targetSeconds / 60),
+                            totalCompletedMinutes: Math.round(newCompleted / 60)
+                        }
+                    });
+                } else if (typeof Swal !== 'undefined') {
                     Swal.fire({
                         title: 'Session Recorded!',
                         html: `You completed <strong>${result.elapsedFormatted || '00:01'}</strong> in <strong>${gameName}</strong>.<br><br><span class="badge bg-primary fs-6" style="padding: 6px 16px; border-radius: 9999px; background: rgba(16, 185, 129, 0.2); color: #10b981; font-weight: 700;">+${result.score || 0} pts</span>`,
@@ -265,11 +340,15 @@ export default class UserDashboard extends React.Component {
         this.fetchUserData();
         window.addEventListener('lazyeye:game-completed', this.fetchUserData);
         window.addEventListener('lazyeye:profile-updated', this.handleProfileUpdated);
+        window.addEventListener('online', this.handleOnlineStatus);
+        window.addEventListener('offline', this.handleOfflineStatus);
     }
 
     componentWillUnmount() {
         window.removeEventListener('lazyeye:game-completed', this.fetchUserData);
         window.removeEventListener('lazyeye:profile-updated', this.handleProfileUpdated);
+        window.removeEventListener('online', this.handleOnlineStatus);
+        window.removeEventListener('offline', this.handleOfflineStatus);
     }
     pad = (n) => {
         return (n.length < 2) ? "0" + n : n;
@@ -381,6 +460,61 @@ export default class UserDashboard extends React.Component {
 
         return (
             <>
+                {/* Floating Offline Network Detection Alert */}
+                {this.state.isOffline && (
+                    <div 
+                        style={{
+                            position: 'fixed',
+                            top: 0,
+                            left: 0,
+                            right: 0,
+                            zIndex: 10000000,
+                            backgroundColor: '#dc2626',
+                            color: '#ffffff',
+                            padding: '9px 16px',
+                            textAlign: 'center',
+                            fontSize: '0.84rem',
+                            fontWeight: 700,
+                            boxShadow: '0 4px 16px rgba(220, 38, 38, 0.5)',
+                            display: 'flex',
+                            alignItems: 'center',
+                            justifyContent: 'center',
+                            gap: '8px'
+                        }}
+                    >
+                        <i className="fa-solid fa-triangle-exclamation"></i>
+                        <span>Offline Mode: Network disconnected. Therapy exercises are safely buffered locally and will sync when reconnected.</span>
+                    </div>
+                )}
+
+                {/* Connection Restored Auto-Sync Toast */}
+                {this.state.showOnlineRestored && (
+                    <div 
+                        style={{
+                            position: 'fixed',
+                            top: 0,
+                            left: 0,
+                            right: 0,
+                            zIndex: 10000000,
+                            backgroundColor: '#059669',
+                            color: '#ffffff',
+                            padding: '9px 16px',
+                            textAlign: 'center',
+                            fontSize: '0.84rem',
+                            fontWeight: 700,
+                            boxShadow: '0 4px 16px rgba(5, 150, 105, 0.5)',
+                            display: 'flex',
+                            alignItems: 'center',
+                            justifyContent: 'center',
+                            gap: '8px',
+                            animation: 'fadeIn 0.25s ease-out'
+                        }}
+                    >
+                        <i className="fa-solid fa-cloud-arrow-up"></i>
+                        <span>Connection Restored: Back online. Clinical therapy data synchronized successfully!</span>
+                    </div>
+                )}
+
                 <p id="score_history" style={{ 'display': "none" }}>{this.state.data.user_game_records}</p>
                 <span id="time" style={{ display: "none" }}>{this.state.data?.user_playing_time || 20}</span>
 
@@ -923,6 +1057,137 @@ export default class UserDashboard extends React.Component {
                 <UserDetailsModal data={this.state.data} />
 
                 <ImageUploadModal data={this.state.data} />
+
+                {/* Daily Prescription Goal Celebration Modal */}
+                {this.state.showGoalCelebration && this.state.celebrationData && (
+                    <div 
+                        style={{
+                            position: 'fixed',
+                            top: 0,
+                            left: 0,
+                            right: 0,
+                            bottom: 0,
+                            backgroundColor: 'rgba(2, 6, 23, 0.88)',
+                            backdropFilter: 'blur(10px)',
+                            WebkitBackdropFilter: 'blur(10px)',
+                            zIndex: 10000001,
+                            display: 'flex',
+                            alignItems: 'center',
+                            justifyContent: 'center',
+                            padding: '16px'
+                        }}
+                    >
+                        <div 
+                            style={{
+                                width: '100%',
+                                maxWidth: '440px',
+                                backgroundColor: '#0f172a',
+                                border: '1px solid rgba(245, 158, 11, 0.4)',
+                                borderRadius: '24px',
+                                padding: '32px 24px',
+                                boxShadow: '0 25px 60px -12px rgba(245, 158, 11, 0.25), 0 0 40px rgba(245, 158, 11, 0.1)',
+                                color: '#ffffff',
+                                textAlign: 'center',
+                                position: 'relative'
+                            }}
+                        >
+                            {/* Animated 3-Star Trophy Header */}
+                            <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', gap: '10px', marginBottom: '16px' }}>
+                                <i className="fa-solid fa-star" style={{ color: '#fbbf24', fontSize: '1.8rem', filter: 'drop-shadow(0 0 8px rgba(251, 191, 36, 0.8))' }}></i>
+                                <i className="fa-solid fa-trophy" style={{ color: '#f59e0b', fontSize: '2.8rem', filter: 'drop-shadow(0 0 16px rgba(245, 158, 11, 0.9))' }}></i>
+                                <i className="fa-solid fa-star" style={{ color: '#fbbf24', fontSize: '1.8rem', filter: 'drop-shadow(0 0 8px rgba(251, 191, 36, 0.8))' }}></i>
+                            </div>
+
+                            <span style={{
+                                backgroundColor: 'rgba(245, 158, 11, 0.15)',
+                                color: '#fbbf24',
+                                border: '1px solid rgba(245, 158, 11, 0.4)',
+                                borderRadius: '9999px',
+                                padding: '4px 16px',
+                                fontSize: '0.78rem',
+                                fontWeight: 800,
+                                textTransform: 'uppercase',
+                                letterSpacing: '1px'
+                            }}>
+                                Daily Goal Completed
+                            </span>
+
+                            <h3 style={{ marginTop: '16px', marginBottom: '8px', fontWeight: 800, fontSize: '1.45rem', color: '#ffffff' }}>
+                                Spectacular Effort!
+                            </h3>
+
+                            <p style={{ color: '#94a3b8', fontSize: '0.88rem', lineHeight: '1.5', marginBottom: '20px' }}>
+                                You have fulfilled today's prescribed amblyopia therapy target of 
+                                <strong style={{ color: '#38bdf8' }}> {this.state.celebrationData.targetMinutes} minutes</strong>! Your visual cortex received full dichoptic stimulation today.
+                            </p>
+
+                            {/* Summary stats pill box */}
+                            <div style={{
+                                display: 'grid',
+                                gridTemplateColumns: '1fr 1fr',
+                                gap: '12px',
+                                backgroundColor: 'rgba(30, 41, 59, 0.7)',
+                                border: '1px solid #334155',
+                                borderRadius: '16px',
+                                padding: '14px',
+                                marginBottom: '24px'
+                            }}>
+                                <div>
+                                    <div style={{ fontSize: '0.72rem', color: '#94a3b8', textTransform: 'uppercase', fontWeight: 700 }}>Session Score</div>
+                                    <div style={{ fontSize: '1.25rem', fontWeight: 800, color: '#10b981' }}>+{this.state.celebrationData.sessionScore} pts</div>
+                                </div>
+                                <div>
+                                    <div style={{ fontSize: '0.72rem', color: '#94a3b8', textTransform: 'uppercase', fontWeight: 700 }}>Total Played Today</div>
+                                    <div style={{ fontSize: '1.25rem', fontWeight: 800, color: '#f59e0b' }}>{this.state.celebrationData.totalCompletedMinutes}m / {this.state.celebrationData.targetMinutes}m</div>
+                                </div>
+                            </div>
+
+                            {/* Action Buttons */}
+                            <div style={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>
+                                <button
+                                    type="button"
+                                    onClick={() => this.setState({ showGoalCelebration: false })}
+                                    style={{
+                                        width: '100%',
+                                        backgroundColor: '#f59e0b',
+                                        color: '#0f172a',
+                                        border: 'none',
+                                        borderRadius: '12px',
+                                        padding: '12px 20px',
+                                        fontSize: '0.95rem',
+                                        fontWeight: 800,
+                                        cursor: 'pointer',
+                                        display: 'flex',
+                                        alignItems: 'center',
+                                        justifyContent: 'center',
+                                        gap: '8px',
+                                        boxShadow: '0 4px 16px rgba(245, 158, 11, 0.4)'
+                                    }}
+                                >
+                                    <i className="fa-solid fa-circle-check"></i>
+                                    <span>Claim Reward & Continue</span>
+                                </button>
+                                <button
+                                    type="button"
+                                    onClick={() => this.setState({ showGoalCelebration: false, current_component: 'progress' })}
+                                    style={{
+                                        width: '100%',
+                                        backgroundColor: 'transparent',
+                                        color: '#94a3b8',
+                                        border: '1px solid #334155',
+                                        borderRadius: '12px',
+                                        padding: '10px 20px',
+                                        fontSize: '0.85rem',
+                                        fontWeight: 600,
+                                        cursor: 'pointer'
+                                    }}
+                                >
+                                    <i className="fa-solid fa-chart-line me-1"></i> View Clinical Progress Report
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                )}
 
             </>
         )

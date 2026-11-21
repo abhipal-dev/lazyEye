@@ -53,3 +53,24 @@ A clean summary of recent issues resolved, mobile gaming fixes, and user activit
 - **Solution:**
   - Added real-time contrast balance sliders (Left / Red and Right / Cyan) inside the in-game Pause modal (`GameSessionHUD.js`).
   - Sliders update instantly with +/- 5% fine-tuning controls and broadcast to the running game engine.
+
+### 7. Daily Prescription Goal Celebration Modal & Web Audio Fanfare
+- **Issue:** When patients reached their daily prescribed therapy target (e.g. 20 minutes), there was only a subtle toast notification with no celebratory positive reinforcement.
+- **Solution:**
+  - Added real-time goal threshold detection in `UserDashboard.js` (`crossedGoal = prevCompleted < targetSeconds && newCompleted >= targetSeconds`).
+  - Implemented an upbeat 4-note victory arpeggio fanfare (C5 → E5 → G5 → C6) using the Web Audio API.
+  - Designed an interactive goal celebration modal with animated 3-star trophy header, completed minutes breakdown, score summary, and 1-click navigation to clinical progress reports.
+
+### 8. Offline Network Detection & Auto-Sync Status Banners
+- **Issue:** Patients on intermittent mobile data or hospital Wi-Fi had no feedback on network state, leading to fears that therapy time was lost when connection dropped.
+- **Solution:**
+  - Added window listeners for `online` and `offline` events in `UserDashboard.js`.
+  - Added a floating offline warning banner reassuring users that session time is buffered locally and will automatically synchronize.
+  - Added connection restored auto-sync notification toast when reconnecting to Wi-Fi/cellular data.
+
+### 9. Persistent Sound & Haptic Feedback Toggle in HUD Topbar
+- **Issue:** In quiet environments (classrooms, clinical waiting rooms), patients could not quickly mute game sounds or haptic vibrations from the active HUD without muting their entire device.
+- **Solution:**
+  - Added a 1-tap `SFX: ON / OFF` toggle button directly in the in-game HUD topbar of `GameSessionHUD.js`.
+  - Persisted user preference in `localStorage` (`lazyeye_sound_haptics`).
+  - Added an in-game GOAL pill badge on the timer once the daily prescribed minutes milestone is crossed during an active session.
